@@ -31,7 +31,26 @@ const Academics = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="text-4xl font-bold text-gray-800 mb-8">Academic Programs</h1>
+          <section className="py-16 bg-gradient-to-r from-orange-400 to-yellow-500">
+            <div className="container mx-auto px-4 text-center">
+              <h1 className="text-5xl font-comic font-bold text-white">Academics</h1>
+              <p className="text-xl text-white mt-4">Explore our curriculum and academic programs!</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
+                <div className="bg-yellow-200 rounded-lg shadow-lg p-6">
+                  <h2 className="text-2xl font-bold text-orange-500">Curriculum</h2>
+                  <p className="text-gray-600">Our curriculum is designed to foster creativity and critical thinking.</p>
+                </div>
+                <div className="bg-yellow-200 rounded-lg shadow-lg p-6">
+                  <h2 className="text-2xl font-bold text-orange-500">Extracurricular Activities</h2>
+                  <p className="text-gray-600">We offer a variety of activities to enhance learning beyond the classroom.</p>
+                </div>
+                <div className="bg-yellow-200 rounded-lg shadow-lg p-6">
+                  <h2 className="text-2xl font-bold text-orange-500">Support Services</h2>
+                  <p className="text-gray-600">We provide support services to ensure every child thrives academically.</p>
+                </div>
+              </div>
+            </div>
+          </section>
 
           {/* Curriculum Overview */}
           <section className="mb-16">

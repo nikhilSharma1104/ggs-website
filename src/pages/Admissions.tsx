@@ -26,14 +26,33 @@ const Admissions = () => {
 
   return (
     <div className="min-h-screen py-16">
+      <section className="py-16 bg-gradient-to-r from-yellow-400 to-orange-500">
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="text-5xl font-playfair font-bold text-white">Admissions</h1>
+          <p className="text-xl text-white mt-4">Join us in creating a bright future for your child!</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
+            <div className="bg-pink-200 rounded-lg shadow-lg p-6">
+              <h2 className="text-2xl font-bold text-purple-600">Why Choose Us?</h2>
+              <p className="text-lg text-gray-600">We offer a holistic learning experience that nurtures every child's potential.</p>
+            </div>
+            <div className="bg-orange-200 rounded-lg shadow-lg p-6">
+              <h2 className="text-2xl font-bold text-blue-600">How to Apply</h2>
+              <p className="text-lg text-gray-600">Follow our simple application process to enroll your child today!</p>
+            </div>
+            <div className="bg-green-200 rounded-lg shadow-lg p-6">
+              <h2 className="text-2xl font-bold text-red-600">Contact Us</h2>
+              <p className="text-lg text-gray-600">Have questions? Reach out to our admissions team for assistance.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="text-4xl font-bold text-gray-800 mb-8">Admissions</h1>
-
           {/* Process Overview */}
           <section className="mb-16">
             <div className="bg-white p-8 rounded-lg shadow-lg">

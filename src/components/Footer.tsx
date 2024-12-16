@@ -48,7 +48,7 @@ const Footer = () => {
           <h3 className="text-2xl font-comic font-bold text-secondary-300 mb-6">Find Us Here</h3>
           <div className="rounded-xl overflow-hidden h-48">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d YOUR_COORDINATES!2d YOUR_LONGITUDE!3d YOUR_LATITUDE!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zM0PCsDQ5JzUyLjIiTiA3OMKwMjcnMTguOCJF!5e0!3m2!1sen!2sin!4v1234567890"
+              src="https://www.google.com/maps/embed/v1/place?key=AIzaSyDYcwO8ojKK6aIMzA6Tb6-GwYjzHckHJOU&q=Gurukulam+Global+School,Mathura+UP"
               width="100%"
               height="100%"
               style={{ border: 0 }}

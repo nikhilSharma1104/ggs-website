@@ -13,30 +13,26 @@ const About = () => {
     <div className="min-h-screen py-16">
       <div className="container">
         {/* Mission & Vision */}
-        <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="mb-16"
-        >
-          <h1 className="text-4xl font-bold text-gray-800 mb-8">About Gurukulam Global School</h1>
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="bg-white p-6 rounded-lg shadow-lg">
-              <h2 className="text-2xl font-semibold text-blue-600 mb-4">Our Mission</h2>
-              <p className="text-gray-600">
-                To provide holistic education that nurtures intellectual curiosity, creativity, and 
-                character development, preparing students to become responsible global citizens.
-              </p>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow-lg">
-              <h2 className="text-2xl font-semibold text-blue-600 mb-4">Our Vision</h2>
-              <p className="text-gray-600">
-                To be a leading educational institution that empowers students with knowledge, 
-                skills, and values to excel in an ever-evolving global landscape.
-              </p>
+        <section className="py-16 bg-gradient-to-r from-yellow-400 to-orange-500">
+          <div className="container mx-auto px-4 text-center">
+            <h1 className="text-5xl font-playfair font-bold text-white">About Us</h1>
+            <p className="text-xl text-white mt-4">Discover our mission, vision, and values!</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
+              <div className="bg-orange-200 rounded-lg shadow-lg p-6">
+                <h2 className="text-2xl font-bold text-orange-600">Our Mission</h2>
+                <p className="text-orange-600">To provide a nurturing environment that fosters holistic development.</p>
+              </div>
+              <div className="bg-orange-200 rounded-lg shadow-lg p-6">
+                <h2 className="text-2xl font-bold text-orange-600">Our Vision</h2>
+                <p className="text-orange-600">To empower children to become lifelong learners and responsible citizens.</p>
+              </div>
+              <div className="bg-orange-200 rounded-lg shadow-lg p-6">
+                <h2 className="text-2xl font-bold text-orange-600">Our Values</h2>
+                <p className="text-orange-600">Integrity, Respect, and Excellence in all we do.</p>
+              </div>
             </div>
           </div>
-        </motion.section>
+        </section>
 
         {/* Stats Section */}
         <section className="mb-16 bg-blue-600 text-white rounded-lg p-8">
