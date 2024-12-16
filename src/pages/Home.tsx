@@ -214,6 +214,25 @@ const Home = () => {
           </div>
         </div>
       </section>
+      <motion.div 
+        className="fixed bottom-8 left-8 z-50"
+        initial={{ opacity: 0, scale: 0.5 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        <motion.button
+          onClick={() => navigate('/prospectus')}
+          className="bg-gradient-to-r from-primary-500 to-primary-600 text-white px-6 py-3 rounded-full font-comic font-bold flex items-center space-x-2 shadow-lg hover:shadow-xl"
+          whileHover={{ 
+            scale: 1.05,
+            boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
+          }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <span className="text-2xl">📚</span>
+          <span>View Prospectus</span>
+        </motion.button>
+      </motion.div>
       <a href="https://wa.me/1234567890" target="_blank" rel="noopener noreferrer" className="fixed bottom-5 right-5 bg-green-500 text-white p-3 rounded-full shadow-lg hover:bg-green-600 transition duration-300">
         <span className="text-2xl">📞</span> {/* Phone emoji */}
       </a>

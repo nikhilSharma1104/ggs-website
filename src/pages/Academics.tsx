@@ -1,146 +1,230 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-const Academics = () => {
-  const programs = [
-    {
-      level: 'Primary School',
-      grades: 'Grades 1-5',
-      description: 'Foundation years focusing on core subjects and developmental activities.',
-      subjects: ['English', 'Mathematics', 'Science', 'Social Studies', 'Art & Craft'],
-    },
-    {
-      level: 'Middle School',
-      grades: 'Grades 6-8',
-      description: 'Building on fundamentals with introduction to specialized subjects.',
-      subjects: ['Language Arts', 'Advanced Mathematics', 'Life Sciences', 'World History', 'Computer Science'],
-    },
-    {
-      level: 'High School',
-      grades: 'Grades 9-12',
-      description: 'Comprehensive education preparing students for higher studies.',
-      subjects: ['Literature', 'Calculus', 'Physics', 'Chemistry', 'Biology', 'Economics'],
-    },
-  ];
+// Floating animation variants
+const floatingAnimation = {
+  animate: {
+    y: [0, -10, 0],
+    transition: {
+      duration: 2,
+      repeat: Infinity,
+      ease: "easeInOut"
+    }
+  }
+};
 
+const rotatingAnimation = {
+  animate: {
+    rotate: [0, 360],
+    transition: {
+      duration: 20,
+      repeat: Infinity,
+      ease: "linear"
+    }
+  }
+};
+
+const Academics = () => {
   return (
-    <div className="min-h-screen py-16">
-      <div className="container">
+    <div className="min-h-screen bg-gradient-to-b from-primary-50 to-white py-16 relative overflow-hidden">
+      {/* Floating Decorative Elements */}
+      <motion.div
+        className="absolute top-20 left-10 text-6xl opacity-20"
+        variants={floatingAnimation}
+        animate="animate"
+      >
+        📚
+      </motion.div>
+      <motion.div
+        className="absolute top-40 right-20 text-6xl opacity-20"
+        variants={floatingAnimation}
+        animate="animate"
+      >
+        🎨
+      </motion.div>
+      <motion.div
+        className="absolute bottom-40 left-20 text-6xl opacity-20"
+        variants={rotatingAnimation}
+        animate="animate"
+      >
+        ⭐
+      </motion.div>
+      <motion.div
+        className="absolute bottom-60 right-10 text-6xl opacity-20"
+        variants={floatingAnimation}
+        animate="animate"
+      >
+        🌈
+      </motion.div>
+
+      <div className="container mx-auto px-4 relative">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <section className="py-16 bg-gradient-to-r from-orange-400 to-yellow-500">
-            <div className="container mx-auto px-4 text-center">
-              <h1 className="text-5xl font-comic font-bold text-white">Academics</h1>
-              <p className="text-xl text-white mt-4">Explore our curriculum and academic programs!</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
-                <div className="bg-yellow-200 rounded-lg shadow-lg p-6">
-                  <h2 className="text-2xl font-bold text-orange-500">Curriculum</h2>
-                  <p className="text-gray-600">Our curriculum is designed to foster creativity and critical thinking.</p>
-                </div>
-                <div className="bg-yellow-200 rounded-lg shadow-lg p-6">
-                  <h2 className="text-2xl font-bold text-orange-500">Extracurricular Activities</h2>
-                  <p className="text-gray-600">We offer a variety of activities to enhance learning beyond the classroom.</p>
-                </div>
-                <div className="bg-yellow-200 rounded-lg shadow-lg p-6">
-                  <h2 className="text-2xl font-bold text-orange-500">Support Services</h2>
-                  <p className="text-gray-600">We provide support services to ensure every child thrives academically.</p>
-                </div>
-              </div>
-            </div>
-          </section>
+          <motion.h1 
+            className="text-5xl font-comic font-bold text-primary-600 mb-8 text-center relative"
+            whileHover={{ scale: 1.05 }}
+            transition={{ type: "spring", stiffness: 300 }}
+          >
+            Journey to Excellence 
+            <span className="block text-3xl mt-2 text-primary-400">NEP 2020 & NCF 2024</span>
+          </motion.h1>
 
-          {/* Curriculum Overview */}
-          <section className="mb-16">
-            <div className="bg-white p-8 rounded-lg shadow-lg">
-              <h2 className="text-2xl font-semibold text-blue-600 mb-4">Curriculum Overview</h2>
-              <p className="text-gray-600 mb-4">
-                Our curriculum is designed to provide a comprehensive education that balances 
-                academic excellence with personal development. We follow international standards 
-                while incorporating local cultural values.
-              </p>
-              <p className="text-gray-600">
-                Through innovative teaching methods and modern technology, we ensure that our 
-                students receive an education that prepares them for future success.
-              </p>
-            </div>
-          </section>
-
-          {/* Academic Programs */}
-          <section className="mb-16">
-            <h2 className="text-3xl font-semibold text-gray-800 mb-6">Our Programs</h2>
-            <div className="grid md:grid-cols-3 gap-8">
-              {programs.map((program) => (
-                <div key={program.level} className="bg-white p-6 rounded-lg shadow-lg">
-                  <h3 className="text-xl font-semibold text-blue-600 mb-2">{program.level}</h3>
-                  <p className="text-sm text-gray-500 mb-3">{program.grades}</p>
-                  <p className="text-gray-600 mb-4">{program.description}</p>
-                  <h4 className="font-semibold text-gray-700 mb-2">Key Subjects:</h4>
-                  <ul className="list-disc list-inside text-gray-600">
-                    {program.subjects.map((subject) => (
-                      <li key={subject}>{subject}</li>
-                    ))}
-                  </ul>
-                </div>
+          {/* Interactive Learning Path */}
+          <div className="relative mb-16">
+            <div className="absolute inset-0 bg-gradient-to-r from-primary-100 via-primary-200 to-primary-100 transform -skew-y-3"></div>
+            <motion.div 
+              className="relative grid md:grid-cols-4 gap-8 p-8"
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+            >
+              {[
+                { icon: "🎈", title: "Play & Learn", desc: "Ages 3-8" },
+                { icon: "✏️", title: "Discover", desc: "Ages 8-11" },
+                { icon: "🔍", title: "Explore", desc: "Ages 11-14" },
+                { icon: "🎓", title: "Excel", desc: "Ages 14-18" }
+              ].map((item, index) => (
+                <motion.div
+                  key={index}
+                  className="bg-white p-6 rounded-2xl shadow-lg text-center transform hover:-translate-y-2 transition-transform duration-300"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <motion.div 
+                    className="text-5xl mb-4"
+                    animate={{ rotate: [0, 10, 0] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    {item.icon}
+                  </motion.div>
+                  <h3 className="text-xl font-comic font-bold text-primary-600">{item.title}</h3>
+                  <p className="text-primary-400">{item.desc}</p>
+                </motion.div>
               ))}
-            </div>
-          </section>
+            </motion.div>
+          </div>
 
-          {/* Teaching Methodology */}
-          <section className="mb-16">
-            <h2 className="text-3xl font-semibold text-gray-800 mb-6">Teaching Methodology</h2>
-            <div className="grid md:grid-cols-2 gap-8">
+          {/* NEP Features with Interactive Cards */}
+          <motion.div
+            className="mb-16"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8 }}
+          >
+            <h2 className="text-4xl font-comic font-bold text-primary-600 mb-8 text-center">
+              Learning Reimagined 🚀
+            </h2>
+            <div className="grid md:grid-cols-3 gap-8">
               {[
                 {
-                  title: 'Interactive Learning',
-                  description: 'Engaging students through discussions, projects, and hands-on activities.',
+                  icon: "🌈",
+                  title: "Multilingual Magic",
+                  desc: "Learn in your mother tongue while mastering multiple languages",
+                  color: "from-pink-100 to-purple-200"
                 },
                 {
-                  title: 'Technology Integration',
-                  description: 'Using modern educational tools and digital resources to enhance learning.',
+                  icon: "🎨",
+                  title: "Art Integration",
+                  desc: "Express creativity through every subject",
+                  color: "from-blue-100 to-green-200"
                 },
                 {
-                  title: 'Personalized Attention',
-                  description: 'Small class sizes ensuring individual attention and support.',
-                },
-                {
-                  title: 'Regular Assessment',
-                  description: 'Continuous evaluation to track progress and identify areas for improvement.',
-                },
-              ].map((method) => (
-                <div key={method.title} className="bg-white p-6 rounded-lg shadow-lg">
-                  <h3 className="text-xl font-semibold text-blue-600 mb-2">{method.title}</h3>
-                  <p className="text-gray-600">{method.description}</p>
-                </div>
+                  icon: "🔬",
+                  title: "Experiential Learning",
+                  desc: "Learn by doing, exploring, and creating",
+                  color: "from-yellow-100 to-orange-200"
+                }
+              ].map((feature, index) => (
+                <motion.div
+                  key={index}
+                  className={`bg-gradient-to-br ${feature.color} p-6 rounded-2xl shadow-lg`}
+                  whileHover={{ scale: 1.05, rotate: 2 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <motion.div 
+                    className="text-5xl mb-4"
+                    animate={{ y: [0, -10, 0] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    {feature.icon}
+                  </motion.div>
+                  <h3 className="text-xl font-comic font-bold text-primary-600 mb-2">{feature.title}</h3>
+                  <p className="text-gray-600">{feature.desc}</p>
+                </motion.div>
               ))}
             </div>
-          </section>
+          </motion.div>
 
-          {/* Academic Support */}
-          <section>
-            <h2 className="text-3xl font-semibold text-gray-800 mb-6">Academic Support</h2>
-            <div className="bg-white p-6 rounded-lg shadow-lg">
-              <div className="grid md:grid-cols-3 gap-6">
-                {[
-                  'After-school tutoring programs',
-                  'Learning resource center',
-                  'Career counseling',
-                  'Special education support',
-                  'Advanced placement options',
-                  'Study skills workshops',
-                ].map((support) => (
-                  <div key={support} className="flex items-center">
-                    <svg className="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-gray-600">{support}</span>
-                  </div>
-                ))}
-              </div>
+          {/* Interactive Skills Section */}
+          <motion.div
+            className="mb-16 bg-white p-8 rounded-2xl shadow-lg"
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <h2 className="text-4xl font-comic font-bold text-primary-600 mb-8 text-center">
+              Skills for Tomorrow 🌟
+            </h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {[
+                { icon: "💻", skill: "Coding & AI" },
+                { icon: "🤝", skill: "Collaboration" },
+                { icon: "🌱", skill: "Sustainability" },
+                { icon: "🎯", skill: "Critical Thinking" },
+                { icon: "🗣️", skill: "Communication" },
+                { icon: "🎨", skill: "Creativity" },
+                { icon: "🌍", skill: "Global Awareness" },
+                { icon: "🧩", skill: "Problem Solving" }
+              ].map((skill, index) => (
+                <motion.div
+                  key={index}
+                  className="p-4 bg-primary-50 rounded-xl text-center cursor-pointer"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <motion.div 
+                    className="text-3xl mb-2"
+                    animate={{ rotate: [0, 15, 0] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    {skill.icon}
+                  </motion.div>
+                  <h3 className="font-bold text-primary-600">{skill.skill}</h3>
+                </motion.div>
+              ))}
             </div>
-          </section>
+          </motion.div>
+
+          {/* Fun Facts Carousel */}
+          <motion.div
+            className="bg-gradient-to-r from-primary-100 via-primary-200 to-primary-100 p-8 rounded-2xl shadow-lg"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8 }}
+          >
+            <h2 className="text-3xl font-comic font-bold text-primary-600 mb-6 text-center">
+              Did You Know? 🤔
+            </h2>
+            <div className="grid md:grid-cols-3 gap-6">
+              {[
+                "Our brain-friendly learning approach makes studying fun and effective! 🧠",
+                "You'll learn coding and AI in exciting, hands-on projects! 🤖",
+                "Every class is an adventure with art, music, and movement! 🎨"
+              ].map((fact, index) => (
+                <motion.div
+                  key={index}
+                  className="bg-white p-4 rounded-xl shadow-md"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <p className="text-primary-600 text-center font-comic">{fact}</p>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
         </motion.div>
       </div>
     </div>

@@ -9,6 +9,7 @@ import CampusLife from './pages/CampusLife';
 import Events from './pages/Events';
 import Gallery from './pages/Gallery';
 import Contact from './pages/Contact';
+import Prospectus from './pages/Prospectus';
 import AdmissionPopup from './components/AdmissionPopup';
 import Footer from './components/Footer';
 import { motion } from 'framer-motion';
@@ -41,6 +42,7 @@ function App() {
                 <Route path="/events" element={<Events />} />
                 <Route path="/gallery" element={<Gallery />} />
                 <Route path="/contact" element={<Contact />} />
+                <Route path="/prospectus" element={<Prospectus />} />
               </Routes>
             </main>
           </div>
