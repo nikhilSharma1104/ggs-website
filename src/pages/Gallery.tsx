@@ -1,117 +1,174 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const FloatingShape = ({ emoji, className }: { emoji: string; className: string }) => (
-  <motion.div
-    className={`absolute ${className}`}
-    animate={{
-      y: [0, -20, 0],
-      rotate: [0, 10, -10, 0],
-    }}
-    transition={{
-      duration: 4,
-      repeat: Infinity,
-      ease: "easeInOut"
-    }}
-  >
-    <span className="text-4xl">{emoji}</span>
-  </motion.div>
-);
+interface GalleryImage {
+  id: number;
+  src: string;
+  title: string;
+  category: string;
+  description: string;
+}
 
-const Gallery = () => {
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+const Gallery: React.FC = () => {
+  const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState("All");
 
-  const categories = [
-    { id: 'all', name: 'All Photos 📸', emoji: '🌈' },
-    { id: 'events', name: 'School Events', emoji: '🎉' },
-    { id: 'sports', name: 'Sports Day', emoji: '⚽' },
-    { id: 'arts', name: 'Art & Craft', emoji: '🎨' },
-    { id: 'activities', name: 'Activities', emoji: '🎮' },
-  ];
+  const categories = ["All", "Campus", "Events", "Sports", "Activities", "Academic"];
 
-  const images = [
-    { id: 1, src: '/images/gallery/event1.jpg', category: 'events', title: 'Annual Day Celebration' },
-    { id: 2, src: '/images/gallery/sports1.jpg', category: 'sports', title: 'Sports Competition' },
-    { id: 3, src: '/images/gallery/art1.jpg', category: 'arts', title: 'Art Exhibition' },
-    { id: 4, src: '/images/gallery/activity1.jpg', category: 'activities', title: 'Science Fair' },
+  const images: GalleryImage[] = [
+    {
+      id: 1,
+      src: "/images/campus1.jpg",
+      title: "Main Building",
+      category: "Campus",
+      description: "Our state-of-the-art main academic building"
+    },
+    {
+      id: 2,
+      src: "/images/events1.jpg",
+      title: "Annual Day Celebration",
+      category: "Events",
+      description: "Students performing at the annual day celebration"
+    },
+    {
+      id: 3,
+      src: "/images/sports1.jpg",
+      title: "Sports Meet",
+      category: "Sports",
+      description: "Annual sports meet at our school grounds"
+    },
+    {
+      id: 4,
+      src: "/images/activities1.jpg",
+      title: "Art Workshop",
+      category: "Activities",
+      description: "Students participating in art and craft activities"
+    },
+    {
+      id: 5,
+      src: "/images/academic1.jpg",
+      title: "Science Exhibition",
+      category: "Academic",
+      description: "Students showcasing their science projects"
+    },
+    {
+      id: 6,
+      src: "/images/campus2.jpg",
+      title: "Library",
+      category: "Campus",
+      description: "Our modern library facility"
+    },
     // Add more images as needed
   ];
 
-  const filteredImages = images.filter(
-    image => selectedCategory === 'all' || image.category === selectedCategory
+  const filteredImages = images.filter(image => 
+    selectedCategory === "All" ? true : image.category === selectedCategory
   );
 
   return (
-    <div className="min-h-screen py-16 bg-secondary-50 relative overflow-hidden">
-      {/* Floating decorative elements */}
-      <FloatingShape emoji="📸" className="top-20 left-10" />
-      <FloatingShape emoji="🎨" className="top-40 right-20" />
-      <FloatingShape emoji="🎭" className="bottom-20 left-20" />
-      <FloatingShape emoji="🎪" className="bottom-40 right-10" />
+    <div className="min-h-screen bg-primary-900">
+      {/* Hero Section */}
+      <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900">
+          {[...Array(20)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute text-4xl"
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{
+                opacity: [0.5, 1, 0.5],
+                scale: [1, 1.2, 1],
+                y: [0, -20, 0],
+                rotate: [0, 10, -10, 0],
+              }}
+              transition={{
+                duration: 4,
+                repeat: Infinity,
+                delay: i * 0.2,
+              }}
+              style={{
+                top: `${Math.random() * 100}%`,
+                left: `${Math.random() * 100}%`,
+              }}
+            >
+              {["📸", "🎨", "🎭", "📚", "🏆", "🎬"][i % 6]}
+            </motion.div>
+          ))}
+        </div>
 
-      <div className="container relative">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <h1 className="text-5xl font-comic font-bold text-primary-600 mb-8 text-center">
-            Our Fun Gallery! 📸
-          </h1>
+        <div className="container mx-auto px-4 relative z-10 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">
+              Photo Gallery
+              <motion.div
+                className="h-1 w-24 bg-secondary-500 mx-auto mt-4"
+                initial={{ width: 0 }}
+                animate={{ width: 96 }}
+                transition={{ duration: 1, delay: 0.5 }}
+              />
+            </h1>
+            <p className="text-xl md:text-2xl text-white/80 max-w-3xl mx-auto">
+              Capturing moments and memories at Gurukulam
+            </p>
+          </motion.div>
+        </div>
+      </section>
 
-          {/* Categories */}
+      {/* Gallery Section */}
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          {/* Category Filter */}
           <div className="flex flex-wrap justify-center gap-4 mb-12">
-            {categories.map((category) => (
+            {categories.map((category, index) => (
               <motion.button
-                key={category.id}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={() => setSelectedCategory(category.id)}
-                className={`px-6 py-3 rounded-full font-comic text-lg transition-colors ${
-                  selectedCategory === category.id
-                    ? 'bg-secondary-400 text-primary-700'
-                    : 'bg-white text-primary-600 hover:bg-secondary-100'
-                } shadow-md border-2 border-secondary-300`}
+                key={index}
+                onClick={() => setSelectedCategory(category)}
+                className={`px-6 py-2 rounded-full text-white transition-colors
+                  ${selectedCategory === category 
+                    ? 'bg-secondary-500' 
+                    : 'bg-primary-800/50 hover:bg-primary-700/50'}`}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                <span className="mr-2">{category.emoji}</span>
-                {category.name}
+                {category}
               </motion.button>
             ))}
           </div>
 
           {/* Image Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {filteredImages.map((image) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredImages.map((image, index) => (
               <motion.div
                 key={image.id}
-                layout
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                whileHover={{ scale: 1.05 }}
                 className="relative group"
-                onClick={() => setSelectedImage(image.src)}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ y: -5 }}
+                onClick={() => setSelectedImage(image)}
               >
-                <div className="aspect-w-4 aspect-h-3 rounded-2xl overflow-hidden border-4 border-secondary-300 shadow-lg">
+                <div className="aspect-w-16 aspect-h-9 rounded-xl overflow-hidden bg-primary-800/50 cursor-pointer">
                   <img
                     src={image.src}
                     alt={image.title}
                     className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-110"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <div className="absolute bottom-4 left-4 right-4">
-                      <h3 className="text-white font-comic font-bold text-lg">
-                        {image.title}
-                      </h3>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="absolute bottom-0 left-0 right-0 p-6">
+                      <h3 className="text-xl font-bold text-white mb-2">{image.title}</h3>
+                      <p className="text-white/80">{image.description}</p>
                     </div>
                   </div>
                 </div>
               </motion.div>
             ))}
           </div>
-        </motion.div>
-      </div>
+        </div>
+      </section>
 
       {/* Image Modal */}
       <AnimatePresence>
@@ -120,29 +177,33 @@ const Gallery = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
             onClick={() => setSelectedImage(null)}
-            className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
           >
             <motion.div
-              initial={{ scale: 0.9 }}
+              initial={{ scale: 0.5 }}
               animate={{ scale: 1 }}
-              exit={{ scale: 0.9 }}
+              exit={{ scale: 0.5 }}
               className="relative max-w-4xl w-full"
-              onClick={(e) => e.stopPropagation()}
+              onClick={e => e.stopPropagation()}
             >
               <img
-                src={selectedImage}
-                alt="Selected"
-                className="w-full h-auto rounded-2xl border-4 border-secondary-300"
+                src={selectedImage.src}
+                alt={selectedImage.title}
+                className="w-full h-auto rounded-xl"
               />
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
+              <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/70 to-transparent">
+                <h3 className="text-2xl font-bold text-white mb-2">{selectedImage.title}</h3>
+                <p className="text-white/80">{selectedImage.description}</p>
+              </div>
+              <button
+                className="absolute top-4 right-4 text-white/80 hover:text-white"
                 onClick={() => setSelectedImage(null)}
-                className="absolute -top-4 -right-4 w-12 h-12 bg-secondary-400 text-primary-700 rounded-full flex items-center justify-center text-2xl shadow-lg border-2 border-secondary-300"
               >
-                ✖️
-              </motion.button>
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </motion.div>
           </motion.div>
         )}

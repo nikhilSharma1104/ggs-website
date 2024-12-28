@@ -1,46 +1,103 @@
-# Getting Started with Create React App
+# Gurukulam Educational Website
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## 🌟 Project Overview
 
-## Available Scripts
+Gurukulam is an innovative educational platform designed to provide a comprehensive and holistic learning experience for students. Our website showcases the unique approach of Gurukulam, emphasizing personalized education and holistic development.
 
-In the project directory, you can run:
+## 🚀 Features
 
-### `npm start`
+- **Responsive Design**: Fully responsive website that works seamlessly across devices
+- **Interactive Animations**: Smooth, engaging animations using Framer Motion
+- **Multiple Stage Sections**: 
+  - Home
+  - Foundational Stage
+  - Preparatory Stage
+  - Academics
+  - Contact
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## 🛠 Tech Stack
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+- **Frontend**: React.js
+- **Styling**: Tailwind CSS
+- **Animation**: Framer Motion
+- **Routing**: React Router
+- **Language**: TypeScript
 
-### `npm test`
+## 📦 Prerequisites
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- Node.js (v14.0.0 or later)
+- npm (v6.0.0 or later)
 
-### `npm run build`
+## 🔧 Installation
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1. Clone the repository
+   ```bash
+   git clone https://github.com/your-username/gurukulam-website.git
+   ```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+2. Navigate to the project directory
+   ```bash
+   cd gurukulam-website
+   ```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+3. Install dependencies
+   ```bash
+   npm install
+   ```
 
-### `npm run eject`
+4. Start the development server
+   ```bash
+   npm start
+   ```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+## 📂 Project Structure
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```
+src/
+│
+├── components/
+│   ├── animations/     # Reusable animation configurations
+│   └── common/         # Shared components
+│
+├── pages/
+│   ├── Home.tsx
+│   ├── Academics.tsx
+│   ├── Contact.tsx
+│   ├── FoundationalStage.tsx
+│   └── PreparatoryStage.tsx
+│
+├── styles/
+│   └── index.css       # Global styles
+│
+└── App.tsx             # Main application component
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## 🎨 Animations
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+The project uses Framer Motion for smooth, interactive animations:
+- `slideInLeft`: Slide in from the left
+- `slideInRight`: Slide in from the right
+- `FadeIn`: Fade and slight vertical movement
+- `ScaleUp`: Scale and opacity transition
 
-## Learn More
+## 🤝 Contributing
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## 📜 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+## 📞 Contact
+
+Your Name - [your.email@example.com](mailto:your.email@example.com)
+
+Project Link: [https://github.com/your-username/gurukulam-website](https://github.com/your-username/gurukulam-website)
+
+---
+
+**Built with ❤️ for the future of education**

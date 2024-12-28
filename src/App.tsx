@@ -1,18 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import Home from './pages/Home';
 import About from './pages/About';
 import Academics from './pages/Academics';
 import Admissions from './pages/Admissions';
-import CampusLife from './pages/CampusLife';
+import Contact from './pages/Contact';
 import Events from './pages/Events';
 import Gallery from './pages/Gallery';
-import Contact from './pages/Contact';
+import CampusLife from './pages/CampusLife';
+import FoundationalStage from './pages/FoundationalStage';
+import PreparatoryStage from './pages/PreparatoryStage';
+import MiddleStage from './pages/MiddleStage';
 import Prospectus from './pages/Prospectus';
 import AdmissionPopup from './components/AdmissionPopup';
-import Footer from './components/Footer';
-import { motion } from 'framer-motion';
+
+const PageTransition: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const location = useLocation();
+
+  return (
+    <motion.div
+      key={location.pathname}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3 }}
+    >
+      {children}
+    </motion.div>
+  );
+};
 
 function App() {
   const [showAdmissionPopup, setShowAdmissionPopup] = useState(false);
@@ -28,26 +47,27 @@ function App() {
 
   return (
     <Router>
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
-        <div className="min-h-screen flex flex-col">
-          <Navbar />
-          <div className="flex-grow">
-            <main>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/academics" element={<Academics />} />
-                <Route path="/admissions" element={<Admissions />} />
-                <Route path="/campus-life" element={<CampusLife />} />
-                <Route path="/events" element={<Events />} />
-                <Route path="/gallery" element={<Gallery />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/prospectus" element={<Prospectus />} />
-              </Routes>
-            </main>
-          </div>
-          <Footer />
-        </div>
+      <div className="flex flex-col min-h-screen">
+        <Navbar />
+        <main className="flex-grow">
+          <AnimatePresence mode="wait">
+            <Routes>
+              <Route path="/" element={<PageTransition><Home /></PageTransition>} />
+              <Route path="/about" element={<PageTransition><About /></PageTransition>} />
+              <Route path="/academics" element={<PageTransition><Academics /></PageTransition>} />
+              <Route path="/academics/foundational-stage" element={<PageTransition><FoundationalStage /></PageTransition>} />
+              <Route path="/academics/preparatory-stage" element={<PageTransition><PreparatoryStage /></PageTransition>} />
+              <Route path="/academics/middle-stage" element={<PageTransition><MiddleStage /></PageTransition>} />
+              <Route path="/admissions" element={<PageTransition><Admissions /></PageTransition>} />
+              <Route path="/campus-life" element={<PageTransition><CampusLife /></PageTransition>} />
+              <Route path="/events" element={<PageTransition><Events /></PageTransition>} />
+              <Route path="/gallery" element={<PageTransition><Gallery /></PageTransition>} />
+              <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
+              <Route path="/prospectus" element={<PageTransition><Prospectus /></PageTransition>} />
+            </Routes>
+          </AnimatePresence>
+        </main>
+        <Footer />
         {showAdmissionPopup && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="relative bg-white rounded-xl shadow-2xl max-w-md w-full mx-4">
@@ -58,7 +78,7 @@ function App() {
             </div>
           </div>
         )}
-      </motion.div>
+      </div>
     </Router>
   );
 }
