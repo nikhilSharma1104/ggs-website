@@ -1,0 +1,88 @@
+.calendar-custom {
+  width: 100%;
+  max-width: 100%;
+  background: white;
+  border: none !important;
+  font-family: inherit;
+}
+
+.calendar-custom button {
+  margin: 0 !important;
+  border: none !important;
+  color: #374151 !important;
+}
+
+.calendar-custom button:enabled:hover {
+  background-color: #f3f4f6 !important;
+}
+
+.calendar-custom .react-calendar__navigation {
+  margin-bottom: 1rem;
+}
+
+.calendar-custom .react-calendar__navigation button {
+  min-width: 44px;
+  background: none;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.calendar-custom .react-calendar__navigation button:disabled {
+  background-color: transparent !important;
+}
+
+.calendar-custom .react-calendar__navigation button:enabled:hover,
+.calendar-custom .react-calendar__navigation button:enabled:focus {
+  background-color: #f3f4f6 !important;
+}
+
+.calendar-custom .react-calendar__month-view__weekdays {
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.calendar-custom .react-calendar__month-view__days__day--weekend {
+  color: #374151 !important;
+}
+
+.calendar-custom .react-calendar__tile {
+  padding: 1em 0.5em;
+  background: none;
+  text-align: center;
+  line-height: 16px;
+  font-size: 0.875rem;
+  border-radius: 8px;
+}
+
+.calendar-custom .react-calendar__tile:enabled:hover,
+.calendar-custom .react-calendar__tile:enabled:focus {
+  background-color: #f3f4f6 !important;
+}
+
+.calendar-custom .react-calendar__tile--now {
+  background: #fef3c7 !important;
+  color: #92400e !important;
+}
+
+.calendar-custom .react-calendar__tile--active {
+  background: #e5e7eb !important;
+  color: #1f2937 !important;
+}
+
+/* Custom styles for event dates */
+.calendar-custom .event-date {
+  background: #22c55e !important;
+  color: white !important;
+  font-weight: 600 !important;
+  position: relative;
+  z-index: 1;
+  transition: all 0.2s ease;
+}
+
+.calendar-custom .event-date:hover {
+  background: #16a34a !important;
+  transform: scale(1.1);
+}
