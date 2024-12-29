@@ -27,6 +27,7 @@ const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose }) => {
   const [selectedEvents, setSelectedEvents] = useState<Event[]>([]);
   const [showEventDetails, setShowEventDetails] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+  const [animateEvents, setAnimateEvents] = useState(false);
 
   const loadEvents = useCallback(async (showLoading = true) => {
     try {
@@ -45,6 +46,7 @@ const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose }) => {
           event => new Date(event.date).toDateString() === selectedDate.toDateString()
         );
         setSelectedEvents(dateEvents);
+        setAnimateEvents(true);
       }
     } catch (err: any) {
       console.error('Error loading events:', err);
@@ -55,6 +57,13 @@ const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose }) => {
       }
     }
   }, [selectedDate]);
+
+  useEffect(() => {
+    if (animateEvents) {
+      const timer = setTimeout(() => setAnimateEvents(false), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [animateEvents]);
 
   // Initial load and periodic refresh
   useEffect(() => {
@@ -91,6 +100,7 @@ const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose }) => {
       );
       setSelectedEvents(dateEvents);
       setShowEventDetails(dateEvents.length > 0);
+      setAnimateEvents(true);
     }
   };
 
@@ -105,130 +115,144 @@ const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose }) => {
 
   const formatLastUpdated = (date: Date): string => {
     return date.toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true
+      hour: '2-digit',
+      minute: '2-digit'
     });
   };
 
-  if (!isOpen) return null;
+  const tileClassName = ({ date }: { date: Date }): string => {
+    const hasEvent = events.some(
+      event => new Date(event.date).toDateString() === date.toDateString()
+    );
+    return hasEvent ? 'event-date' : '';
+  };
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
-      onClick={() => {
-        setShowEventDetails(false);
-        onClose();
-      }}
-    >
-      <motion.div
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.95, opacity: 0 }}
-        className="relative w-full max-w-lg bg-white rounded-xl overflow-hidden"
-        onClick={e => e.stopPropagation()}
-      >
-        {loading ? (
-          <div className="flex flex-col items-center justify-center p-8">
-            <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
-            <p className="mt-4 text-gray-600">Loading calendar...</p>
-          </div>
-        ) : error ? (
-          <div className="p-6 text-center">
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <p className="text-red-600">{error}</p>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  loadEvents();
-                }}
-                className="mt-4 px-4 py-2 bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors"
-              >
-                Retry
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="relative">
-            <div className="absolute right-4 top-4 flex items-center gap-2 z-10">
-              <span className="text-xs text-gray-500">
-                Updated: {formatLastUpdated(lastUpdated)}
-              </span>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  loadEvents(true);
-                }}
-                className="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100"
-                title="Refresh events"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowEventDetails(false);
-                  onClose();
-                }}
-                className="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.95 }}
+          transition={{ duration: 0.2 }}
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+          onClick={onClose}
+        >
+          <motion.div
+            initial={{ y: 20 }}
+            animate={{ y: 0 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
+            className="bg-white rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+            onClick={e => e.stopPropagation()}
+          >
             <div className="p-6">
-              <Calendar
-                onChange={handleDateChange}
-                value={selectedDate}
-                className="w-full rounded-lg shadow-sm calendar-custom"
-                tileClassName={({ date }) => {
-                  return events.some(
-                    event => new Date(event.date).toDateString() === date.toDateString()
-                  ) ? 'event-date' : '';
-                }}
-              />
-            </div>
-
-            <AnimatePresence>
-              {showEventDetails && selectedEvents.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 20 }}
-                  className="border-t border-gray-200 bg-gray-50"
+              <div className="flex justify-between items-center mb-6">
+                <motion.h2
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  className="text-2xl font-bold text-gray-900"
                 >
-                  <div className="p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                      Events on {formatDate(selectedDate)}
-                    </h3>
-                    <div className="space-y-4">
-                      {selectedEvents.map((event, index) => (
-                        <div
-                          key={index}
-                          className="bg-white p-4 rounded-lg shadow-sm border border-gray-100"
-                        >
-                          <h4 className="font-semibold text-green-800">{event.title}</h4>
-                          {event.description && (
-                            <p className="mt-2 text-gray-600">{event.description}</p>
-                          )}
-                        </div>
-                      ))}
-                    </div>
+                  School Calendar
+                </motion.h2>
+                <motion.button
+                  initial={{ x: 20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={onClose}
+                  className="text-gray-500 hover:text-gray-700 transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </motion.button>
+              </div>
+
+              {loading ? (
+                <div className="flex justify-center items-center py-12">
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    className="w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full"
+                  />
+                </div>
+              ) : error ? (
+                <div className="text-red-500 text-center py-4">{error}</div>
+              ) : (
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <Calendar
+                      onChange={handleDateChange}
+                      value={selectedDate}
+                      className="calendar-custom"
+                      tileClassName={tileClassName}
+                    />
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="text-sm text-gray-500 mt-4 text-center"
+                    >
+                      Last updated: {formatLastUpdated(lastUpdated)}
+                    </motion.p>
                   </div>
-                </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="bg-gray-50 rounded-xl p-6"
+                  >
+                    <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                      {formatDate(selectedDate)}
+                    </h3>
+                    
+                    <AnimatePresence mode="wait">
+                      {selectedEvents.length > 0 ? (
+                        <motion.div
+                          key="events"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          {selectedEvents.map((event, index) => (
+                            <motion.div
+                              key={index}
+                              initial={{ opacity: 0, x: -20 }}
+                              animate={{ 
+                                opacity: 1, 
+                                x: 0,
+                                transition: { delay: index * 0.1 }
+                              }}
+                              className="bg-white rounded-lg p-4 shadow-sm mb-3 border border-gray-100"
+                            >
+                              <h4 className="font-semibold text-gray-900">{event.title}</h4>
+                              {event.description && (
+                                <p className="text-gray-600 mt-2">{event.description}</p>
+                              )}
+                            </motion.div>
+                          ))}
+                        </motion.div>
+                      ) : (
+                        <motion.div
+                          key="no-events"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          className="text-gray-500 text-center py-8"
+                        >
+                          No events scheduled for this date
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                </div>
               )}
-            </AnimatePresence>
-          </div>
-        )}
-      </motion.div>
-    </motion.div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 
