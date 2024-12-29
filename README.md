@@ -1,8 +1,8 @@
-# Gurukulam Educational Website
+# Gurukulam GLobal School Website
 
 ## 🌟 Project Overview
 
-Gurukulam is an innovative educational platform designed to provide a comprehensive and holistic learning experience for students. Our website showcases the unique approach of Gurukulam, emphasizing personalized education and holistic development.
+Gurukulam GLobal School is an innovative educational premise innovated to provide a comprehensive and holistic learning experience for students. Our website showcases the unique approach of Gurukulam, emphasizing personalized education and holistic development.
 
 ## 🚀 Features
 
@@ -92,11 +92,8 @@ The project uses Framer Motion for smooth, interactive animations:
 
 Distributed under the MIT License. See `LICENSE` for more information.
 
-## 📞 Contact
+## 📞 Contact - [Nikhil Sharma](mailto:nikhil.shrma.1104@gmail.com)
 
-Your Name - [your.email@example.com](mailto:your.email@example.com)
-
-Project Link: [https://github.com/your-username/gurukulam-website](https://github.com/your-username/gurukulam-website)
 
 ---
 
