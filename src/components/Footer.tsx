@@ -20,18 +20,45 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-gradient-to-b from-primary-600 to-primary-800 text-white py-16">
-      <div className="container mx-auto grid md:grid-cols-4 gap-12 px-4">
+    <footer className="relative bg-primary-900 text-white pt-16 pb-8 overflow-hidden">
+      {/* Animated Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(30)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-2 h-2 bg-gradient-to-r from-secondary-500 to-primary-500 rounded-full"
+            style={{
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              filter: "blur(1px)",
+            }}
+            animate={{
+              y: [0, -30, 0],
+              x: [0, 30, 0],
+              scale: [1, 1.5, 1],
+              opacity: [0.1, 0.3, 0.1],
+            }}
+            transition={{
+              duration: 3 + Math.random() * 2,
+              repeat: Infinity,
+              delay: Math.random() * 2,
+            }}
+          />
+        ))}
+      </div>
+
+      <div className="container mx-auto grid md:grid-cols-4 gap-12 px-4 relative z-10">
         {/* Contact Information */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
+          className="backdrop-blur-sm"
         >
-          <h3 className="text-2xl font-comic font-bold text-secondary-300 mb-6">Contact Us</h3>
-          <div className="space-y-4 font-comic">
+          <h3 className="text-2xl font-bold text-secondary-300 mb-6">Contact Us</h3>
+          <div className="space-y-4">
             <motion.div 
-              className="flex items-center space-x-3 hover:bg-primary-700 p-2 rounded-lg transition-all"
+              className="flex items-center space-x-3 hover:bg-primary-800/50 p-2 rounded-lg transition-all border border-primary-800/50"
               whileHover={{ scale: 1.02 }}
             >
               <span className="text-2xl">📍</span>
@@ -42,23 +69,13 @@ const Footer = () => {
               </div>
             </motion.div>
             <motion.div 
-              className="flex items-center space-x-3 hover:bg-primary-700 p-2 rounded-lg transition-all"
+              className="flex items-center space-x-3 hover:bg-primary-800/50 p-2 rounded-lg transition-all border border-primary-800/50"
               whileHover={{ scale: 1.02 }}
             >
               <span className="text-2xl">📞</span>
               <div>
                 <p className="font-bold text-secondary-200">Phone</p>
                 <p className="text-gray-300">+1 (123) 456-7890</p>
-              </div>
-            </motion.div>
-            <motion.div 
-              className="flex items-center space-x-3 hover:bg-primary-700 p-2 rounded-lg transition-all"
-              whileHover={{ scale: 1.02 }}
-            >
-              <span className="text-2xl">📧</span>
-              <div>
-                <p className="font-bold text-secondary-200">Email</p>
-                <p className="text-gray-300">hello@gurukulamschool.com</p>
               </div>
             </motion.div>
           </div>
@@ -69,117 +86,112 @@ const Footer = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
+          className="backdrop-blur-sm"
         >
-          <h3 className="text-2xl font-comic font-bold text-secondary-300 mb-6">Quick Links</h3>
-          <div className="space-y-2 font-comic">
-            {quickLinks.map((link, index) => (
-              <motion.div
-                key={index}
-                whileHover={{ x: 5 }}
-                className="transition-all"
-              >
-                <Link 
+          <h3 className="text-2xl font-bold text-secondary-300 mb-6">Quick Links</h3>
+          <ul className="space-y-3">
+            {quickLinks.map((link) => (
+              <motion.li key={link.name}>
+                <Link
                   to={link.path}
-                  className="text-gray-300 hover:text-secondary-300 block py-1"
+                  className="text-gray-300 hover:text-secondary-300 transition-colors flex items-center space-x-2 group"
                 >
-                  → {link.name}
+                  <motion.span
+                    className="inline-block"
+                    initial={{ x: 0 }}
+                    whileHover={{ x: 5 }}
+                  >
+                    ➜
+                  </motion.span>
+                  <span>{link.name}</span>
                 </Link>
-              </motion.div>
+              </motion.li>
             ))}
-          </div>
+          </ul>
         </motion.div>
 
-        {/* School Hours */}
+        {/* Social Links */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
+          className="backdrop-blur-sm"
         >
-          <h3 className="text-2xl font-comic font-bold text-secondary-300 mb-6">School Hours</h3>
-          <div className="space-y-2 font-comic text-gray-300">
-            <motion.p 
-              className="hover:bg-primary-700 p-2 rounded-lg transition-all"
-              whileHover={{ x: 5 }}
-            >
-              Monday - Friday: 8:00 AM - 3:30 PM
-            </motion.p>
-            <motion.p 
-              className="hover:bg-primary-700 p-2 rounded-lg transition-all"
-              whileHover={{ x: 5 }}
-            >
-              Saturday: 8:00 AM - 12:30 PM
-            </motion.p>
-            <motion.p 
-              className="hover:bg-primary-700 p-2 rounded-lg transition-all"
-              whileHover={{ x: 5 }}
-            >
-              Sunday: Closed
-            </motion.p>
-          </div>
-        </motion.div>
-
-        {/* Location Map */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.6 }}
-        >
-          <h3 className="text-2xl font-comic font-bold text-secondary-300 mb-6">Find Us Here</h3>
-          <motion.div 
-            className="rounded-xl overflow-hidden h-48 shadow-lg"
-            whileHover={{ scale: 1.02 }}
-          >
-            <iframe
-              src="https://www.google.com/maps/embed/v1/place?key=AIzaSyDYcwO8ojKK6aIMzA6Tb6-GwYjzHckHJOU&q=Gurukulam+Global+School,Mathura+UP"
-              width="100%"
-              height="100%"
-              style={{ border: 0 }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            />
-          </motion.div>
-          
-          {/* Social Media Links */}
-          <div className="mt-6 flex justify-center space-x-4">
-            {socialLinks.map((social, index) => (
+          <h3 className="text-2xl font-bold text-secondary-300 mb-6">Connect With Us</h3>
+          <div className="flex flex-wrap gap-4">
+            {socialLinks.map((social) => (
               <motion.a
-                key={index}
+                key={social.name}
                 href={social.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-300 hover:text-secondary-300 text-2xl"
-                whileHover={{ scale: 1.2, rotate: 5 }}
+                className="bg-primary-800/50 hover:bg-primary-700/50 p-3 rounded-lg transition-all border border-primary-800/50"
+                whileHover={{ scale: 1.1 }}
                 onHoverStart={() => setIsHovered(social.name)}
                 onHoverEnd={() => setIsHovered(null)}
               >
-                <i className={social.icon}></i>
-                {isHovered === social.name && (
-                  <motion.span
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="absolute text-sm mt-1"
-                  >
-                    {social.name}
-                  </motion.span>
-                )}
+                <i className={`${social.icon} text-2xl ${isHovered === social.name ? 'text-secondary-400' : 'text-gray-300'}`}></i>
               </motion.a>
             ))}
           </div>
         </motion.div>
+
+        {/* Newsletter */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.6 }}
+          className="backdrop-blur-sm"
+        >
+          <h3 className="text-2xl font-bold text-secondary-300 mb-6">Newsletter</h3>
+          <form className="space-y-4">
+            <div>
+              <input
+                type="email"
+                placeholder="Enter your email"
+                className="w-full px-4 py-3 rounded-lg bg-primary-800/50 border border-primary-700 text-white placeholder-gray-400 focus:border-secondary-500 focus:ring-2 focus:ring-secondary-500/20 transition-all"
+              />
+            </div>
+            <motion.button
+              type="submit"
+              className="w-full px-6 py-3 bg-gradient-to-r from-secondary-500 to-secondary-600 hover:from-secondary-600 hover:to-secondary-700 text-white rounded-lg transition-all"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              Subscribe
+            </motion.button>
+          </form>
+        </motion.div>
       </div>
 
-      {/* Copyright Section */}
-      <motion.div 
-        className="text-center mt-12 pt-8 border-t border-primary-500"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.8 }}
-      >
-        <p className="text-gray-400 font-comic">
-          {new Date().getFullYear()} Gurukulam Global School. All rights reserved.
-        </p>
-      </motion.div>
+      {/* Bottom Bar */}
+      <div className="mt-16 pt-8 border-t border-primary-800">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.8 }}
+              className="text-gray-400 text-center md:text-left"
+            >
+              &copy; {new Date().getFullYear()} Gurukulam Global School. All rights reserved.
+            </motion.p>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 1 }}
+              className="flex space-x-6"
+            >
+              <Link to="/privacy" className="text-gray-400 hover:text-secondary-300 transition-colors">
+                Privacy Policy
+              </Link>
+              <Link to="/terms" className="text-gray-400 hover:text-secondary-300 transition-colors">
+                Terms of Service
+              </Link>
+            </motion.div>
+          </div>
+        </div>
+      </div>
     </footer>
   );
 };

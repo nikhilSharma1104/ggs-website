@@ -1,6 +1,12 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { FadeIn, slideInLeft, slideInRight, staggerContainer, staggerItem } from '../components/animations';
+import React, { useState, useRef } from 'react';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import { slideInLeft, slideInRight, staggerContainer, staggerItem } from '../components/animations';
+import { submitContactForm } from '../services/contactService';
+
+const fadeInVariant = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+};
 
 interface ContactForm {
   name: string;
@@ -21,6 +27,14 @@ const Contact: React.FC = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const formRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: formRef,
+    offset: ["start end", "end start"],
+  });
+
+  const y = useTransform(scrollYProgress, [0, 1], [100, -100]);
+  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -33,10 +47,10 @@ const Contact: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setSubmitStatus('idle');
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await submitContactForm(formData);
       setSubmitStatus('success');
       setFormData({
         name: '',
@@ -47,233 +61,242 @@ const Contact: React.FC = () => {
       });
     } catch (error) {
       setSubmitStatus('error');
+      console.error('Error submitting form:', error);
     } finally {
       setIsSubmitting(false);
-      setTimeout(() => setSubmitStatus('idle'), 3000);
     }
   };
 
-  const contactInfo = [
-    {
-      title: "Address",
-      info: "123 School Street, City, State - 12345",
-      icon: "📍"
-    },
-    {
-      title: "Phone",
-      info: "+1 (234) 567-8900",
-      icon: "📞"
-    },
-    {
-      title: "Email",
-      info: "info@gurukulam.edu",
-      icon: "📧"
-    },
-    {
-      title: "Office Hours",
-      info: "Monday - Friday: 8:00 AM - 4:00 PM",
-      icon: "⏰"
-    }
-  ];
-
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="min-h-screen bg-gradient-to-b from-primary-50 to-white py-16 px-4"
-    >
-      <div className="container mx-auto">
-        <FadeIn>
-          <div className="text-center mb-16">
-            <motion.h1
-              initial={{ y: -20 }}
-              animate={{ y: 0 }}
-              transition={{ type: "spring", stiffness: 300 }}
-              className="text-5xl font-comic font-bold text-primary-600 mb-4"
+    <div className="bg-primary-900 min-h-screen">
+      {/* Hero Section */}
+      <motion.section
+        className="relative min-h-[60vh] flex items-center justify-center overflow-hidden"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1 }}
+      >
+        {/* Animated Background with Enhanced Particles */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900">
+          {[...Array(50)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-2 h-2 bg-gradient-to-r from-secondary-500 to-primary-500 rounded-full"
+              style={{
+                top: `${Math.random() * 100}%`,
+                left: `${Math.random() * 100}%`,
+                filter: "blur(1px)",
+              }}
+              animate={{
+                y: [0, -30, 0],
+                x: [0, 30, 0],
+                scale: [1, 1.5, 1],
+                opacity: [0.2, 0.5, 0.2],
+              }}
+              transition={{
+                duration: 3 + Math.random() * 2,
+                repeat: Infinity,
+                delay: Math.random() * 2,
+              }}
+            />
+          ))}
+        </div>
+
+        <div className="container mx-auto px-4 relative z-10 text-center">
+          <motion.div
+            className="max-w-4xl mx-auto"
+            variants={staggerContainer}
+            initial="hidden"
+            animate="show"
+          >
+            <motion.h1 
+              variants={staggerItem}
+              className="text-6xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white via-secondary-200 to-secondary-400 text-transparent bg-clip-text"
             >
               Contact Us
             </motion.h1>
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              className="text-xl text-gray-600 max-w-2xl mx-auto"
+            <motion.p 
+              variants={staggerItem}
+              className="text-xl md:text-2xl text-gray-300 mb-8"
             >
-              We're here to help and answer any questions you might have
+              We'd Love to Hear From You! 🌟
             </motion.p>
-          </div>
-        </FadeIn>
+          </motion.div>
+        </div>
+      </motion.section>
 
-        <motion.div 
-          variants={slideInLeft}
-          initial="hidden"
-          animate="show"
-          className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto"
-        >
-          <motion.div
-            whileHover={{ scale: 1.02 }}
-            transition={{ type: "spring", stiffness: 300 }}
-            className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20"
-          >
-            {/* Contact Form */}
-            <h2 className="text-2xl font-comic font-bold text-primary-600 mb-6">
-              Send us a Message
-            </h2>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <motion.div
-                variants={staggerContainer}
-                initial="hidden"
-                animate="show"
-              >
-                {[
-                  { name: "name", label: "Your Name", type: "text" },
-                  { name: "email", label: "Email Address", type: "email" },
-                  { name: "phone", label: "Phone Number", type: "tel" },
-                  { name: "subject", label: "Subject", type: "text" }
-                ].map((field) => (
-                  <motion.div
-                    key={field.name}
-                    variants={staggerItem}
-                    className="mb-4"
-                  >
-                    <label
-                      htmlFor={field.name}
-                      className="block text-gray-700 font-comic mb-2"
-                    >
-                      {field.label}
-                    </label>
+      {/* Contact Form Section */}
+      <motion.section
+        ref={formRef}
+        className="py-20 px-4 relative z-10"
+        style={{ y, opacity }}
+      >
+        <div className="container mx-auto max-w-4xl">
+          <div className="bg-primary-800/50 backdrop-blur-lg rounded-3xl shadow-xl border border-primary-700 overflow-hidden">
+            <div className="p-8 md:p-12">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <motion.div variants={slideInLeft}>
+                    <label className="block text-secondary-200 font-semibold mb-2">Name</label>
                     <input
-                      type={field.type}
-                      id={field.name}
-                      name={field.name}
-                      value={formData[field.name as keyof typeof formData]}
+                      type="text"
+                      name="name"
+                      value={formData.name}
                       onChange={handleChange}
-                      className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors"
                       required
+                      className="w-full px-4 py-3 rounded-lg bg-primary-700/50 border border-primary-600 text-white placeholder-gray-400 focus:border-secondary-500 focus:ring-2 focus:ring-secondary-500/20 transition-all"
+                      placeholder="Your Name"
                     />
                   </motion.div>
-                ))}
-                <motion.div variants={staggerItem} className="mb-4">
-                  <label
-                    htmlFor="message"
-                    className="block text-gray-700 font-comic mb-2"
-                  >
-                    Message
-                  </label>
+
+                  <motion.div variants={slideInRight}>
+                    <label className="block text-secondary-200 font-semibold mb-2">Email</label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-3 rounded-lg bg-primary-700/50 border border-primary-600 text-white placeholder-gray-400 focus:border-secondary-500 focus:ring-2 focus:ring-secondary-500/20 transition-all"
+                      placeholder="your.email@example.com"
+                    />
+                  </motion.div>
+
+                  <motion.div variants={slideInLeft}>
+                    <label className="block text-secondary-200 font-semibold mb-2">Phone</label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-3 rounded-lg bg-primary-700/50 border border-primary-600 text-white placeholder-gray-400 focus:border-secondary-500 focus:ring-2 focus:ring-secondary-500/20 transition-all"
+                      placeholder="Your Phone Number"
+                    />
+                  </motion.div>
+
+                  <motion.div variants={slideInRight}>
+                    <label className="block text-secondary-200 font-semibold mb-2">Subject</label>
+                    <input
+                      type="text"
+                      name="subject"
+                      value={formData.subject}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-3 rounded-lg bg-primary-700/50 border border-primary-600 text-white placeholder-gray-400 focus:border-secondary-500 focus:ring-2 focus:ring-secondary-500/20 transition-all"
+                      placeholder="Message Subject"
+                    />
+                  </motion.div>
+                </div>
+
+                <motion.div variants={fadeInVariant}>
+                  <label className="block text-secondary-200 font-semibold mb-2">Message</label>
                   <textarea
-                    id="message"
                     name="message"
                     value={formData.message}
                     onChange={handleChange}
-                    rows={4}
-                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors"
                     required
+                    rows={6}
+                    className="w-full px-4 py-3 rounded-lg bg-primary-700/50 border border-primary-600 text-white placeholder-gray-400 focus:border-secondary-500 focus:ring-2 focus:ring-secondary-500/20 transition-all resize-none"
+                    placeholder="Your Message"
                   />
                 </motion.div>
-                <motion.button
-                  variants={staggerItem}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  type="submit"
-                  disabled={isSubmitting}
-                  className={`w-full bg-primary-600 text-white py-3 px-6 rounded-lg font-comic hover:bg-primary-700 transition-colors
-                    ${isSubmitting 
-                      ? 'bg-primary-700 cursor-not-allowed' 
-                      : 'bg-secondary-500 hover:bg-secondary-600'}`}
-                >
-                  {isSubmitting ? 'Sending...' : 'Send Message'}
-                </motion.button>
 
-                {/* Status Messages */}
-                <AnimatePresence>
-                  {submitStatus === 'success' && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0 }}
-                      className="mt-4 p-4 bg-green-500/20 border border-green-500/50 rounded-lg text-green-500 text-center"
-                    >
-                      Message sent successfully!
-                    </motion.div>
-                  )}
-                  {submitStatus === 'error' && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0 }}
-                      className="mt-4 p-4 bg-red-500/20 border border-red-500/50 rounded-lg text-red-500 text-center"
-                    >
-                      Failed to send message. Please try again.
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            </form>
-          </motion.div>
-        </motion.div>
-
-        <motion.div 
-          variants={slideInRight}
-          initial="hidden"
-          animate="show"
-          className="space-y-8"
-        >
-          {/* Contact Information */}
-          <div className="space-y-8">
-            <motion.div
-              variants={staggerContainer}
-              initial="hidden"
-              animate="show"
-              className="bg-white rounded-2xl shadow-xl p-8"
-            >
-              <h2 className="text-2xl font-comic font-bold text-primary-600 mb-6">
-                Get in Touch
-              </h2>
-              <div className="space-y-6">
-                {contactInfo.map((info, index) => (
-                  <motion.div
-                    key={info.title}
-                    variants={staggerItem}
-                    className="flex items-start space-x-4"
+                <motion.div variants={fadeInVariant} className="flex justify-center">
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className={`px-8 py-4 rounded-full font-bold text-white 
+                      ${isSubmitting 
+                        ? 'bg-gray-600 cursor-not-allowed' 
+                        : 'bg-gradient-to-r from-secondary-500 to-secondary-600 hover:from-secondary-600 hover:to-secondary-700 transform hover:scale-105'} 
+                      transition-all duration-200 shadow-lg`}
                   >
-                    <motion.div
-                      animate={{
-                        y: [0, -5, 0],
-                        rotate: [0, 5, -5, 0],
-                      }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                      className="text-3xl"
-                    >
-                      {info.icon}
-                    </motion.div>
-                    <div>
-                      <h3 className="font-comic font-bold text-gray-800">
-                        {info.title}
-                      </h3>
-                      <p className="text-gray-600">{info.info}</p>
-                    </div>
+                    {isSubmitting ? (
+                      <span className="flex items-center">
+                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Sending...
+                      </span>
+                    ) : 'Send Message 📨'}
+                  </button>
+                </motion.div>
+              </form>
+
+              {/* Status Messages */}
+              <AnimatePresence>
+                {submitStatus === 'success' && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    className="mt-6 p-4 bg-green-900/20 border border-green-500/30 text-green-400 rounded-lg text-center"
+                  >
+                    Thank you for your message! We'll get back to you soon! 🎉
                   </motion.div>
-                ))}
-              </div>
+                )}
+
+                {submitStatus === 'error' && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    className="mt-6 p-4 bg-red-900/20 border border-red-500/30 text-red-400 rounded-lg text-center"
+                  >
+                    Oops! Something went wrong. Please try again later. 😔
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+        </div>
+      </motion.section>
+
+      {/* Contact Information Cards */}
+      <section className="py-20 px-4 relative z-10">
+        <div className="container mx-auto max-w-6xl">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Address Card */}
+            <motion.div
+              variants={staggerItem}
+              whileHover={{ scale: 1.05 }}
+              className="bg-primary-800/50 backdrop-blur-lg p-8 rounded-3xl shadow-lg border border-primary-700 text-center"
+            >
+              <div className="text-4xl mb-4">📍</div>
+              <h3 className="text-xl font-bold text-secondary-300 mb-2">Visit Us</h3>
+              <p className="text-gray-300">123 School Street</p>
+              <p className="text-gray-300">City Name, State 12345</p>
             </motion.div>
 
-            {/* Map or Additional Information */}
+            {/* Phone Card */}
             <motion.div
-              whileHover={{ scale: 1.02 }}
-              transition={{ type: "spring", stiffness: 300 }}
-              className="bg-white rounded-2xl shadow-xl p-8"
+              variants={staggerItem}
+              whileHover={{ scale: 1.05 }}
+              className="bg-primary-800/50 backdrop-blur-lg p-8 rounded-3xl shadow-lg border border-primary-700 text-center"
             >
-              <h2 className="text-2xl font-comic font-bold text-primary-600 mb-6">
-                Visit Us
-              </h2>
-              <div className="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden bg-gray-200">
-                {/* Add map here */}
-              </div>
+              <div className="text-4xl mb-4">📞</div>
+              <h3 className="text-xl font-bold text-secondary-300 mb-2">Call Us</h3>
+              <p className="text-gray-300">+1 (123) 456-7890</p>
+              <p className="text-gray-300">Mon - Fri: 8:00 AM - 5:00 PM</p>
+            </motion.div>
+
+            {/* Email Card */}
+            <motion.div
+              variants={staggerItem}
+              whileHover={{ scale: 1.05 }}
+              className="bg-primary-800/50 backdrop-blur-lg p-8 rounded-3xl shadow-lg border border-primary-700 text-center"
+            >
+              <div className="text-4xl mb-4">✉️</div>
+              <h3 className="text-xl font-bold text-secondary-300 mb-2">Email Us</h3>
+              <p className="text-gray-300">info@gurukulam.edu</p>
+              <p className="text-gray-300">admissions@gurukulam.edu</p>
             </motion.div>
           </div>
-        </motion.div>
-      </div>
-    </motion.div>
+        </div>
+      </section>
+    </div>
   );
 };
 
