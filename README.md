@@ -92,11 +92,8 @@ The project uses Framer Motion for smooth, interactive animations:
 
 Distributed under the MIT License. See `LICENSE` for more information.
 
-## 📞 Contact
+## 📞 Contact - [Nikhil Sharma](mailto:nikhil.shrma.1104@gmail.com)
 
-Your Name - [Nikhil Sharma](mailto:nikhil.shrma.1104@gmail.com)
-
-Project Link: [https://github.com/your-username/gurukulam-website](https://github.com/your-username/gurukulam-website)
 
 ---
 
