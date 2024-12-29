@@ -1,5 +1,6 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import CalendarModal from '../components/CalendarModal';
 
 interface Event {
   title: string;
@@ -57,6 +58,7 @@ const Events: React.FC = () => {
 
   const categories = ["All", "Sports", "Academic", "Cultural", "Social"];
   const [selectedCategory, setSelectedCategory] = React.useState("All");
+  const [showCalendar, setShowCalendar] = useState(false);
 
   const filteredEvents = events.filter(event => 
     selectedCategory === "All" ? true : event.category === selectedCategory
@@ -185,10 +187,21 @@ const Events: React.FC = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => setShowCalendar(true)}
               className="bg-secondary-500 text-white px-8 py-3 rounded-full hover:bg-secondary-600 transition-colors"
             >
-              View Calendar
+              View Calendar 📅
             </motion.button>
+
+            {/* Calendar Modal */}
+            <AnimatePresence>
+              {showCalendar && (
+                <CalendarModal
+                  isOpen={showCalendar}
+                  onClose={() => setShowCalendar(false)}
+                />
+              )}
+            </AnimatePresence>
           </motion.div>
         </div>
       </section>

@@ -27,6 +27,6 @@ const contactSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   }
-});
+}, { collection: 'contactformdata' });
 
 module.exports = mongoose.model('Contact', contactSchema);

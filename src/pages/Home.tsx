@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import Slider from 'react-slick';
+import YouTube from 'react-youtube';
 
 interface FloatingElementProps {
   emoji: string;
@@ -53,6 +54,10 @@ interface SectionProps {
   description: string;
   className?: string;
   children: React.ReactNode;
+}
+
+interface HeroSectionProps {
+  onOpenVideo: () => void;
 }
 
 const Section: React.FC<SectionProps> = ({ title, subtitle, description, className, children }) => {
@@ -250,7 +255,7 @@ const Butterfly: React.FC<{ className?: string }> = ({ className = "" }) => (
   </motion.div>
 );
 
-const HeroSection: React.FC = () => {
+const HeroSection: React.FC<HeroSectionProps> = ({ onOpenVideo }) => {
   return (
     <motion.div 
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
@@ -356,6 +361,17 @@ const HeroSection: React.FC = () => {
                   Apply Now 🎓
                 </motion.button>
               </Link>
+              <motion.button
+                onClick={onOpenVideo}
+                className="px-8 py-4 bg-primary-500 text-white rounded-full font-semibold
+                         hover:bg-primary-600 transition-colors duration-300
+                         border-2 border-white/20 hover:border-white/30
+                         shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Virtual Tour 🎥
+              </motion.button>
             </motion.div>
           </motion.div>
 
@@ -412,7 +428,7 @@ const HeroSection: React.FC = () => {
               className="absolute -top-4 -right-4 w-24 h-24 bg-secondary-500/20 rounded-full blur-xl"
               animate={{
                 scale: [1, 1.2, 1],
-                opacity: [0.3, 0.5, 0.3],
+                opacity: [0.1, 0.2, 0.1],
               }}
               transition={{ duration: 3, repeat: Infinity }}
             />
@@ -420,7 +436,7 @@ const HeroSection: React.FC = () => {
               className="absolute -bottom-4 -left-4 w-24 h-24 bg-primary-500/20 rounded-full blur-xl"
               animate={{
                 scale: [1.2, 1, 1.2],
-                opacity: [0.5, 0.3, 0.5],
+                opacity: [0.2, 0.1, 0.2],
               }}
               transition={{ duration: 3, repeat: Infinity }}
             />
@@ -558,11 +574,12 @@ const TestimonialCard: React.FC<{ name: string; role: string; quote: string }> =
 );
 
 const Home: React.FC = () => {
+  const [showVideoModal, setShowVideoModal] = useState(false);
   const funFacts: FunFact[] = [
-    { emoji: "🎯", title: "Holistic Growth", description: "Developing intellectual, physical, and emotional capabilities" },
-    { emoji: "🌟", title: "Value Education", description: "Instilling strong moral values and ethical principles" },
-    { emoji: "🚀", title: "Modern Learning", description: "Embracing innovative teaching methods and technology" },
-    { emoji: "🌍", title: "Global Vision", description: "Preparing students for success in a global environment" },
+    { emoji: "🎯", title: "Modern Education", description: "Innovative teaching methods with traditional values" },
+    { emoji: "🌟", title: "Growing Community", description: "400+ students and growing since 2022" },
+    { emoji: "🚀", title: "Digital Learning", description: "Smart classrooms and technology integration" },
+    { emoji: "🌍", title: "Holistic Development", description: "Focus on academic and personal growth" },
   ];
 
   const activities = [
@@ -572,9 +589,9 @@ const Home: React.FC = () => {
   ];
 
   const features = [
-    { emoji: "🏫", title: "Modern Campus", description: "State-of-the-art facilities for optimal learning" },
-    { emoji: "👩‍🏫", title: "Expert Faculty", description: "Dedicated teachers with extensive experience" },
-    { emoji: "🌏", title: "Global Exposure", description: "International programs and cultural exchange" },
+    { emoji: "🏫", title: "Modern Campus", description: "New facilities with latest amenities" },
+    { emoji: "👩‍🏫", title: "Expert Faculty", description: "Dedicated team of 20+ experienced teachers" },
+    { emoji: "📚", title: "Quality Education", description: "95% success rate in academics" },
   ];
 
   const highlights = [
@@ -585,8 +602,50 @@ const Home: React.FC = () => {
 
   return (
     <div className="min-h-screen overflow-hidden bg-primary-900">
+      {/* Video Modal */}
+      <AnimatePresence>
+        {showVideoModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+            onClick={() => setShowVideoModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.5, opacity: 0 }}
+              className="relative w-full max-w-4xl aspect-video bg-black rounded-xl overflow-hidden"
+              onClick={e => e.stopPropagation()}
+            >
+              <YouTube
+                videoId="6DHDX1rXrjU"
+                opts={{
+                  width: '100%',
+                  height: '100%',
+                  playerVars: {
+                    autoplay: 1,
+                    start: 7,
+                  },
+                }}
+                className="w-full h-full"
+              />
+              <button
+                onClick={() => setShowVideoModal(false)}
+                className="absolute top-4 right-4 text-white hover:text-secondary-500 transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Hero Section */}
-      <HeroSection />
+      <HeroSection onOpenVideo={() => setShowVideoModal(true)} />
 
       {/* Why Choose Us - Animated Counter Section */}
       <section className="py-16 bg-secondary-500/10 relative overflow-hidden">
@@ -607,8 +666,8 @@ const Home: React.FC = () => {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
             >
-              <div className="text-4xl font-bold text-secondary-400 mb-2">25+</div>
-              <div className="text-white/90">Years of Excellence</div>
+              <div className="text-4xl font-bold text-secondary-400 mb-2">2022</div>
+              <div className="text-white/90">Established</div>
             </motion.div>
             <motion.div
               className="p-6 rounded-xl bg-primary-800/50"
@@ -618,8 +677,8 @@ const Home: React.FC = () => {
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
             >
-              <div className="text-4xl font-bold text-secondary-400 mb-2">100%</div>
-              <div className="text-white/90">Board Results</div>
+              <div className="text-4xl font-bold text-secondary-400 mb-2">95%</div>
+              <div className="text-white/90">Success Rate</div>
             </motion.div>
             <motion.div
               className="p-6 rounded-xl bg-primary-800/50"
@@ -629,8 +688,8 @@ const Home: React.FC = () => {
               viewport={{ once: true }}
               transition={{ delay: 0.4 }}
             >
-              <div className="text-4xl font-bold text-secondary-400 mb-2">50+</div>
-              <div className="text-white/90">Activities & Clubs</div>
+              <div className="text-4xl font-bold text-secondary-400 mb-2">20+</div>
+              <div className="text-white/90">Expert Teachers</div>
             </motion.div>
             <motion.div
               className="p-6 rounded-xl bg-primary-800/50"
@@ -640,7 +699,7 @@ const Home: React.FC = () => {
               viewport={{ once: true }}
               transition={{ delay: 0.6 }}
             >
-              <div className="text-4xl font-bold text-secondary-400 mb-2">1000+</div>
+              <div className="text-4xl font-bold text-secondary-400 mb-2">400+</div>
               <div className="text-white/90">Happy Students</div>
             </motion.div>
           </div>

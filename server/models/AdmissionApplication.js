@@ -35,6 +35,6 @@ const admissionApplicationSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   }
-});
+}, { collection: 'admissionformdata' });
 
 module.exports = mongoose.model('AdmissionApplication', admissionApplicationSchema);

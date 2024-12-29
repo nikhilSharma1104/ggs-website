@@ -266,8 +266,9 @@ const Contact: React.FC = () => {
             >
               <div className="text-4xl mb-4">📍</div>
               <h3 className="text-xl font-bold text-secondary-300 mb-2">Visit Us</h3>
-              <p className="text-gray-300">123 School Street</p>
-              <p className="text-gray-300">City Name, State 12345</p>
+              <p className="text-gray-300">136 A, Madhuvan Enclave,</p>
+              <p className="text-gray-300">Near Natraj Mutri, Krishna Nagar,</p>
+              <p className="text-gray-300">Mathura, Uttar Pradesh - 281003</p>
             </motion.div>
 
             {/* Phone Card */}
@@ -278,8 +279,9 @@ const Contact: React.FC = () => {
             >
               <div className="text-4xl mb-4">📞</div>
               <h3 className="text-xl font-bold text-secondary-300 mb-2">Call Us</h3>
-              <p className="text-gray-300">+1 (123) 456-7890</p>
-              <p className="text-gray-300">Mon - Fri: 8:00 AM - 5:00 PM</p>
+              <p className="text-gray-300">+91 7505335080</p>
+              <p className="text-gray-300">+91 7617645050</p>
+              <p className="text-gray-300">Mon - Sat: 9:00 AM - 5:00 PM</p>
             </motion.div>
 
             {/* Email Card */}

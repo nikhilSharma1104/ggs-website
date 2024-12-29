@@ -5,10 +5,10 @@ const About: React.FC = () => {
   const [selectedValue, setSelectedValue] = useState<number | null>(null);
 
   const stats = [
-    { icon: "👨‍🏫", value: "50+", label: "Expert Teachers", description: "Highly qualified educators dedicated to excellence" },
-    { icon: "👨‍🎓", value: "1000+", label: "Students", description: "Nurturing young minds from diverse backgrounds" },
-    { icon: "📈", value: "95%", label: "Success Rate", description: "Consistent academic achievement" },
-    { icon: "🏆", value: "25+", label: "Years of Excellence", description: "A legacy of quality education" },
+    { icon: "👨‍🏫", value: "20+", label: "Expert Teachers", description: "Highly qualified educators dedicated to excellence" },
+    { icon: "👨‍🎓", value: "400+", label: "Students", description: "Growing student community since 2022" },
+    { icon: "📈", value: "95%", label: "Success Rate", description: "Exceptional academic achievement" },
+    { icon: "🌟", value: "2022", label: "Established", description: "A young and dynamic institution" },
   ];
 
   return (
@@ -331,29 +331,23 @@ const About: React.FC = () => {
 
             {[
               { 
-                year: "1995", 
+                year: "2022", 
                 title: "Foundation", 
-                description: "Establishment of Gurukulam Global School with a vision for excellence",
-                achievements: ["First batch of 100 students", "State-of-the-art campus", "Pioneering teaching methodology"]
-              },
-              { 
-                year: "2005", 
-                title: "Expansion", 
-                description: "Major campus development and curriculum enhancement",
-                achievements: ["New academic block", "Sports complex", "Digital library"]
-              },
-              { 
-                year: "2015", 
-                title: "Innovation", 
-                description: "Integration of technology and modern learning methods",
-                achievements: ["Smart classrooms", "STEM labs", "International partnerships"]
+                description: "Establishment of Gurukulam Global School with a vision for excellence in education",
+                achievements: ["Started with first batch of students", "Modern campus facilities", "Innovative teaching methodology"]
               },
               { 
                 year: "2023", 
-                title: "Global Recognition", 
-                description: "Achieving international standards and accreditation",
-                achievements: ["ISO certification", "International student exchange", "Research partnerships"]
+                title: "Growth", 
+                description: "Rapid expansion and enhancement of facilities",
+                achievements: ["Growing student community", "Enhanced infrastructure", "Enriched curriculum"]
               },
+              { 
+                year: "2024", 
+                title: "Innovation", 
+                description: "Integration of modern learning methods and technology",
+                achievements: ["Smart classrooms", "Digital learning integration", "400+ student strength"]
+              }
             ].map((milestone, index) => (
               <motion.div
                 key={index}

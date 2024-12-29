@@ -1,0 +1,121 @@
+.rbc-calendar {
+  background-color: white;
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.rbc-toolbar {
+  margin-bottom: 1.5rem;
+}
+
+.rbc-toolbar button {
+  color: #4F46E5;
+  border-color: #4F46E5;
+}
+
+.rbc-toolbar button:hover {
+  background-color: #4F46E5;
+  color: white;
+}
+
+.rbc-toolbar button.rbc-active {
+  background-color: #4F46E5;
+  color: white;
+}
+
+.rbc-event {
+  background-color: #4F46E5;
+}
+
+.rbc-event.rbc-selected {
+  background-color: #6366F1;
+}
+
+.rbc-today {
+  background-color: #EEF2FF;
+}
+
+.rbc-header {
+  padding: 0.5rem;
+  font-weight: 600;
+  color: #1F2937;
+}
+
+.rbc-off-range-bg {
+  background-color: #F3F4F6;
+}
+
+.rbc-date-cell {
+  padding: 0.25rem;
+  color: #4B5563;
+}
+
+.rbc-show-more {
+  color: #4F46E5;
+  font-weight: 500;
+}
+
+.rbc-event-content {
+  font-size: 0.875rem;
+}
+
+.rbc-event-label {
+  font-size: 0.75rem;
+}
+
+.react-calendar {
+  width: 100% !important;
+  border: none !important;
+  background-color: white !important;
+  font-family: inherit !important;
+}
+
+.react-calendar__tile {
+  padding: 1rem !important;
+  font-size: 1rem !important;
+  color: #1F2937 !important;
+}
+
+.react-calendar__tile:enabled:hover,
+.react-calendar__tile:enabled:focus {
+  background-color: #EEF2FF !important;
+  color: #4F46E5 !important;
+}
+
+.react-calendar__tile--now {
+  background-color: #F3F4F6 !important;
+  color: #4F46E5 !important;
+}
+
+.react-calendar__tile--active {
+  background-color: #4F46E5 !important;
+  color: white !important;
+}
+
+.react-calendar__navigation button {
+  font-size: 1.25rem !important;
+  color: #4F46E5 !important;
+}
+
+.react-calendar__navigation button:enabled:hover,
+.react-calendar__navigation button:enabled:focus {
+  background-color: #EEF2FF !important;
+}
+
+.react-calendar__month-view__weekdays__weekday {
+  padding: 0.5rem !important;
+  color: #6B7280 !important;
+  font-weight: 600 !important;
+}
+
+.react-calendar__month-view__weekdays__weekday abbr {
+  text-decoration: none !important;
+}
+
+.bg-secondary-100 {
+  background-color: #EEF2FF !important;
+}
+
+.text-secondary-900 {
+  color: #4F46E5 !important;
+}

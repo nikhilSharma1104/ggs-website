@@ -64,8 +64,9 @@ const Footer = () => {
               <span className="text-2xl">📍</span>
               <div>
                 <p className="font-bold text-secondary-200">Address</p>
-                <p className="text-gray-300">123 School Street, City Name</p>
-                <p className="text-gray-300">State 12345</p>
+                <p className="text-gray-300">136 A, Madhuvan Enclave,</p>
+                <p className="text-gray-300">Near Natraj Mutri, Krishna Nagar,</p>
+                <p className="text-gray-300">Mathura, Uttar Pradesh - 281003</p>
               </div>
             </motion.div>
             <motion.div 
@@ -75,7 +76,8 @@ const Footer = () => {
               <span className="text-2xl">📞</span>
               <div>
                 <p className="font-bold text-secondary-200">Phone</p>
-                <p className="text-gray-300">+1 (123) 456-7890</p>
+                <p className="text-gray-300">+91 7505335080</p>
+                <p className="text-gray-300">+91 7617645050</p>
               </div>
             </motion.div>
           </div>

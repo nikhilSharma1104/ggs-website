@@ -1,5 +1,6 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import YouTube from 'react-youtube';
 
 interface Facility {
   title: string;
@@ -9,6 +10,7 @@ interface Facility {
 }
 
 const CampusLife: React.FC = () => {
+  const [showVideoModal, setShowVideoModal] = useState(false);
   const facilities: Facility[] = [
     {
       title: 'Sports Facilities',
@@ -62,6 +64,48 @@ const CampusLife: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-primary-900">
+      {/* Video Modal */}
+      <AnimatePresence>
+        {showVideoModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+            onClick={() => setShowVideoModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.5, opacity: 0 }}
+              className="relative w-full max-w-4xl aspect-video bg-black rounded-xl overflow-hidden"
+              onClick={e => e.stopPropagation()}
+            >
+              <YouTube
+                videoId="6DHDX1rXrjU"
+                opts={{
+                  width: '100%',
+                  height: '100%',
+                  playerVars: {
+                    autoplay: 1,
+                    start: 7,
+                  },
+                }}
+                className="w-full h-full"
+              />
+              <button
+                onClick={() => setShowVideoModal(false)}
+                className="absolute top-4 right-4 text-white hover:text-secondary-500 transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Hero Section */}
       <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900">
@@ -188,9 +232,10 @@ const CampusLife: React.FC = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => setShowVideoModal(true)}
               className="bg-secondary-500 text-white px-8 py-3 rounded-full hover:bg-secondary-600 transition-colors"
             >
-              Start Virtual Tour
+              Start Virtual Tour 🎥
             </motion.button>
           </motion.div>
         </div>
