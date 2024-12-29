@@ -1,8 +1,8 @@
-# Gurukulam Educational Website
+# Gurukulam GLobal School Website
 
 ## 🌟 Project Overview
 
-Gurukulam is an innovative educational platform designed to provide a comprehensive and holistic learning experience for students. Our website showcases the unique approach of Gurukulam, emphasizing personalized education and holistic development.
+Gurukulam GLobal School is an innovative educational premise innovated to provide a comprehensive and holistic learning experience for students. Our website showcases the unique approach of Gurukulam, emphasizing personalized education and holistic development.
 
 ## 🚀 Features
 
