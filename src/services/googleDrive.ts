@@ -1,4 +1,4 @@
-import { google } from 'googleapis';
+import axios from 'axios';
 
 export interface DriveImage {
   id: string;
@@ -8,63 +8,39 @@ export interface DriveImage {
   category?: string;
 }
 
-const SCOPES = ['https://www.googleapis.com/auth/drive.readonly'];
-
-// Function to initialize the Google Drive API client
-const initializeGoogleDrive = async () => {
-  try {
-    // You'll need to replace these with your actual credentials
-    const credentials = {
-      client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
-      client_secret: process.env.REACT_APP_GOOGLE_CLIENT_SECRET,
-      redirect_uri: process.env.REACT_APP_GOOGLE_REDIRECT_URI,
-    };
-
-    const oauth2Client = new google.auth.OAuth2(
-      credentials.client_id,
-      credentials.client_secret,
-      credentials.redirect_uri
-    );
-
-    // Set credentials if you have a token
-    if (process.env.REACT_APP_GOOGLE_REFRESH_TOKEN) {
-      oauth2Client.setCredentials({
-        refresh_token: process.env.REACT_APP_GOOGLE_REFRESH_TOKEN,
-      });
-    }
-
-    return google.drive({ version: 'v3', auth: oauth2Client });
-  } catch (error) {
-    console.error('Error initializing Google Drive:', error);
-    throw error;
-  }
-};
+const API_KEY = process.env.REACT_APP_GOOGLE_API_KEY;
 
 // Function to get images from a specific folder
 export const getImagesFromFolder = async (folderId: string): Promise<DriveImage[]> => {
+  if (!API_KEY) {
+    throw new Error('Google Drive API key is missing. Please check your environment variables.');
+  }
+
   try {
-    const drive = await initializeGoogleDrive();
+    const query = `'${folderId}' in parents and mimeType contains 'image/' and trashed = false`;
+    const response = await axios.get(
+      `https://www.googleapis.com/drive/v3/files`,
+      {
+        params: {
+          q: query,
+          key: API_KEY,
+          fields: 'files(id, name, webViewLink, thumbnailLink)',
+          orderBy: 'name',
+        },
+      }
+    );
 
-    // Query files in the specified folder
-    const response = await drive.files.list({
-      q: `'${folderId}' in parents and (mimeType contains 'image/')`,
-      fields: 'files(id, name, webViewLink, thumbnailLink)',
-      pageSize: 100,
-    });
-
-    const files = response.data.files;
-    if (!files || files.length === 0) {
+    if (!response.data || !response.data.files) {
+      console.warn('No images found in the folder');
       return [];
     }
 
-    // Transform the files into our DriveImage format
-    return files.map((file) => ({
-      id: file.id || '',
-      name: file.name || '',
-      webViewLink: file.webViewLink || '',
-      thumbnailLink: file.thumbnailLink || '',
-      // You can add category based on folder structure or file naming convention
-      category: getCategoryFromFileName(file.name || ''),
+    return response.data.files.map((file: any) => ({
+      id: file.id,
+      name: file.name,
+      webViewLink: file.webViewLink,
+      thumbnailLink: file.thumbnailLink,
+      category: getCategoryFromFileName(file.name),
     }));
   } catch (error) {
     console.error('Error fetching images from Google Drive:', error);
@@ -72,9 +48,10 @@ export const getImagesFromFolder = async (folderId: string): Promise<DriveImage[
   }
 };
 
-// Helper function to extract category from file name (you can customize this)
+// Helper function to extract category from file name
 const getCategoryFromFileName = (fileName: string): string => {
-  // Example: "Campus_MainBuilding.jpg" -> "Campus"
-  const category = fileName.split('_')[0];
-  return category || 'Uncategorized';
+  // Remove the file extension
+  const nameWithoutExtension = fileName.split('.').slice(0, -1).join('.');
+  // Split by underscore or hyphen and get the first part
+  return nameWithoutExtension.split(/[-_]/)[0].trim();
 };

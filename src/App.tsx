@@ -15,6 +15,7 @@ import FoundationalStage from './pages/FoundationalStage';
 import PreparatoryStage from './pages/PreparatoryStage';
 import MiddleStage from './pages/MiddleStage';
 import Prospectus from './pages/Prospectus';
+import Careers from './pages/Careers';
 import AdmissionPopup from './components/AdmissionPopup';
 
 const PageTransition: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -64,6 +65,7 @@ function App() {
               <Route path="/gallery" element={<PageTransition><Gallery /></PageTransition>} />
               <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
               <Route path="/prospectus" element={<PageTransition><Prospectus /></PageTransition>} />
+              <Route path="/careers" element={<PageTransition><Careers /></PageTransition>} />
             </Routes>
           </AnimatePresence>
         </main>

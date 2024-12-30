@@ -12,6 +12,8 @@
     "@google-cloud/local-auth": "^3.0.1",
     "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.2.0",
+    "@types/cors": "^2.8.17",
+    "@types/mongoose": "^5.11.96",
     "@types/react-calendar": "^3.9.0",
     "autoprefixer": "^10.4.20",
     "axios": "^1.7.9",
@@ -22,7 +24,7 @@
     "express": "^4.21.2",
     "framer-motion": "^11.14.4",
     "googleapis": "^144.0.0",
-    "mongoose": "^8.9.2",
+    "mongoose": "^8.9.3",
     "postcss": "^8.4.49",
     "react": "^19.0.0",
     "react-big-calendar": "^1.17.1",
@@ -38,9 +40,9 @@
     "web-vitals": "^4.2.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -69,6 +71,20 @@
     "@types/react-big-calendar": "^1.16.0",
     "@types/react-dom": "^19.0.2",
     "@types/testing-library__react": "^10.0.1",
-    "typescript": "^4.9.5"
+    "assert": "^2.1.0",
+    "browserify-zlib": "^0.2.0",
+    "buffer": "^6.0.3",
+    "crypto-browserify": "^3.12.1",
+    "https-browserify": "^1.0.0",
+    "os-browserify": "^0.3.0",
+    "path-browserify": "^1.0.1",
+    "process": "^0.11.10",
+    "querystring-es3": "^0.2.1",
+    "react-app-rewired": "^2.2.1",
+    "stream-browserify": "^3.0.0",
+    "stream-http": "^3.2.0",
+    "typescript": "^4.9.5",
+    "url": "^0.11.4",
+    "util": "^0.12.5"
   }
 }
