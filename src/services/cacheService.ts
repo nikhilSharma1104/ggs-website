@@ -4,52 +4,65 @@ interface CacheData<T> {
 }
 
 export class CacheService {
-  private static MONTH_IN_MS = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
-
   static async getOrFetch<T>(
     key: string,
     fetchFn: () => Promise<T>,
     forceRefresh: boolean = false
   ): Promise<T> {
-    const cachedData = localStorage.getItem(key);
-
-    if (cachedData && !forceRefresh) {
-      const parsed: CacheData<T> = JSON.parse(cachedData);
-      const isExpired = Date.now() - parsed.timestamp > this.MONTH_IN_MS;
-
-      if (!isExpired) {
-        console.log(`Using cached data for ${key}`);
-        return parsed.data;
+    if (!forceRefresh) {
+      const cachedData = this.getCache<T>(key);
+      if (cachedData) {
+        return cachedData;
       }
     }
 
+    const freshData = await fetchFn();
+    this.setCache(key, freshData);
+    return freshData;
+  }
+
+  static getCache<T>(key: string): T | null {
     try {
-      console.log(`Fetching fresh data for ${key}`);
-      const freshData = await fetchFn();
-      
-      const cacheData: CacheData<T> = {
-        data: freshData,
-        timestamp: Date.now(),
-      };
-      
-      localStorage.setItem(key, JSON.stringify(cacheData));
-      return freshData;
-    } catch (error) {
-      // If fetch fails and we have cached data, use it as fallback
-      if (cachedData) {
-        console.log(`Fetch failed, using cached data for ${key}`);
-        const parsed: CacheData<T> = JSON.parse(cachedData);
-        return parsed.data;
+      const item = localStorage.getItem(key);
+      if (!item) return null;
+
+      const { data, timestamp } = JSON.parse(item);
+      const now = Date.now();
+      const CACHE_DURATION = 30 * 24 * 60 * 60 * 1000; // 30 days
+
+      if (now - timestamp > CACHE_DURATION) {
+        this.clearCache(key);
+        return null;
       }
-      throw error;
+
+      return data;
+    } catch (error) {
+      console.error('Error reading from cache:', error);
+      return null;
     }
   }
 
-  static clearCache(key: string) {
+  static setCache(key: string, data: any): void {
+    try {
+      const cacheData = {
+        data,
+        timestamp: Date.now(),
+      };
+      localStorage.setItem(key, JSON.stringify(cacheData));
+    } catch (error) {
+      console.error('Error writing to cache:', error);
+    }
+  }
+
+  static clearCache(key: string): void {
     localStorage.removeItem(key);
   }
 
-  static clearAllCache() {
+  static clearAllCache(): void {
     localStorage.clear();
+  }
+
+  static forceRefresh(key: string): void {
+    this.clearCache(key);
   }
 }

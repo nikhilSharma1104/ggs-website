@@ -7,25 +7,32 @@ export interface DriveImage {
   webViewLink: string;
   thumbnailLink: string;
   category?: string;
+  mimeType: string;
 }
+
+const CACHE_KEY = 'galleryImages';
 
 // Function to fetch fresh images from Google Drive
 const fetchImagesFromDrive = async (folderId: string): Promise<DriveImage[]> => {
   const API_KEY = process.env.REACT_APP_GOOGLE_API_KEY;
 
   if (!API_KEY) {
-    throw new Error('Google Drive API key is missing. Please check your environment variables.');
+    throw new Error('Google Drive API key is missing');
   }
 
   try {
-    const query = `'${folderId}' in parents and mimeType contains 'image/' and trashed = false`;
+    // Query for all image types
+    const query = `'${folderId}' in parents and (
+      mimeType contains 'image/'
+    ) and trashed = false`;
+
     const response = await axios.get(
       'https://www.googleapis.com/drive/v3/files',
       {
         params: {
           q: query,
           key: API_KEY,
-          fields: 'files(id, name)',
+          fields: 'files(id, name, mimeType, thumbnailLink)',
           orderBy: 'name',
           pageSize: 1000,
         },
@@ -40,10 +47,9 @@ const fetchImagesFromDrive = async (folderId: string): Promise<DriveImage[]> => 
     return response.data.files.map((file: any) => ({
       id: file.id,
       name: file.name,
-      // For full-size image viewing
-      webViewLink: `https://lh3.googleusercontent.com/d/${file.id}`,
-      // For thumbnail
-      thumbnailLink: `https://lh3.googleusercontent.com/d/${file.id}=w400-h400-p-k-nu`,
+      mimeType: file.mimeType,
+      webViewLink: `https://drive.google.com/uc?export=view&id=${file.id}`,
+      thumbnailLink: file.thumbnailLink || `https://drive.google.com/thumbnail?id=${file.id}`,
       category: getCategoryFromFileName(file.name),
     }));
   } catch (error) {
@@ -54,23 +60,23 @@ const fetchImagesFromDrive = async (folderId: string): Promise<DriveImage[]> => 
 
 // Function to get images with caching
 export const getImagesFromFolder = async (folderId: string, forceRefresh: boolean = false): Promise<DriveImage[]> => {
-  const cacheKey = `drive_images_${folderId}`;
-  
   try {
-    const images = await CacheService.getOrFetch<DriveImage[]>(
-      cacheKey,
+    return await CacheService.getOrFetch<DriveImage[]>(
+      CACHE_KEY,
       () => fetchImagesFromDrive(folderId),
       forceRefresh
     );
-    return images;
   } catch (error) {
     console.error('Error getting images:', error);
-    throw error;
+    // If cache fails, try fetching directly
+    return fetchImagesFromDrive(folderId);
   }
 };
 
 // Helper function to extract category from file name
 const getCategoryFromFileName = (fileName: string): string => {
-  const parts = fileName.split('_');
+  // Remove file extension and get first part before underscore
+  const nameWithoutExtension = fileName.replace(/\.[^/.]+$/, '');
+  const parts = nameWithoutExtension.split('_');
   return parts[0] || 'Uncategorized';
 };

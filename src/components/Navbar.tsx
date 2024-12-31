@@ -39,23 +39,35 @@ const Navbar: React.FC = () => {
       animate={{ y: 0 }}
       className={`fixed w-full z-50 transition-all duration-300 ${
         scrolled
-          ? 'bg-primary-900/95 backdrop-blur-lg shadow-lg'
+          ? 'bg-primary-900/95 backdrop-blur-sm shadow-lg'
           : 'bg-transparent'
       }`}
     >
-      <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center h-20">
-          {/* Logo */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            className="flex items-center space-x-2"
-          >
-            <Link to="/" className="flex items-center space-x-2">
-              <span className="text-2xl font-bold text-white">Gurukulam Global School</span>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16">
+          <div className="flex-shrink-0 flex items-center">
+            <Link to="/" className="flex items-center space-x-3">
+              <img
+                src="/logo.png"
+                alt="Gurukulam Global School"
+                className={`transition-all duration-300 ${
+                  scrolled ? 'h-10' : 'h-12'
+                }`}
+              />
+              <div className="flex flex-col">
+                <span className={`font-bold text-lg md:text-xl lg:text-2xl text-white transition-all duration-300 ${
+                  scrolled ? 'text-lg' : 'text-xl'
+                }`}>
+                  Gurukulam Global School
+                </span>
+                <span className={`text-sm text-secondary-400 transition-opacity duration-300 ${
+                  scrolled ? 'opacity-0 h-0' : 'opacity-100'
+                }`}>
+                  Nurturing Future Leaders
+                </span>
+              </div>
             </Link>
-          </motion.div>
+          </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1">
@@ -69,7 +81,9 @@ const Navbar: React.FC = () => {
                 <Link
                   to={item.href}
                   className={`relative px-4 py-2 rounded-lg text-white hover:text-secondary-500 transition-colors ${
-                    location.pathname === item.href ? 'text-secondary-500' : ''
+                    location.pathname === item.href
+                      ? 'text-secondary-500'
+                      : ''
                   }`}
                 >
                   {item.name}
@@ -81,7 +95,7 @@ const Navbar: React.FC = () => {
                       transition={{
                         type: "spring",
                         stiffness: 380,
-                        damping: 30
+                        damping: 30,
                       }}
                     />
                   )}

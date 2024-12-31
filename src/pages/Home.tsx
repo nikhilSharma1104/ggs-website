@@ -60,6 +60,24 @@ interface HeroSectionProps {
   onOpenVideo: () => void;
 }
 
+const specializedPrograms = [
+  {
+    icon: "🌍",
+    title: "Foreign Language Program",
+    description: "Learn global languages and cultures. Our program includes multiple foreign languages taught by expert instructors, preparing students for international opportunities."
+  },
+  {
+    icon: "🤖",
+    title: "AI & Programming Lab",
+    description: "State-of-the-art technology lab where students learn artificial intelligence, programming, and computational thinking through hands-on projects."
+  },
+  {
+    icon: "🚀",
+    title: "Innovation Hub",
+    description: "A creative space where technology meets imagination. Students work on innovative projects, combining their programming skills with real-world applications."
+  }
+];
+
 const Section: React.FC<SectionProps> = ({ title, subtitle, description, className, children }) => {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
@@ -783,6 +801,31 @@ const Home: React.FC = () => {
             role="Parent"
             quote="The school's focus on values and character development sets it apart. We're extremely happy with our decision."
           />
+        </div>
+      </Section>
+
+      {/* Specialized Programs */}
+      <Section
+        title="Specialized Programs"
+        subtitle="Future-Ready Education"
+        description="We offer cutting-edge programs to prepare our students for the global stage"
+        className="bg-primary-700/50"
+      >
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {specializedPrograms.map((program, index) => (
+            <motion.div
+              key={program.title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              viewport={{ once: true }}
+              className="bg-primary-800/50 rounded-xl p-6 backdrop-blur-sm hover:bg-primary-800/70 transition-all duration-300"
+            >
+              <div className="text-4xl mb-4">{program.icon}</div>
+              <h3 className="text-xl font-bold text-white mb-2">{program.title}</h3>
+              <p className="text-gray-300">{program.description}</p>
+            </motion.div>
+          ))}
         </div>
       </Section>
 

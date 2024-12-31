@@ -18,6 +18,7 @@ const Gallery: React.FC = () => {
   const [images, setImages] = useState<GalleryImage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Create unique categories array
   const categories = ['all', ...images
@@ -30,43 +31,54 @@ const Gallery: React.FC = () => {
     ? images
     : images.filter(img => img.category === selectedCategory);
 
-  useEffect(() => {
-    const fetchImages = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        const folderId = process.env.REACT_APP_GOOGLE_DRIVE_GALLERY_FOLDER_ID;
-        const apiKey = process.env.REACT_APP_GOOGLE_API_KEY;
+  const fetchImages = async (forceRefresh: boolean = false) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const folderId = process.env.REACT_APP_GOOGLE_DRIVE_GALLERY_FOLDER_ID;
+      const apiKey = process.env.REACT_APP_GOOGLE_API_KEY;
 
-        if (!folderId) {
-          throw new Error('Google Drive Gallery folder ID not configured');
-        }
+      if (!folderId) {
+        throw new Error('Google Drive Gallery folder ID not configured');
+      }
 
-        if (!apiKey) {
-          throw new Error('Google Drive API key not configured');
-        }
+      if (!apiKey) {
+        throw new Error('Google Drive API key not configured');
+      }
 
-        const driveImages = await getImagesFromFolder(folderId, false);
-        
-        const galleryImages: GalleryImage[] = driveImages.map(img => ({
+      const driveImages = await getImagesFromFolder(folderId, forceRefresh);
+      
+      const galleryImages: GalleryImage[] = driveImages
+        .filter(img => img.mimeType.startsWith('image/'))
+        .map(img => ({
           id: img.id,
-          url: img.thumbnailLink, // Use thumbnail for grid view
+          url: img.thumbnailLink,
           title: img.name.split('_').slice(1).join(' ').replace(/\.[^/.]+$/, ''),
           category: img.category || 'Uncategorized',
           description: '',
-          fullSizeUrl: img.webViewLink, // Use webViewLink for full-size view
+          fullSizeUrl: img.webViewLink,
         }));
 
-        setImages(galleryImages);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch images');
-        console.error('Error fetching images:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+      setImages(galleryImages);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch images');
+      console.error('Error fetching images:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  const refreshGallery = async () => {
+    try {
+      setIsRefreshing(true);
+      await fetchImages(true);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
     fetchImages();
   }, []);
 
@@ -98,13 +110,37 @@ const Gallery: React.FC = () => {
           Our Gallery
         </motion.h1>
         <motion.p 
-          className="text-xl text-gray-300 max-w-2xl mx-auto"
+          className="text-xl text-gray-300 max-w-2xl mx-auto mb-8"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
           Capturing moments and memories from our vibrant school life
         </motion.p>
+        
+        <motion.button
+          onClick={refreshGallery}
+          disabled={isRefreshing}
+          className={`px-6 py-3 rounded-full text-sm font-medium transition-all
+            ${isRefreshing 
+              ? 'bg-secondary-700 cursor-not-allowed'
+              : 'bg-secondary-500 hover:bg-secondary-600 active:bg-secondary-700'
+            } text-white shadow-lg shadow-secondary-500/30`}
+          whileHover={{ scale: isRefreshing ? 1 : 1.05 }}
+          whileTap={{ scale: isRefreshing ? 1 : 0.95 }}
+        >
+          {isRefreshing ? (
+            <span className="flex items-center">
+              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Refreshing...
+            </span>
+          ) : (
+            'Refresh Gallery'
+          )}
+        </motion.button>
       </div>
 
       {/* Category Filter */}
