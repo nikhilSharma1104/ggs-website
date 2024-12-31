@@ -760,50 +760,6 @@ const Home: React.FC = () => {
         </div>
       </Section>
 
-      {/* Student Life Gallery */}
-      <Section
-        title="Student Life"
-        subtitle="Moments That Define Us"
-        description="Experience the vibrant campus life at our school, where every day brings new opportunities for learning, growth, and achievement."
-        className="bg-primary-700/50"
-      >
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <motion.div
-            className="relative h-64 rounded-xl overflow-hidden group"
-            whileHover={{ scale: 1.05 }}
-          >
-            <img src="/images/academic.jpg" alt="Academic Life" className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-primary-900 to-transparent opacity-75" />
-            <div className="absolute bottom-0 left-0 p-6">
-              <h3 className="text-2xl font-bold text-white mb-2">Academic Life</h3>
-              <p className="text-white/90">Engaging learning experiences</p>
-            </div>
-          </motion.div>
-          <motion.div
-            className="relative h-64 rounded-xl overflow-hidden group"
-            whileHover={{ scale: 1.05 }}
-          >
-            <img src="/images/sports.jpg" alt="Sports" className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-primary-900 to-transparent opacity-75" />
-            <div className="absolute bottom-0 left-0 p-6">
-              <h3 className="text-2xl font-bold text-white mb-2">Sports</h3>
-              <p className="text-white/90">Building champions</p>
-            </div>
-          </motion.div>
-          <motion.div
-            className="relative h-64 rounded-xl overflow-hidden group"
-            whileHover={{ scale: 1.05 }}
-          >
-            <img src="/images/arts.jpg" alt="Arts & Culture" className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-primary-900 to-transparent opacity-75" />
-            <div className="absolute bottom-0 left-0 p-6">
-              <h3 className="text-2xl font-bold text-white mb-2">Arts & Culture</h3>
-              <p className="text-white/90">Nurturing creativity</p>
-            </div>
-          </motion.div>
-        </div>
-      </Section>
-
       {/* Testimonials */}
       <Section
         title="What Parents Say"
@@ -827,20 +783,6 @@ const Home: React.FC = () => {
             role="Parent"
             quote="The school's focus on values and character development sets it apart. We're extremely happy with our decision."
           />
-        </div>
-      </Section>
-
-      {/* Student Life */}
-      <Section
-        title="Student Life"
-        subtitle="Experience the Gurukulam difference"
-        description="Life at Gurukulam is a perfect blend of academics, activities, and personal growth."
-        className="bg-primary-900"
-      >
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {highlights.map((highlight, index) => (
-            <ActivityCard key={index} activity={highlight} index={index} />
-          ))}
         </div>
       </Section>
 
