@@ -1,95 +1,62 @@
 import React, { useState } from 'react';
-import { AdvancedImage } from '@cloudinary/react';
-import { Cloudinary } from '@cloudinary/url-gen';
-import { fill } from '@cloudinary/url-gen/actions/resize';
+import { motion } from 'framer-motion';
 
 interface ImageUploadProps {
-  onImageUpload?: (url: string) => void;
+  onUploadComplete: (file: File) => void;
+  className?: string;
 }
 
-const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload }) => {
-  const [uploading, setUploading] = useState(false);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+const ImageUpload: React.FC<ImageUploadProps> = ({ onUploadComplete, className = '' }) => {
+  const [isDragging, setIsDragging] = useState(false);
 
-  const uploadImage = async (file: File) => {
-    try {
-      setUploading(true);
-      setError(null);
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
 
-      // Create form data
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('upload_preset', 'your_upload_preset'); // Replace with your upload preset
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
 
-      // Upload to Cloudinary
-      const response = await fetch(
-        `https://api.cloudinary.com/v1_1/your-cloud-name/image/upload`, // Replace with your cloud name
-        {
-          method: 'POST',
-          body: formData,
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error('Upload failed');
-      }
-
-      const data = await response.json();
-      const url = data.secure_url;
-      setImageUrl(url);
-      onImageUpload?.(url);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to upload image');
-    } finally {
-      setUploading(false);
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      onUploadComplete(file);
     }
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      if (file.size > 10 * 1024 * 1024) { // 10MB limit
-        setError('File size should be less than 10MB');
-        return;
-      }
-      uploadImage(file);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files?.[0]) {
+      onUploadComplete(e.target.files[0]);
     }
   };
 
   return (
-    <div className="w-full">
-      <div className="mb-4">
-        <label
-          className="block w-full px-4 py-2 text-sm text-white bg-primary-600 rounded-lg cursor-pointer hover:bg-primary-700 transition-colors text-center"
-        >
-          {uploading ? 'Uploading...' : 'Choose Image'}
-          <input
-            type="file"
-            className="hidden"
-            accept="image/*"
-            onChange={handleFileChange}
-            disabled={uploading}
-          />
-        </label>
+    <motion.div
+      className={`relative border-2 border-dashed rounded-lg p-6 text-center cursor-pointer
+                 ${isDragging ? 'border-secondary-500 bg-secondary-500/10' : 'border-gray-600 hover:border-gray-500'}
+                 ${className}`}
+      whileHover={{ scale: 1.02 }}
+      onDragEnter={handleDragEnter}
+      onDragOver={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
+      <input
+        type="file"
+        onChange={handleFileChange}
+        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+        accept="image/*"
+      />
+      <div className="text-white/80">
+        <p className="mb-2">Drag and drop an image here, or click to select</p>
+        <p className="text-sm">Supports: JPG, PNG, GIF (max 5MB)</p>
       </div>
-
-      {error && (
-        <div className="text-red-500 text-sm mb-4">
-          {error}
-        </div>
-      )}
-
-      {imageUrl && (
-        <div className="relative rounded-lg overflow-hidden">
-          <img
-            src={imageUrl}
-            alt="Uploaded"
-            className="w-full h-auto rounded-lg"
-          />
-        </div>
-      )}
-    </div>
+    </motion.div>
   );
 };
 

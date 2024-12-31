@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
-import { CloudinaryContext } from '@cloudinary/react';
 import { FaChalkboardTeacher, FaUserTie, FaUsers, FaFileUpload } from 'react-icons/fa';
 
 const Careers: React.FC = () => {
@@ -14,7 +13,7 @@ const Careers: React.FC = () => {
     phone: '',
     experience: '',
     education: '',
-    resumeUrl: '',
+    resume: null as File | null,
     coverLetter: ''
   });
 
@@ -28,26 +27,12 @@ const Careers: React.FC = () => {
     });
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files?.[0]) return;
-
-    const file = e.target.files[0];
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', 'your_upload_preset');
-
-    try {
-      const response = await axios.post(
-        `https://api.cloudinary.com/v1_1/your-cloud-name/upload`,
-        formData
-      );
-      setFormData(prev => ({
-        ...prev,
-        resumeUrl: response.data.secure_url
-      }));
-    } catch (error) {
-      console.error('Error uploading file:', error);
-    }
+    setFormData(prev => ({
+      ...prev,
+      resume: e.target.files![0]
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -70,7 +55,7 @@ const Careers: React.FC = () => {
         phone: '',
         experience: '',
         education: '',
-        resumeUrl: '',
+        resume: null,
         coverLetter: ''
       });
     } catch (error) {
@@ -166,7 +151,7 @@ const Careers: React.FC = () => {
             className="text-center mb-16"
           >
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Why Join GGS?</h2>
-            <p className="text-xl text-white/80 max-w-3xl mx-auto">
+            <p className="text-xl text-white/80">
               Be part of an institution that values growth, innovation, and excellence in education
             </p>
           </motion.div>
@@ -380,8 +365,8 @@ const Careers: React.FC = () => {
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className={`mt-6 p-4 rounded-lg ${
-                    submitStatus.type === 'success' 
-                      ? 'bg-green-500/20 text-green-200 border border-green-500/30' 
+                    submitStatus.type === 'success'
+                      ? 'bg-green-500/20 text-green-200 border border-green-500/30'
                       : 'bg-red-500/20 text-red-200 border border-red-500/30'
                   }`}
                 >
