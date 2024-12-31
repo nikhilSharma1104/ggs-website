@@ -20,10 +20,10 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="relative bg-primary-900 text-white pt-16 pb-8 overflow-hidden">
+    <footer className="relative bg-primary-900 text-white pt-12 pb-6 overflow-hidden">
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(30)].map((_, i) => (
+        {[...Array(20)].map((_, i) => (
           <motion.div
             key={i}
             className="absolute w-2 h-2 bg-gradient-to-r from-secondary-500 to-primary-500 rounded-full"
@@ -47,150 +47,119 @@ const Footer = () => {
         ))}
       </div>
 
-      <div className="container mx-auto grid md:grid-cols-4 gap-12 px-4 relative z-10">
-        {/* Contact Information */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="backdrop-blur-sm"
-        >
-          <h3 className="text-2xl font-bold text-secondary-300 mb-6">Contact Us</h3>
-          <div className="space-y-4">
-            <motion.div 
-              className="flex items-center space-x-3 hover:bg-primary-800/50 p-2 rounded-lg transition-all border border-primary-800/50"
-              whileHover={{ scale: 1.02 }}
-            >
-              <span className="text-2xl">📍</span>
-              <div>
-                <p className="font-bold text-secondary-200">Address</p>
-                <p className="text-gray-300">136 A, Madhuvan Enclave,</p>
-                <p className="text-gray-300">Near Natraj Mutri, Krishna Nagar,</p>
-                <p className="text-gray-300">Mathura, Uttar Pradesh - 281003</p>
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
+          {/* Map and Contact Section */}
+          <div className="lg:col-span-2">
+            <div className="grid md:grid-cols-2 gap-8">
+              {/* Map */}
+              <div className="h-[250px]">
+                <iframe 
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3538.874189167418!2d77.6549611!3d27.504287899999994!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x397371e014c8525f%3A0x9019ba62fabf9da7!2sGurukulam%20Global%20School%20-%20Best%20School%20in%20Mathura%20%7C%20Most%20Dynamic%20School%20In%20Mathura%20-%20Vridavan%20Region!5e0!3m2!1sen!2sin!4v1735657740426!5m2!1sen!2sin"
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen={true}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Gurukulam Global School Location"
+                  className="rounded-lg"
+                />
               </div>
-            </motion.div>
-            <motion.div 
-              className="flex items-center space-x-3 hover:bg-primary-800/50 p-2 rounded-lg transition-all border border-primary-800/50"
-              whileHover={{ scale: 1.02 }}
-            >
-              <span className="text-2xl">📞</span>
+
+              {/* Contact Info */}
               <div>
-                <p className="font-bold text-secondary-200">Phone</p>
-                <p className="text-gray-300">+91 7505335080</p>
-                <p className="text-gray-300">+91 7617645050</p>
+                <h3 className="text-xl font-bold text-secondary-300 mb-4">Contact Us</h3>
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-3 p-2 rounded-lg border border-primary-800/50">
+                    <span className="text-xl">📍</span>
+                    <div>
+                      <p className="text-secondary-200">136 A, Madhuvan Enclave,</p>
+                      <p className="text-gray-300">Near Natraj Mutri, Krishna Nagar,</p>
+                      <p className="text-gray-300">Mathura, UP - 281003</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-3 p-2 rounded-lg border border-primary-800/50">
+                    <span className="text-xl">📞</span>
+                    <div>
+                      <p className="text-gray-300">+91 7505335080</p>
+                      <p className="text-gray-300">+91 7617645050</p>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </motion.div>
-          </div>
-        </motion.div>
-
-        {/* Quick Links */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="backdrop-blur-sm"
-        >
-          <h3 className="text-2xl font-bold text-secondary-300 mb-6">Quick Links</h3>
-          <ul className="space-y-3">
-            {quickLinks.map((link) => (
-              <motion.li key={link.name}>
-                <Link
-                  to={link.path}
-                  className="text-gray-300 hover:text-secondary-300 transition-colors flex items-center space-x-2 group"
-                >
-                  <motion.span
-                    className="inline-block"
-                    initial={{ x: 0 }}
-                    whileHover={{ x: 5 }}
-                  >
-                    ➜
-                  </motion.span>
-                  <span>{link.name}</span>
-                </Link>
-              </motion.li>
-            ))}
-          </ul>
-        </motion.div>
-
-        {/* Social Links */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className="backdrop-blur-sm"
-        >
-          <h3 className="text-2xl font-bold text-secondary-300 mb-6">Connect With Us</h3>
-          <div className="flex flex-wrap gap-4">
-            {socialLinks.map((social) => (
-              <motion.a
-                key={social.name}
-                href={social.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-primary-800/50 hover:bg-primary-700/50 p-3 rounded-lg transition-all border border-primary-800/50"
-                whileHover={{ scale: 1.1 }}
-                onHoverStart={() => setIsHovered(social.name)}
-                onHoverEnd={() => setIsHovered(null)}
-              >
-                <i className={`${social.icon} text-2xl ${isHovered === social.name ? 'text-secondary-400' : 'text-gray-300'}`}></i>
-              </motion.a>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Newsletter */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.6 }}
-          className="backdrop-blur-sm"
-        >
-          <h3 className="text-2xl font-bold text-secondary-300 mb-6">Newsletter</h3>
-          <form className="space-y-4">
-            <div>
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="w-full px-4 py-3 rounded-lg bg-primary-800/50 border border-primary-700 text-white placeholder-gray-400 focus:border-secondary-500 focus:ring-2 focus:ring-secondary-500/20 transition-all"
-              />
             </div>
-            <motion.button
-              type="submit"
-              className="w-full px-6 py-3 bg-gradient-to-r from-secondary-500 to-secondary-600 hover:from-secondary-600 hover:to-secondary-700 text-white rounded-lg transition-all"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              Subscribe
-            </motion.button>
-          </form>
-        </motion.div>
-      </div>
+          </div>
 
-      {/* Bottom Bar */}
-      <div className="mt-16 pt-8 border-t border-primary-800">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.8 }}
-              className="text-gray-400 text-center md:text-left"
-            >
-              &copy; {new Date().getFullYear()} Gurukulam Global School. All rights reserved.
-            </motion.p>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 1 }}
-              className="flex space-x-6"
-            >
-              <Link to="/privacy" className="text-gray-400 hover:text-secondary-300 transition-colors">
-                Privacy Policy
-              </Link>
-              <Link to="/terms" className="text-gray-400 hover:text-secondary-300 transition-colors">
-                Terms of Service
-              </Link>
-            </motion.div>
+          {/* Quick Links and Social */}
+          <div className="space-y-6">
+            {/* Quick Links */}
+            <div>
+              <h3 className="text-xl font-bold text-secondary-300 mb-4">Quick Links</h3>
+              <ul className="grid grid-cols-2 gap-2">
+                {quickLinks.map((link) => (
+                  <li key={link.name}>
+                    <Link
+                      to={link.path}
+                      className="text-gray-300 hover:text-secondary-300 transition-colors flex items-center space-x-1"
+                    >
+                      <span>➜</span>
+                      <span>{link.name}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Social Links */}
+            <div>
+              <h3 className="text-xl font-bold text-secondary-300 mb-4">Connect With Us</h3>
+              <div className="flex gap-3">
+                {socialLinks.map((social) => (
+                  <motion.a
+                    key={social.name}
+                    href={social.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-primary-800/50 p-2 rounded-lg border border-primary-800/50"
+                    whileHover={{ scale: 1.1 }}
+                    onHoverStart={() => setIsHovered(social.name)}
+                    onHoverEnd={() => setIsHovered(null)}
+                  >
+                    <i className={`${social.icon} text-xl ${isHovered === social.name ? 'text-secondary-400' : 'text-gray-300'}`}></i>
+                  </motion.a>
+                ))}
+              </div>
+            </div>
+
+            {/* Newsletter - Simplified */}
+            <div>
+              <h3 className="text-xl font-bold text-secondary-300 mb-4">Newsletter</h3>
+              <div className="flex">
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  className="flex-1 px-3 py-2 rounded-l-lg bg-primary-800/50 border border-primary-700 text-white placeholder-gray-400"
+                />
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-secondary-500 hover:bg-secondary-600 text-white rounded-r-lg transition-colors"
+                >
+                  →
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Bar - Simplified */}
+        <div className="pt-6 border-t border-primary-800">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-400">
+            <p>&copy; {new Date().getFullYear()} Gurukulam Global School. All rights reserved.</p>
+            <div className="flex gap-4">
+              <Link to="/privacy" className="hover:text-secondary-300 transition-colors">Privacy</Link>
+              <Link to="/terms" className="hover:text-secondary-300 transition-colors">Terms</Link>
+            </div>
           </div>
         </div>
       </div>

@@ -17,6 +17,7 @@ import MiddleStage from './pages/MiddleStage';
 import Prospectus from './pages/Prospectus';
 import Careers from './pages/Careers';
 import AdmissionPopup from './components/AdmissionPopup';
+import WhatsAppWidget from './components/WhatsAppWidget';
 
 const PageTransition: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
@@ -70,6 +71,7 @@ function App() {
           </AnimatePresence>
         </main>
         <Footer />
+        <WhatsAppWidget phoneNumber="+917617645050" />
         {showAdmissionPopup && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="relative bg-white rounded-xl shadow-2xl max-w-md w-full mx-4">
