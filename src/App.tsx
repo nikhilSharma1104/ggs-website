@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -47,41 +47,39 @@ function App() {
   }, []);
 
   return (
-    <Router>
-      <div className="flex flex-col min-h-screen">
-        <Navbar />
-        <main className="flex-grow">
-          <AnimatePresence mode="wait">
-            <Routes>
-              <Route path="/" element={<PageTransition><Home /></PageTransition>} />
-              <Route path="/about" element={<PageTransition><About /></PageTransition>} />
-              <Route path="/academics" element={<PageTransition><Academics /></PageTransition>} />
-              <Route path="/academics/foundational-stage" element={<PageTransition><FoundationalStage /></PageTransition>} />
-              <Route path="/academics/preparatory-stage" element={<PageTransition><PreparatoryStage /></PageTransition>} />
-              <Route path="/academics/middle-stage" element={<PageTransition><MiddleStage /></PageTransition>} />
-              <Route path="/admissions" element={<PageTransition><Admissions /></PageTransition>} />
-              <Route path="/campus-life" element={<PageTransition><CampusLife /></PageTransition>} />
-              <Route path="/events" element={<PageTransition><Events /></PageTransition>} />
-              <Route path="/gallery" element={<PageTransition><Gallery /></PageTransition>} />
-              <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
-              <Route path="/prospectus" element={<PageTransition><Prospectus /></PageTransition>} />
-              <Route path="/careers" element={<PageTransition><Careers /></PageTransition>} />
-            </Routes>
-          </AnimatePresence>
-        </main>
-        <Footer />
-        {showAdmissionPopup && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="relative bg-white rounded-xl shadow-2xl max-w-md w-full mx-4">
-              <AdmissionPopup 
-                isOpen={showAdmissionPopup}
-                onClose={() => setShowAdmissionPopup(false)} 
-              />
-            </div>
+    <div className="flex flex-col min-h-screen">
+      <Navbar />
+      <main className="flex-grow">
+        <AnimatePresence mode="wait">
+          <Routes>
+            <Route path="/" element={<PageTransition><Home /></PageTransition>} />
+            <Route path="/about" element={<PageTransition><About /></PageTransition>} />
+            <Route path="/academics" element={<PageTransition><Academics /></PageTransition>} />
+            <Route path="/academics/foundational-stage" element={<PageTransition><FoundationalStage /></PageTransition>} />
+            <Route path="/academics/preparatory-stage" element={<PageTransition><PreparatoryStage /></PageTransition>} />
+            <Route path="/academics/middle-stage" element={<PageTransition><MiddleStage /></PageTransition>} />
+            <Route path="/admissions" element={<PageTransition><Admissions /></PageTransition>} />
+            <Route path="/campus-life" element={<PageTransition><CampusLife /></PageTransition>} />
+            <Route path="/events" element={<PageTransition><Events /></PageTransition>} />
+            <Route path="/gallery" element={<PageTransition><Gallery /></PageTransition>} />
+            <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
+            <Route path="/prospectus" element={<PageTransition><Prospectus /></PageTransition>} />
+            <Route path="/careers" element={<PageTransition><Careers /></PageTransition>} />
+          </Routes>
+        </AnimatePresence>
+      </main>
+      <Footer />
+      {showAdmissionPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="relative bg-white rounded-xl shadow-2xl max-w-md w-full mx-4">
+            <AdmissionPopup 
+              isOpen={showAdmissionPopup}
+              onClose={() => setShowAdmissionPopup(false)} 
+            />
           </div>
-        )}
-      </div>
-    </Router>
+        </div>
+      )}
+    </div>
   );
 }
 

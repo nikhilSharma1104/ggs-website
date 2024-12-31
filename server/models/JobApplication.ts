@@ -35,9 +35,15 @@ const jobApplicationSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  resumeUrl: {
-    type: String,
-    required: true
+  resume: {
+    fileId: {
+      type: String,
+      required: true
+    },
+    webViewLink: {
+      type: String,
+      required: true
+    }
   },
   coverLetter: {
     type: String,

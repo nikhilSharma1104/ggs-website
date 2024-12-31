@@ -64,6 +64,10 @@ const Events: React.FC = () => {
     selectedCategory === "All" ? true : event.category === selectedCategory
   );
 
+  const handleEventSubmit = () => {
+    // Add your event submission logic here
+  };
+
   return (
     <div className="min-h-screen bg-primary-900">
       {/* Hero Section */}
@@ -199,6 +203,7 @@ const Events: React.FC = () => {
                 <CalendarModal
                   isOpen={showCalendar}
                   onClose={() => setShowCalendar(false)}
+                  onSubmit={handleEventSubmit}
                 />
               )}
             </AnimatePresence>

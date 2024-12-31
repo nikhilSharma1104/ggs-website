@@ -12,14 +12,9 @@ const Navbar: React.FC = () => {
     { name: 'About', href: '/about' },
     { name: 'Academics', href: '/academics' },
     { name: 'Admissions', href: '/admissions' },
-    { name: 'Campus Life', href: '/campus-life' },
-    { name: 'Events', href: '/events' },
-    { name: 'Gallery', href: '/gallery' },
-    { name: 'Careers', href: '/careers' },
-    { name: 'Contact', href: '/contact' },
+    { name: 'Contact', href: '/contact' }
   ];
 
-  // Handle scroll effect
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
@@ -27,11 +22,6 @@ const Navbar: React.FC = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  // Close mobile menu on route change
-  useEffect(() => {
-    setIsOpen(false);
-  }, [location]);
 
   return (
     <motion.nav
@@ -50,7 +40,6 @@ const Navbar: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
-            className="flex items-center space-x-2"
           >
             <Link to="/" className="flex items-center space-x-2">
               <span className="text-2xl font-bold text-white">Gurukulam Global School</span>
@@ -78,11 +67,7 @@ const Navbar: React.FC = () => {
                       layoutId="navbar-underline"
                       className="absolute bottom-0 left-0 right-0 h-0.5 bg-secondary-500"
                       initial={false}
-                      transition={{
-                        type: "spring",
-                        stiffness: 380,
-                        damping: 30
-                      }}
+                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
                     />
                   )}
                 </Link>
@@ -99,56 +84,53 @@ const Navbar: React.FC = () => {
           >
             <div className="w-6 h-5 relative flex flex-col justify-between">
               <motion.span
-                animate={isOpen ? { rotate: 45, y: 8 } : { rotate: 0, y: 0 }}
-                className="w-full h-0.5 bg-current transform origin-left transition-all"
+                className="w-full h-0.5 bg-current transform origin-right"
+                animate={{ rotate: isOpen ? 45 : 0 }}
               />
               <motion.span
-                animate={isOpen ? { opacity: 0 } : { opacity: 1 }}
-                className="w-full h-0.5 bg-current opacity-100 transition-opacity"
+                className="w-full h-0.5 bg-current"
+                animate={{ opacity: isOpen ? 0 : 1 }}
               />
               <motion.span
-                animate={isOpen ? { rotate: -45, y: -8 } : { rotate: 0, y: 0 }}
-                className="w-full h-0.5 bg-current transform origin-left transition-all"
+                className="w-full h-0.5 bg-current transform origin-right"
+                animate={{ rotate: isOpen ? -45 : 0 }}
               />
             </div>
           </motion.button>
-        </div>
 
-        {/* Mobile Menu */}
-        <AnimatePresence>
-          {isOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3 }}
-              className="md:hidden overflow-hidden bg-primary-800/95 backdrop-blur-lg rounded-b-2xl"
-            >
-              <div className="px-4 py-2">
-                {navigation.map((item, index) => (
-                  <motion.div
-                    key={item.href}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                  >
-                    <Link
-                      to={item.href}
-                      className={`block py-3 px-4 rounded-lg text-white hover:text-secondary-500 hover:bg-primary-700/50 transition-colors ${
-                        location.pathname === item.href
-                          ? 'text-secondary-500 bg-primary-700/50'
-                          : ''
-                      }`}
-                      onClick={() => setIsOpen(false)}
+          {/* Mobile Menu */}
+          <AnimatePresence>
+            {isOpen && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="absolute top-full left-0 right-0 md:hidden bg-primary-800/95 backdrop-blur-lg"
+              >
+                <div className="px-4 py-2">
+                  {navigation.map((item, index) => (
+                    <motion.div
+                      key={item.href}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
                     >
-                      {item.name}
-                    </Link>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+                      <Link
+                        to={item.href}
+                        onClick={() => setIsOpen(false)}
+                        className={`block py-3 px-4 rounded-lg text-white hover:text-secondary-500 hover:bg-primary-700/50 transition-colors ${
+                          location.pathname === item.href ? 'text-secondary-500 bg-primary-700/50' : ''
+                        }`}
+                      >
+                        {item.name}
+                      </Link>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
     </motion.nav>
   );

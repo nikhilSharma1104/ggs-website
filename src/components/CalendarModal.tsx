@@ -9,6 +9,7 @@ import './CalendarModal.css';
 interface CalendarModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSubmit: (eventData: any) => void;
 }
 
 interface Event {
@@ -17,20 +18,43 @@ interface Event {
   description?: string;
 }
 
-const REFRESH_INTERVAL = 60000; // Refresh every minute
+const REFRESH_INTERVAL = 15 * 24 * 60 * 60 * 1000; // Refresh every 15 days
+const CACHE_KEY = 'calendarEvents';
+const LAST_UPDATED_KEY = 'calendarLastUpdated';
 
-const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose }) => {
+const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose, onSubmit }) => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedEvents, setSelectedEvents] = useState<Event[]>([]);
   const [showEventDetails, setShowEventDetails] = useState(false);
-  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+  const [lastUpdated, setLastUpdated] = useState<Date>(() => {
+    const stored = localStorage.getItem(LAST_UPDATED_KEY);
+    return stored ? new Date(stored) : new Date();
+  });
   const [animateEvents, setAnimateEvents] = useState(false);
+
+  const [title, setTitle] = useState('');
+  const [date, setDate] = useState('');
+  const [time, setTime] = useState('');
+  const [venue, setVenue] = useState('');
+  const [description, setDescription] = useState('');
+  const [registrationLink, setRegistrationLink] = useState('');
+  const [category, setCategory] = useState('academic');
 
   const loadEvents = useCallback(async (showLoading = true) => {
     try {
+      // Check if we have cached events and if they're still valid
+      const cachedEvents = localStorage.getItem(CACHE_KEY);
+      const lastUpdatedTime = new Date(lastUpdated).getTime();
+      const now = new Date().getTime();
+      
+      if (cachedEvents && (now - lastUpdatedTime) < REFRESH_INTERVAL) {
+        setEvents(JSON.parse(cachedEvents));
+        return;
+      }
+
       if (showLoading) {
         setLoading(true);
       }
@@ -38,7 +62,12 @@ const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose }) => {
       
       const fetchedEvents = await fetchEventsFromSheet();
       setEvents(fetchedEvents);
-      setLastUpdated(new Date());
+      
+      // Cache the events and last updated time
+      localStorage.setItem(CACHE_KEY, JSON.stringify(fetchedEvents));
+      const newLastUpdated = new Date();
+      localStorage.setItem(LAST_UPDATED_KEY, newLastUpdated.toISOString());
+      setLastUpdated(newLastUpdated);
 
       // Update selected events if a date is already selected
       if (selectedDate) {
@@ -67,18 +96,15 @@ const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose }) => {
 
   // Initial load and periodic refresh
   useEffect(() => {
-    if (isOpen) {
-      loadEvents();
+    loadEvents();
 
-      // Set up periodic refresh
-      const refreshInterval = setInterval(() => {
-        loadEvents(false); // Don't show loading state for background refreshes
-      }, REFRESH_INTERVAL);
+    // Set up periodic refresh
+    const intervalId = setInterval(() => {
+      loadEvents(false); // Don't show loading state for background refreshes
+    }, REFRESH_INTERVAL);
 
-      // Clean up interval when modal closes
-      return () => clearInterval(refreshInterval);
-    }
-  }, [isOpen, loadEvents]);
+    return () => clearInterval(intervalId);
+  }, [loadEvents]);
 
   // Set up visibility change detection
   useEffect(() => {
@@ -126,6 +152,33 @@ const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose }) => {
     );
     return hasEvent ? 'event-date' : '';
   };
+
+  const handleSubmit = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit({
+      title,
+      date,
+      time,
+      venue,
+      description,
+      registrationLink,
+      category
+    });
+    onClose();
+  }, [title, date, time, venue, description, registrationLink, category, onSubmit, onClose]);
+
+  // Reset form when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setTitle('');
+      setDate('');
+      setTime('');
+      setVenue('');
+      setDescription('');
+      setRegistrationLink('');
+      setCategory('academic');
+    }
+  }, [isOpen]);
 
   return (
     <AnimatePresence>

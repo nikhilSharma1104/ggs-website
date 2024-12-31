@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import Prospectus from './Prospectus';
 
 const Footer = () => {
   const [isHovered, setIsHovered] = useState<string | null>(null);
@@ -99,12 +100,10 @@ const Footer = () => {
                   className="text-gray-300 hover:text-secondary-300 transition-colors flex items-center space-x-2 group"
                 >
                   <motion.span
-                    className="inline-block"
-                    initial={{ x: 0 }}
-                    whileHover={{ x: 5 }}
-                  >
-                    ➜
-                  </motion.span>
+                    className="w-2 h-2 bg-secondary-500 rounded-full opacity-0 group-hover:opacity-100"
+                    initial={false}
+                    animate={isHovered === link.name ? { scale: [1, 1.5, 1] } : {}}
+                  />
                   <span>{link.name}</span>
                 </Link>
               </motion.li>
@@ -127,72 +126,66 @@ const Footer = () => {
                 href={social.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-primary-800/50 hover:bg-primary-700/50 p-3 rounded-lg transition-all border border-primary-800/50"
+                className="w-12 h-12 rounded-full bg-primary-800 flex items-center justify-center hover:bg-secondary-500 transition-colors"
                 whileHover={{ scale: 1.1 }}
-                onHoverStart={() => setIsHovered(social.name)}
-                onHoverEnd={() => setIsHovered(null)}
+                whileTap={{ scale: 0.9 }}
               >
-                <i className={`${social.icon} text-2xl ${isHovered === social.name ? 'text-secondary-400' : 'text-gray-300'}`}></i>
+                <i className={`${social.icon} text-xl`}></i>
               </motion.a>
             ))}
           </div>
         </motion.div>
 
-        {/* Newsletter */}
+        {/* Location Map */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.6 }}
-          className="backdrop-blur-sm"
+          className="backdrop-blur-sm md:col-span-1"
         >
-          <h3 className="text-2xl font-bold text-secondary-300 mb-6">Newsletter</h3>
-          <form className="space-y-4">
-            <div>
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="w-full px-4 py-3 rounded-lg bg-primary-800/50 border border-primary-700 text-white placeholder-gray-400 focus:border-secondary-500 focus:ring-2 focus:ring-secondary-500/20 transition-all"
-              />
+          <h3 className="text-2xl font-bold text-secondary-300 mb-6">Find Us</h3>
+          <div className="rounded-lg overflow-hidden shadow-lg border-4 border-primary-800/50 hover:border-secondary-500 transition-all duration-300">
+            <div className="relative">
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3539.901789586309!2d77.67260217533774!3d27.498902476090753!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x397371c0f6fc3857%3A0x7c826b5d2c0a5567!2sGurukulam%20Global%20School!5e0!3m2!1sen!2sin!4v1704015594276!5m2!1sen!2sin"
+                width="100%"
+                height="350"
+                style={{ border: 0 }}
+                allowFullScreen={true}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Gurukulam Global School Location"
+                className="w-full transition-opacity filter contrast-125 saturate-110"
+              ></iframe>
+              <div className="absolute bottom-4 right-4 flex space-x-4">
+                <a 
+                  href="https://maps.app.goo.gl/PejZuZcYUZ93XfwU7"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-secondary-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-secondary-600 transition-all duration-300 flex items-center space-x-2 text-sm font-medium"
+                >
+                  <i className="fas fa-directions mr-2"></i>
+                  Get Directions
+                </a>
+                <Prospectus />
+              </div>
             </div>
-            <motion.button
-              type="submit"
-              className="w-full px-6 py-3 bg-gradient-to-r from-secondary-500 to-secondary-600 hover:from-secondary-600 hover:to-secondary-700 text-white rounded-lg transition-all"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              Subscribe
-            </motion.button>
-          </form>
+            <div className="bg-primary-800/80 backdrop-blur-sm p-4">
+              <h4 className="text-secondary-300 font-semibold mb-1">Visit Us At:</h4>
+              <p className="text-gray-300 text-sm">
+                136A, Madhuvan Enclave, Near Natraj Murti, Krishna Nagar,<br />
+                Mathura, Uttar Pradesh - 281003
+              </p>
+            </div>
+          </div>
         </motion.div>
       </div>
 
-      {/* Bottom Bar */}
-      <div className="mt-16 pt-8 border-t border-primary-800">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.8 }}
-              className="text-gray-400 text-center md:text-left"
-            >
-              &copy; {new Date().getFullYear()} Gurukulam Global School. All rights reserved.
-            </motion.p>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 1 }}
-              className="flex space-x-6"
-            >
-              <Link to="/privacy" className="text-gray-400 hover:text-secondary-300 transition-colors">
-                Privacy Policy
-              </Link>
-              <Link to="/terms" className="text-gray-400 hover:text-secondary-300 transition-colors">
-                Terms of Service
-              </Link>
-            </motion.div>
-          </div>
-        </div>
+      {/* Copyright */}
+      <div className="container mx-auto mt-16 pt-8 border-t border-primary-800 text-center relative z-10">
+        <p className="text-gray-400">
+          &copy; {new Date().getFullYear()} Gurukulam Global School. All rights reserved.
+        </p>
       </div>
     </footer>
   );

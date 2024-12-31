@@ -1,261 +1,34 @@
-import React, { useState, useRef } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import React, { useState, useRef, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import Slider from 'react-slick';
 import YouTube from 'react-youtube';
-
-interface FloatingElementProps {
-  emoji: string;
-  className?: string;
-  delay?: number;
-}
-
-interface BouncingEmojiProps {
-  emoji: string;
-  delay?: number;
-  className?: string;
-}
-
-interface RainbowTextProps {
-  children: string;
-  className?: string;
-}
-
-interface FunFact {
-  emoji: string;
-  title: string;
-  description: string;
-}
-
-interface FunFactCardProps {
-  fact: FunFact;
-  index: number;
-}
-
-interface Activity {
-  emoji: string;
-  title: string;
-  description: string;
-  color: string;
-}
-
-interface ActivityCardProps {
-  activity: {
-    emoji: string;
-    title: string;
-    description: string;
-  };
-  index: number;
-}
+import StudentLifeSection from '../components/StudentLifeSection';
+import SEO from '../components/SEO';
 
 interface SectionProps {
   title: string;
-  subtitle: string;
-  description: string;
-  className?: string;
+  description?: string;
   children: React.ReactNode;
+  className?: string;
 }
 
-interface HeroSectionProps {
-  onOpenVideo: () => void;
-}
-
-const Section: React.FC<SectionProps> = ({ title, subtitle, description, className, children }) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  });
-
-  const y = useTransform(scrollYProgress, [0, 1], [100, -100]);
-  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
-
+const Section: React.FC<SectionProps> = ({ title, description, children, className = '' }) => {
   return (
-    <motion.section
-      ref={ref}
-      className={`relative py-20 overflow-hidden ${className}`}
-    >
-      {/* Background Particles */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(20)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-2 h-2 bg-secondary-500/20 rounded-full"
-            style={{
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [0, -30, 0],
-              x: [0, 30, 0],
-              scale: [1, 1.5, 1],
-              opacity: [0.2, 0.5, 0.2],
-            }}
-            transition={{
-              duration: 3 + Math.random() * 2,
-              repeat: Infinity,
-              delay: Math.random() * 2,
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Floating Decorations */}
-      <motion.div
-        className="absolute -top-20 -left-20 w-40 h-40 bg-secondary-500/10 rounded-full blur-xl"
-        animate={{
-          scale: [1, 1.2, 1],
-          opacity: [0.3, 0.5, 0.3],
-        }}
-        transition={{ duration: 4, repeat: Infinity }}
-      />
-      <motion.div
-        className="absolute -bottom-20 -right-20 w-40 h-40 bg-primary-500/10 rounded-full blur-xl"
-        animate={{
-          scale: [1.2, 1, 1.2],
-          opacity: [0.5, 0.3, 0.5],
-        }}
-        transition={{ duration: 4, repeat: Infinity }}
-      />
-      
-      <motion.div
-        className="container mx-auto px-4 relative"
-        style={{ y, opacity }}
-      >
-        <motion.div
-          className="text-center mb-16"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-        >
-          <motion.h2
-            className="text-4xl md:text-5xl font-bold text-white mb-4"
-            whileHover={{ scale: 1.05 }}
-          >
-            {title}
-          </motion.h2>
-          <motion.p
-            className="text-xl text-white/80"
-            whileHover={{ scale: 1.05 }}
-          >
-            {subtitle}
-          </motion.p>
-        </motion.div>
-        
+    <section className={`py-16 ${className}`}>
+      <div className="container mx-auto px-4">
+        <div className="text-center mb-12">
+          <h2 className="text-4xl font-bold text-primary-900 mb-4">{title}</h2>
+          {description && (
+            <p className="text-gray-600 max-w-2xl mx-auto">{description}</p>
+          )}
+        </div>
         {children}
-      </motion.div>
-    </motion.section>
+      </div>
+    </section>
   );
 };
 
-const BouncingEmoji: React.FC<BouncingEmojiProps> = ({ emoji, delay = 0, className = "" }) => (
-  <motion.div
-    className={`text-4xl ${className}`}
-    animate={{
-      y: [-10, 10],
-      scale: [1, 1.2, 1],
-    }}
-    transition={{
-      duration: 2,
-      repeat: Infinity,
-      repeatType: "reverse",
-      delay,
-    }}
-  >
-    {emoji}
-  </motion.div>
-);
-
-const FloatingElement: React.FC<FloatingElementProps> = ({ emoji, className, delay = 0 }) => (
-  <motion.div
-    className={`absolute text-6xl ${className}`}
-    animate={{
-      y: [-20, 20],
-      x: [-20, 20],
-      rotate: [0, 360],
-    }}
-    transition={{
-      duration: 3,
-      repeat: Infinity,
-      repeatType: "reverse",
-      delay,
-    }}
-  >
-    {emoji}
-  </motion.div>
-);
-
-const RainbowText: React.FC<RainbowTextProps> = ({ children, className = "" }) => {
-  const colors = ["text-red-500", "text-orange-500", "text-yellow-500", "text-green-500", "text-blue-500", "text-purple-500"];
-  return (
-    <span className="inline-flex">
-      {children.split("").map((letter: string, i: number) => (
-        <motion.span
-          key={i}
-          className={`${colors[i % colors.length]} ${className}`}
-          animate={{ y: [-2, 2, -2] }}
-          transition={{ duration: 1, repeat: Infinity, delay: i * 0.1 }}
-        >
-          {letter}
-        </motion.span>
-      ))}
-    </span>
-  );
-};
-
-const Cloud: React.FC<{ className?: string }> = ({ className = "" }) => (
-  <motion.div
-    className={`absolute ${className}`}
-    animate={{
-      x: [0, 100, 0],
-      y: [-5, 5, -5],
-    }}
-    transition={{
-      duration: 20,
-      repeat: Infinity,
-      ease: "linear",
-    }}
-  >
-    <div className="text-6xl">☁️</div>
-  </motion.div>
-);
-
-const Bird: React.FC<{ className?: string }> = ({ className = "" }) => (
-  <motion.div
-    className={`absolute ${className}`}
-    animate={{
-      x: [-100, window.innerWidth + 100],
-      y: [0, -20, 0, -10, 0],
-    }}
-    transition={{
-      duration: 15,
-      repeat: Infinity,
-      ease: "linear",
-    }}
-  >
-    <div className="text-3xl">🦅</div>
-  </motion.div>
-);
-
-const Butterfly: React.FC<{ className?: string }> = ({ className = "" }) => (
-  <motion.div
-    className={`absolute ${className}`}
-    animate={{
-      x: [-50, 50],
-      y: [-30, 30],
-      rotate: [-10, 10],
-    }}
-    transition={{
-      duration: 4,
-      repeat: Infinity,
-      repeatType: "reverse",
-    }}
-  >
-    <div className="text-2xl">🦋</div>
-  </motion.div>
-);
-
-const HeroSection: React.FC<HeroSectionProps> = ({ onOpenVideo }) => {
+const HeroSection: React.FC<{ onOpenVideo: () => void }> = ({ onOpenVideo }) => {
   return (
     <motion.div 
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
@@ -447,21 +220,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onOpenVideo }) => {
   );
 };
 
-const FunFactCard: React.FC<FunFactCardProps> = ({ fact, index }) => (
-  <motion.div
-    className="bg-primary-800/50 backdrop-blur-sm rounded-2xl p-6 shadow-lg transform hover:scale-105 transition-transform duration-300 border border-primary-700/30"
-    initial={{ opacity: 0, y: 50 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true }}
-    transition={{ delay: index * 0.2 }}
-  >
-    <BouncingEmoji emoji={fact.emoji} className="mb-4" />
-    <h3 className="text-xl font-bold mb-2 text-white">{fact.title}</h3>
-    <p className="text-white/80">{fact.description}</p>
-  </motion.div>
-);
-
-const ActivityCard: React.FC<ActivityCardProps> = ({ activity, index }) => {
+const ActivityCard: React.FC<{ activity: { emoji: string; title: string; description: string; }; index: number }> = ({ activity, index }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -484,7 +243,20 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, index }) => {
         transition={{ duration: 3, repeat: Infinity }}
       />
       
-      <BouncingEmoji emoji={activity.emoji} className="mb-4" />
+      <motion.div
+        className="text-4xl mb-4"
+        animate={{ 
+          y: [0, -10, 0],
+          rotate: [0, 5, -5, 0]
+        }}
+        transition={{ 
+          duration: 2,
+          repeat: Infinity,
+          delay: index * 0.2
+        }}
+      >
+        {activity.emoji}
+      </motion.div>
       <motion.h3
         className="text-xl font-bold mb-2 text-white"
         animate={{ scale: isHovered ? 1.1 : 1 }}
@@ -500,26 +272,21 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, index }) => {
       </motion.p>
 
       {/* Hover Info */}
-      <AnimatePresence>
-        {isHovered && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            className="absolute inset-0 bg-primary-900/90 p-6 flex flex-col justify-center items-center backdrop-blur-sm"
-          >
-            <motion.div
-              className="text-4xl mb-4"
-              animate={{ scale: [1, 1.2, 1] }}
-              transition={{ duration: 0.5 }}
-            >
-              {activity.emoji}
-            </motion.div>
-            <h4 className="text-xl font-bold text-white mb-2">{activity.title}</h4>
-            <p className="text-white/90 text-center">{activity.description}</p>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 20 }}
+        className="absolute inset-0 bg-primary-900/90 p-6 flex flex-col justify-center items-center backdrop-blur-sm"
+      >
+        <motion.div
+          className="text-4xl mb-4"
+          animate={{ scale: [1, 1.2, 1] }}
+          transition={{ duration: 0.5 }}
+        >
+          {activity.emoji}
+        </motion.div>
+        <h4 className="text-xl font-bold text-white mb-2">{activity.title}</h4>
+        <p className="text-white/90 text-center">{activity.description}</p>
+      </motion.div>
     </motion.div>
   );
 };
@@ -575,12 +342,45 @@ const TestimonialCard: React.FC<{ name: string; role: string; quote: string }> =
 
 const Home: React.FC = () => {
   const [showVideoModal, setShowVideoModal] = useState(false);
-  const funFacts: FunFact[] = [
-    { emoji: "🎯", title: "Modern Education", description: "Innovative teaching methods with traditional values" },
-    { emoji: "🌟", title: "Growing Community", description: "400+ students and growing since 2022" },
-    { emoji: "🚀", title: "Digital Learning", description: "Smart classrooms and technology integration" },
-    { emoji: "🌍", title: "Holistic Development", description: "Focus on academic and personal growth" },
+  const [currentVideoId] = useState('YOUR_VIDEO_ID');
+  const videoRef = useRef<any>(null);
+
+  const sections = [
+    'hero',
+    'why-choose-us',
+    'core-values',
+    'activities',
+    'features',
+    'student-life',
+    'testimonials'
   ];
+
+  const [activeSection, setActiveSection] = useState('hero');
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + window.innerHeight / 3;
+
+      for (const section of sections) {
+        const element = document.getElementById(section);
+        if (element) {
+          const { top, bottom } = element.getBoundingClientRect();
+          const elementTop = top + window.scrollY;
+          const elementBottom = bottom + window.scrollY;
+
+          if (scrollPosition >= elementTop && scrollPosition <= elementBottom) {
+            setActiveSection(section);
+            break;
+          }
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Initial check
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [sections]);
 
   const activities = [
     { emoji: "🎨", title: "Creative Arts", description: "Nurturing artistic talents and creative expression" },
@@ -601,57 +401,58 @@ const Home: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen overflow-hidden bg-primary-900">
-      {/* Video Modal */}
-      <AnimatePresence>
-        {showVideoModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+    <div className="min-h-screen bg-primary-900">
+      <SEO 
+        title="Gurukulam Global School - Excellence in Education"
+        description="Welcome to Gurukulam Global School, where we nurture young minds and build future leaders through holistic education and values."
+      />
+
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: showVideoModal ? 1 : 0 }}
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+        onClick={() => setShowVideoModal(false)}
+      >
+        <motion.div
+          initial={{ scale: 0.5, opacity: 0 }}
+          animate={{ scale: showVideoModal ? 1 : 0.5, opacity: showVideoModal ? 1 : 0 }}
+          className="relative w-full max-w-4xl aspect-video bg-black rounded-xl overflow-hidden"
+          onClick={e => e.stopPropagation()}
+        >
+          <YouTube
+            videoId={currentVideoId}
+            opts={{
+              width: '100%',
+              height: '100%',
+              playerVars: {
+                autoplay: 1,
+                start: 7,
+              },
+            }}
+            className="w-full h-full"
+          />
+          <button
             onClick={() => setShowVideoModal(false)}
+            className="absolute top-4 right-4 text-white hover:text-secondary-500 transition-colors"
           >
-            <motion.div
-              initial={{ scale: 0.5, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.5, opacity: 0 }}
-              className="relative w-full max-w-4xl aspect-video bg-black rounded-xl overflow-hidden"
-              onClick={e => e.stopPropagation()}
-            >
-              <YouTube
-                videoId="6DHDX1rXrjU"
-                opts={{
-                  width: '100%',
-                  height: '100%',
-                  playerVars: {
-                    autoplay: 1,
-                    start: 7,
-                  },
-                }}
-                className="w-full h-full"
-              />
-              <button
-                onClick={() => setShowVideoModal(false)}
-                className="absolute top-4 right-4 text-white hover:text-secondary-500 transition-colors"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </motion.div>
+      </motion.div>
 
-      {/* Hero Section */}
-      <HeroSection onOpenVideo={() => setShowVideoModal(true)} />
+      <section id="hero" className={`min-h-screen ${activeSection === 'hero' ? 'active' : ''}`}>
+        <HeroSection onOpenVideo={() => setShowVideoModal(true)} />
+      </section>
 
-      {/* Why Choose Us - Animated Counter Section */}
-      <section className="py-16 bg-secondary-500/10 relative overflow-hidden">
+      <section 
+        id="why-choose-us" 
+        className={`py-16 bg-secondary-500/10 relative overflow-hidden ${activeSection === 'why-choose-us' ? 'active' : ''}`}
+      >
         <div className="container mx-auto px-4">
           <motion.h2
-            className="text-4xl md:text-5xl font-bold text-center mb-12 text-white"
+            className="text-4xl md:text-5xl font-bold text-white mb-12 text-center"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -659,227 +460,169 @@ const Home: React.FC = () => {
             Why Choose Us?
           </motion.h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
-            <motion.div
-              className="p-6 rounded-xl bg-primary-800/50"
-              whileHover={{ scale: 1.05 }}
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-            >
-              <div className="text-4xl font-bold text-secondary-400 mb-2">2022</div>
-              <div className="text-white/90">Established</div>
-            </motion.div>
-            <motion.div
-              className="p-6 rounded-xl bg-primary-800/50"
-              whileHover={{ scale: 1.05 }}
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-            >
-              <div className="text-4xl font-bold text-secondary-400 mb-2">95%</div>
-              <div className="text-white/90">Success Rate</div>
-            </motion.div>
-            <motion.div
-              className="p-6 rounded-xl bg-primary-800/50"
-              whileHover={{ scale: 1.05 }}
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.4 }}
-            >
-              <div className="text-4xl font-bold text-secondary-400 mb-2">20+</div>
-              <div className="text-white/90">Expert Teachers</div>
-            </motion.div>
-            <motion.div
-              className="p-6 rounded-xl bg-primary-800/50"
-              whileHover={{ scale: 1.05 }}
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.6 }}
-            >
-              <div className="text-4xl font-bold text-secondary-400 mb-2">400+</div>
-              <div className="text-white/90">Happy Students</div>
-            </motion.div>
+            {[
+              { number: "2022", label: "Established" },
+              { number: "95%", label: "Success Rate" },
+              { number: "20+", label: "Expert Teachers" },
+              { number: "400+", label: "Happy Students" }
+            ].map((stat, index) => (
+              <motion.div
+                key={index}
+                className="p-6 rounded-xl bg-primary-800/50"
+                whileHover={{ scale: 1.05 }}
+                initial={{ opacity: 0, x: -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.2 }}
+              >
+                <div className="text-4xl font-bold text-secondary-400 mb-2">{stat.number}</div>
+                <div className="text-white/90">{stat.label}</div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Core Values */}
-      <Section
-        title="Core Values"
-        subtitle="Building Strong Foundations"
-        description="Our core values shape every aspect of education, fostering intellectual curiosity, moral integrity, and global awareness in our students."
-        className="bg-primary-800/50"
+      <section 
+        id="core-values" 
+        className={`py-16 bg-primary-800/50 ${activeSection === 'core-values' ? 'active' : ''}`}
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {funFacts.map((fact, index) => (
-            <motion.div
-              key={index}
-              className="group relative"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.2 }}
-              whileHover={{ scale: 1.05 }}
-            >
-              <BouncingEmoji emoji={fact.emoji} className="mb-4" />
-              <h3 className="text-xl font-bold mb-2 text-white">{fact.title}</h3>
-              <p className="text-white/80">{fact.description}</p>
-            </motion.div>
-          ))}
-        </div>
-      </Section>
+        <Section
+          title="Core Values"
+          description="Our core values shape every aspect of education, fostering intellectual curiosity, moral integrity, and global awareness in our students."
+          className="bg-primary-800/50"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              { emoji: "🎯", title: "Modern Education", description: "Innovative teaching methods with traditional values" },
+              { emoji: "🌟", title: "Growing Community", description: "400+ students and growing since 2022" },
+              { emoji: "🚀", title: "Digital Learning", description: "Smart classrooms and technology integration" },
+              { emoji: "🌍", title: "Holistic Development", description: "Focus on academic and personal growth" },
+            ].map((fact, index) => (
+              <motion.div
+                key={index}
+                className="group relative"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.2 }}
+                whileHover={{ scale: 1.05 }}
+              >
+                <motion.div
+                  className="text-4xl mb-4"
+                  animate={{ 
+                    y: [0, -10, 0],
+                    rotate: [0, 5, -5, 0]
+                  }}
+                  transition={{ 
+                    duration: 2,
+                    repeat: Infinity,
+                    delay: index * 0.2
+                  }}
+                >
+                  {fact.emoji}
+                </motion.div>
+                <h3 className="text-xl font-bold mb-2 text-white">{fact.title}</h3>
+                <p className="text-white/80">{fact.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        </Section>
+      </section>
 
-      {/* Our Activities */}
-      <Section
-        title="Our Activities"
-        subtitle="Discover the vibrant life at Gurukulam"
-        description="Engage in a wide range of activities that foster growth and development."
-        className="bg-primary-900"
+      <section 
+        id="activities" 
+        className={`py-16 bg-primary-900 ${activeSection === 'activities' ? 'active' : ''}`}
       >
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {activities.map((activity, index) => (
-            <ActivityCard key={index} activity={activity} index={index} />
-          ))}
-        </div>
-      </Section>
+        <Section
+          title="Student Activities"
+          description="Engaging activities that foster holistic development and lifelong learning."
+          className="bg-primary-900"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {activities.map((activity, index) => (
+              <ActivityCard key={index} activity={activity} index={index} />
+            ))}
+          </div>
+        </Section>
+      </section>
 
-      {/* Campus Features */}
-      <Section
-        title="Campus Features"
-        subtitle="State-of-the-art facilities for comprehensive development"
-        description="Our campus is equipped with modern amenities to support various aspects of student growth."
-        className="bg-primary-800/50"
+      <section 
+        id="features" 
+        className={`py-16 bg-primary-800/50 ${activeSection === 'features' ? 'active' : ''}`}
       >
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {features.map((feature, index) => (
-            <ActivityCard key={index} activity={feature} index={index} />
-          ))}
-        </div>
-      </Section>
+        <Section
+          title="Campus Features"
+          description="Our campus is equipped with modern amenities to support various aspects of student growth."
+          className="bg-primary-800/50"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {features.map((feature, index) => (
+              <ActivityCard key={index} activity={feature} index={index} />
+            ))}
+          </div>
+        </Section>
+      </section>
 
-      {/* Student Life Gallery */}
-      <Section
-        title="Student Life"
-        subtitle="Moments That Define Us"
-        description="Experience the vibrant campus life at our school, where every day brings new opportunities for learning, growth, and achievement."
-        className="bg-primary-700/50"
+      <section 
+        id="student-life" 
+        className={`py-16 bg-primary-700/50 ${activeSection === 'student-life' ? 'active' : ''}`}
       >
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <motion.div
-            className="relative h-64 rounded-xl overflow-hidden group"
-            whileHover={{ scale: 1.05 }}
-          >
-            <img src="/images/academic.jpg" alt="Academic Life" className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-primary-900 to-transparent opacity-75" />
-            <div className="absolute bottom-0 left-0 p-6">
-              <h3 className="text-2xl font-bold text-white mb-2">Academic Life</h3>
-              <p className="text-white/90">Engaging learning experiences</p>
-            </div>
-          </motion.div>
-          <motion.div
-            className="relative h-64 rounded-xl overflow-hidden group"
-            whileHover={{ scale: 1.05 }}
-          >
-            <img src="/images/sports.jpg" alt="Sports" className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-primary-900 to-transparent opacity-75" />
-            <div className="absolute bottom-0 left-0 p-6">
-              <h3 className="text-2xl font-bold text-white mb-2">Sports</h3>
-              <p className="text-white/90">Building champions</p>
-            </div>
-          </motion.div>
-          <motion.div
-            className="relative h-64 rounded-xl overflow-hidden group"
-            whileHover={{ scale: 1.05 }}
-          >
-            <img src="/images/arts.jpg" alt="Arts & Culture" className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-primary-900 to-transparent opacity-75" />
-            <div className="absolute bottom-0 left-0 p-6">
-              <h3 className="text-2xl font-bold text-white mb-2">Arts & Culture</h3>
-              <p className="text-white/90">Nurturing creativity</p>
-            </div>
-          </motion.div>
-        </div>
-      </Section>
+        <Section
+          title="Student Life"
+          description="Experience the vibrant campus life at our school, where every day brings new opportunities for learning, growth, and achievement."
+          className="bg-primary-700/50"
+        >
+          <StudentLifeSection />
+        </Section>
+      </section>
 
-      {/* Testimonials */}
-      <Section
-        title="What Parents Say"
-        subtitle="Trusted by Families"
-        description="Hear from our school community about their experiences and the positive impact our education has had on their children's development."
-        className="bg-primary-800/50"
+      <section 
+        id="testimonials" 
+        className={`py-16 bg-primary-800/50 ${activeSection === 'testimonials' ? 'active' : ''}`}
       >
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <TestimonialCard
-            name="Priya Sharma"
-            role="Parent"
-            quote="The school's holistic approach to education has transformed my child's learning experience. The teachers are dedicated and caring."
-          />
-          <TestimonialCard
-            name="Rajesh Kumar"
-            role="Parent"
-            quote="Outstanding academic program combined with excellent extracurricular activities. My children have flourished here."
-          />
-          <TestimonialCard
-            name="Anita Patel"
-            role="Parent"
-            quote="The school's focus on values and character development sets it apart. We're extremely happy with our decision."
-          />
-        </div>
-      </Section>
+        <Section
+          title="What Parents Say"
+          description="Hear from our school community about their experiences and the positive impact our education has had on their children's development."
+          className="bg-primary-800/50"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <TestimonialCard
+              name="Priya Sharma"
+              role="Parent"
+              quote="The school's holistic approach to education has transformed my child's learning experience. The teachers are dedicated and caring."
+            />
+            <TestimonialCard
+              name="Rajesh Kumar"
+              role="Parent"
+              quote="Outstanding academic program combined with excellent extracurricular activities. My children have flourished here."
+            />
+            <TestimonialCard
+              name="Anita Patel"
+              role="Parent"
+              quote="The school's focus on values and character development sets it apart. We're extremely happy with our decision."
+            />
+          </div>
+        </Section>
+      </section>
 
-      {/* Student Life */}
-      <Section
-        title="Student Life"
-        subtitle="Experience the Gurukulam difference"
-        description="Life at Gurukulam is a perfect blend of academics, activities, and personal growth."
-        className="bg-primary-900"
-      >
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {highlights.map((highlight, index) => (
-            <ActivityCard key={index} activity={highlight} index={index} />
-          ))}
-        </div>
-      </Section>
-
-      {/* Call to Action */}
       <section className="py-20 bg-secondary-500 relative overflow-hidden">
         <div className="container mx-auto px-4 text-center relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="max-w-2xl mx-auto"
+            className="max-w-3xl mx-auto"
           >
-            <motion.h2
-              className="text-4xl md:text-5xl font-bold mb-6 text-white"
-              animate={{ scale: [1, 1.05, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-8">
+              Ready to Join Our Community?
+            </h2>
+            <Link
+              to="/admissions"
+              className="inline-block px-8 py-4 bg-white text-secondary-500 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
             >
-              Begin Your Journey With Us 🎓
-            </motion.h2>
-            <motion.p className="text-xl mb-8 text-white/90">
-              Join our community of learners and future leaders
-            </motion.p>
-            <motion.div
-              className="flex justify-center space-x-6"
-              whileHover={{ scale: 1.05 }}
-            >
-              <Link
-                to="/admissions"
-                className="bg-white text-secondary-500 px-8 py-4 rounded-full font-bold hover:bg-white/90 transition-all duration-300 shadow-lg transform hover:rotate-2"
-              >
-                Apply Now 📝
-              </Link>
-              <Link
-                to="/contact"
-                className="bg-secondary-600 text-white px-8 py-4 rounded-full font-bold hover:bg-secondary-700 transition-all duration-300 shadow-lg transform hover:-rotate-2"
-              >
-                Schedule a Visit 🏫
-              </Link>
-            </motion.div>
+              Apply Now
+            </Link>
           </motion.div>
         </div>
       </section>
