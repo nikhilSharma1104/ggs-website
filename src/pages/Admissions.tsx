@@ -2,6 +2,14 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { submitAdmissionApplication } from '../services/admissionService';
+import { 
+  fadeIn, 
+  slideInLeft, 
+  slideInRight, 
+  staggerContainer, 
+  staggerItem,
+  getAccessibleAnimationVariants 
+} from '../components/animations';
 
 interface FloatingElementProps {
   emoji: string;
@@ -113,6 +121,8 @@ const Admissions: React.FC = () => {
     }
   ];
 
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -175,153 +185,93 @@ const Admissions: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-primary-900">
+    <div className="bg-primary-900 min-h-screen pt-16 md:pt-20">
       {/* Hero Section */}
-      <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden">
-        {/* Animated Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900">
-          {[...Array(20)].map((_, i) => (
-            <FloatingElement
-              key={i}
-              emoji={["📚", "✏️", "🎨", "🎭", "🏫", "🎓"][i % 6]}
-              className={`top-${Math.random() * 100}% left-${Math.random() * 100}%`}
-              delay={i * 0.2}
-            />
-          ))}
-        </div>
-
-        <div className="container mx-auto px-4 relative z-10 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+      <motion.section
+        className="relative py-12 md:py-20"
+        initial="hidden"
+        animate="show"
+        variants={getAccessibleAnimationVariants(staggerContainer)}
+      >
+        <div className="container mx-auto px-4">
+          <motion.div 
+            className="max-w-4xl mx-auto text-center"
+            variants={getAccessibleAnimationVariants(fadeIn)}
           >
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white via-secondary-200 to-secondary-400 text-transparent bg-clip-text">
               Join Our Community
-              <motion.div
-                className="h-1 w-24 bg-secondary-500 mx-auto mt-4"
-                initial={{ width: 0 }}
-                animate={{ width: 96 }}
-                transition={{ duration: 1, delay: 0.5 }}
-              />
             </h1>
-            <p className="text-xl md:text-2xl text-white/80 max-w-3xl mx-auto">
-              Begin your educational journey with us
+            <p className="text-lg md:text-xl text-gray-300 mb-8">
+              Begin your journey with Gurukulam Global School
             </p>
           </motion.div>
-        </div>
-      </section>
 
-      {/* Admission Process */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <motion.h2
-            className="text-4xl font-bold text-white text-center mb-12"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+          {/* Steps Grid */}
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12"
+            variants={getAccessibleAnimationVariants(staggerContainer)}
           >
-            Admission Process
-            <motion.div
-              className="h-1 w-24 bg-secondary-500 mx-auto mt-4"
-              initial={{ width: 0 }}
-              whileInView={{ width: 96 }}
-              transition={{ duration: 1 }}
-            />
-          </motion.h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8">
             {admissionSteps.map((step, index) => (
               <motion.div
                 key={index}
-                className="bg-primary-800/50 p-6 rounded-xl backdrop-blur-sm border border-white/10
-                          hover:border-secondary-500/50 transition-all duration-300"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ y: -5 }}
+                variants={getAccessibleAnimationVariants(staggerItem)}
+                whileHover={isMobile ? {} : { scale: 1.05 }}
+                className="bg-primary-800/50 backdrop-blur-lg p-6 rounded-2xl border border-primary-700"
               >
-                <motion.div
-                  className="text-4xl mb-4"
-                  animate={{
-                    y: [0, -10, 0],
-                    rotate: [0, 5, -5, 0],
-                  }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
-                  {step.icon}
-                </motion.div>
-                <h3 className="text-xl font-bold text-white mb-2">{step.title}</h3>
-                <p className="text-white/80">{step.description}</p>
+                <div className="text-3xl mb-4">{step.icon}</div>
+                <h3 className="text-xl font-semibold text-white mb-2">{step.title}</h3>
+                <p className="text-gray-300">{step.description}</p>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
-      </section>
+      </motion.section>
 
-      {/* Required Documents */}
-      <section className="py-20 bg-primary-800/30">
+      {/* Requirements Section */}
+      <motion.section
+        className="py-16 md:py-24 bg-primary-800/30"
+        variants={getAccessibleAnimationVariants(fadeIn)}
+      >
         <div className="container mx-auto px-4">
-          <motion.h2
-            className="text-4xl font-bold text-white text-center mb-12"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+          <motion.div 
+            className="max-w-4xl mx-auto"
+            variants={getAccessibleAnimationVariants(staggerContainer)}
           >
-            Required Documents
-            <motion.div
-              className="h-1 w-24 bg-secondary-500 mx-auto mt-4"
-              initial={{ width: 0 }}
-              whileInView={{ width: 96 }}
-              transition={{ duration: 1 }}
-            />
-          </motion.h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8">
-            {requiredDocuments.map((doc, index) => (
-              <motion.div
-                key={index}
-                className="bg-primary-800/50 p-6 rounded-xl backdrop-blur-sm border border-white/10
-                          hover:border-secondary-500/50 transition-all duration-300"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ y: -5 }}
-              >
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-8 text-center">
+              Admission Requirements
+            </h2>
+            <div className="space-y-6">
+              {requiredDocuments.map((req, index) => (
                 <motion.div
-                  className="text-4xl mb-4"
-                  animate={{
-                    y: [0, -10, 0],
-                    rotate: [0, 5, -5, 0],
-                  }}
-                  transition={{ duration: 2, repeat: Infinity }}
+                  key={index}
+                  variants={getAccessibleAnimationVariants(staggerItem)}
+                  className="flex items-start space-x-4"
                 >
-                  {doc.icon}
+                  <div className="text-secondary-500 text-xl">✓</div>
+                  <div>
+                    <h3 className="text-white font-medium mb-2">{req.name}</h3>
+                    <p className="text-gray-300">{req.description}</p>
+                  </div>
                 </motion.div>
-                <h3 className="text-xl font-bold text-white mb-2">{doc.name}</h3>
-                <p className="text-white/80">{doc.description}</p>
-              </motion.div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </motion.div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Application Form */}
-      <section className="py-20">
+      <motion.section
+        className="py-16 md:py-24"
+        variants={getAccessibleAnimationVariants(fadeIn)}
+      >
         <div className="container mx-auto px-4">
-          <motion.h2
-            className="text-4xl font-bold text-white text-center mb-12"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+          <motion.div 
+            className="max-w-3xl mx-auto"
+            variants={getAccessibleAnimationVariants(staggerContainer)}
           >
-            Application Form
-            <motion.div
-              className="h-1 w-24 bg-secondary-500 mx-auto mt-4"
-              initial={{ width: 0 }}
-              whileInView={{ width: 96 }}
-              transition={{ duration: 1 }}
-            />
-          </motion.h2>
-
-          <div className="max-w-2xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6 text-center">
+              Application Form
+            </h2>
             <AnimatePresence>
               {isSubmitted ? (
                 <motion.div
@@ -486,8 +436,8 @@ const Admissions: React.FC = () => {
                       <p className="text-red-500 mb-4">{submitError}</p>
                     )}
                     <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
+                      whileHover={isMobile ? { scale: 1.02 } : { scale: 1.05 }}
+                      whileTap={{ scale: 0.98 }}
                       type="submit"
                       disabled={isLoading}
                       className={`bg-secondary-500 text-white px-8 py-3 rounded-full 
@@ -500,9 +450,9 @@ const Admissions: React.FC = () => {
                 </motion.form>
               )}
             </AnimatePresence>
-          </div>
+          </motion.div>
         </div>
-      </section>
+      </motion.section>
     </div>
   );
 };

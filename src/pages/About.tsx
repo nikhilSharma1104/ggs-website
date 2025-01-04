@@ -5,17 +5,46 @@ const About: React.FC = () => {
   const [selectedValue, setSelectedValue] = useState<number | null>(null);
 
   const stats = [
-    { icon: "👨‍🏫", value: "20+", label: "Expert Teachers", description: "Highly qualified educators dedicated to excellence" },
-    { icon: "👨‍🎓", value: "400+", label: "Students", description: "Growing student community since 2022" },
-    { icon: "📈", value: "95%", label: "Success Rate", description: "Exceptional academic achievement" },
-    { icon: "🌟", value: "2022", label: "Established", description: "A young and dynamic institution" },
+    { icon: "", value: "20+", label: "Expert Teachers", description: "Highly qualified educators dedicated to excellence" },
+    { icon: "", value: "400+", label: "Students", description: "Growing student community since 2022" },
+    { icon: "", value: "95%", label: "Success Rate", description: "Exceptional academic achievement" },
+    { icon: "", value: "2022", label: "Established", description: "A young and dynamic institution" },
   ];
 
+  const getAccessibleAnimationVariants = (variant: any) => {
+    return variant;
+  };
+
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+      },
+    },
+  };
+
+  const staggerItem = {
+    hidden: { opacity: 0, x: -20 },
+    show: { opacity: 1, x: 0 },
+  };
+
+  const slideInLeft = {
+    hidden: { opacity: 0, x: -100 },
+    show: { opacity: 1, x: 0 },
+  };
+
+  const slideInRight = {
+    hidden: { opacity: 0, x: 100 },
+    show: { opacity: 1, x: 0 },
+  };
+
   return (
-    <div className="bg-primary-900 min-h-screen">
+    <div className="bg-primary-900 min-h-screen pt-16 md:pt-20">
       {/* Hero Section with Parallax Effect */}
       <motion.section
-        className="relative min-h-[80vh] flex items-center justify-center overflow-hidden"
+        className="relative min-h-[60vh] md:min-h-[80vh] flex items-center justify-center overflow-hidden"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
@@ -47,15 +76,15 @@ const About: React.FC = () => {
         </div>
 
         {/* Hero Content with Enhanced Typography */}
-        <div className="container mx-auto px-4 relative z-10 text-center">
+        <div className="container mx-auto px-4 relative z-10 text-center py-8 md:py-0">
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.8 }}
-            className="mb-8"
+            className="mb-4 md:mb-8"
           >
             <motion.h1
-              className="text-6xl md:text-8xl font-bold text-white mb-6 relative inline-block"
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-bold text-white mb-4 md:mb-6 relative inline-block"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2 }}
@@ -72,7 +101,7 @@ const About: React.FC = () => {
               </span>
             </motion.h1>
             <motion.p
-              className="text-2xl md:text-3xl text-white/80 max-w-3xl mx-auto font-light"
+              className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-white/80 max-w-3xl mx-auto font-light px-4 sm:px-0"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.4 }}
@@ -82,7 +111,7 @@ const About: React.FC = () => {
           </motion.div>
 
           {/* Stats Section with Hover Effects */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-16">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 mt-8 md:mt-16 px-4 sm:px-6 lg:px-8">
             {stats.map((stat, index) => (
               <motion.div
                 key={index}
@@ -132,7 +161,7 @@ const About: React.FC = () => {
             {[
               {
                 title: "Our Vision",
-                icon: "🔭",
+                icon: "",
                 content: [
                   "To be a globally recognized institution of academic excellence",
                   "Nurturing future leaders with strong ethical values",
@@ -142,7 +171,7 @@ const About: React.FC = () => {
               },
               {
                 title: "Our Mission",
-                icon: "🎯",
+                icon: "",
                 content: [
                   "Providing world-class education with Indian values",
                   "Developing critical thinking and problem-solving skills",
@@ -170,7 +199,7 @@ const About: React.FC = () => {
                 <div className="relative z-10">
                   <motion.div
                     className="text-5xl mb-6"
-                    animate={{ 
+                    animate={{
                       y: [0, -10, 0],
                       rotate: [0, 5, -5, 0]
                     }}
@@ -213,39 +242,39 @@ const About: React.FC = () => {
           </motion.h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { 
-                icon: "🎯", 
-                title: "Excellence", 
+              {
+                icon: "",
+                title: "Excellence",
                 description: "Pursuing the highest standards in academic and personal development",
                 details: ["Rigorous academic programs", "Continuous improvement", "Quality assessment"]
               },
-              { 
-                icon: "🤝", 
-                title: "Integrity", 
+              {
+                icon: "",
+                title: "Integrity",
                 description: "Building character through ethical practices and moral values",
                 details: ["Honest communication", "Ethical behavior", "Moral leadership"]
               },
-              { 
-                icon: "🌱", 
-                title: "Growth", 
+              {
+                icon: "",
+                title: "Growth",
                 description: "Fostering continuous learning and personal development",
                 details: ["Skill development", "Personal growth", "Lifelong learning"]
               },
-              { 
-                icon: "🌍", 
-                title: "Global Mindset", 
+              {
+                icon: "",
+                title: "Global Mindset",
                 description: "Embracing diversity and international perspectives",
                 details: ["Cultural awareness", "Global citizenship", "International exposure"]
               },
-              { 
-                icon: "💡", 
-                title: "Innovation", 
+              {
+                icon: "",
+                title: "Innovation",
                 description: "Encouraging creative thinking and problem-solving",
                 details: ["Creative solutions", "Modern technology", "Research mindset"]
               },
-              { 
-                icon: "❤️", 
-                title: "Compassion", 
+              {
+                icon: "",
+                title: "Compassion",
                 description: "Nurturing empathy and care for others",
                 details: ["Community service", "Emotional intelligence", "Social responsibility"]
               },
@@ -263,11 +292,11 @@ const About: React.FC = () => {
               >
                 <motion.div
                   className="text-4xl mb-4"
-                  animate={{ 
+                  animate={{
                     y: [0, -10, 0],
                     rotate: [0, 5, -5, 0]
                   }}
-                  transition={{ 
+                  transition={{
                     duration: 2,
                     repeat: Infinity,
                     delay: index * 0.2
@@ -277,7 +306,7 @@ const About: React.FC = () => {
                 </motion.div>
                 <h3 className="text-xl font-bold text-white mb-2">{value.title}</h3>
                 <p className="text-white/80 mb-4">{value.description}</p>
-                
+
                 <AnimatePresence>
                   {selectedValue === index && (
                     <motion.div
@@ -330,21 +359,21 @@ const About: React.FC = () => {
             <div className="absolute left-16 top-0 bottom-0 w-0.5 bg-secondary-500/30" />
 
             {[
-              { 
-                year: "2022", 
-                title: "Foundation", 
+              {
+                year: "2022",
+                title: "Foundation",
                 description: "Establishment of Gurukulam Global School with a vision for excellence in education",
                 achievements: ["Started with first batch of students", "Modern campus facilities", "Innovative teaching methodology"]
               },
-              { 
-                year: "2023", 
-                title: "Growth", 
+              {
+                year: "2023",
+                title: "Growth",
                 description: "Rapid expansion and enhancement of facilities",
                 achievements: ["Growing student community", "Enhanced infrastructure", "Enriched curriculum"]
               },
-              { 
-                year: "2024", 
-                title: "Innovation", 
+              {
+                year: "2024",
+                title: "Innovation",
                 description: "Integration of modern learning methods and technology",
                 achievements: ["Smart classrooms", "Digital learning integration", "400+ student strength"]
               }
@@ -391,6 +420,52 @@ const About: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Mobile Optimized Section */}
+      <motion.section
+        className="relative py-20 px-4"
+        initial="hidden"
+        animate="show"
+        variants={staggerContainer}
+      >
+        <div className="container mx-auto max-w-6xl">
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center"
+            variants={staggerContainer}
+          >
+            <motion.div
+              variants={slideInLeft}
+              className="space-y-6"
+            >
+              <motion.h2 
+                variants={staggerItem}
+                className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white via-secondary-200 to-secondary-400 text-transparent bg-clip-text"
+              >
+                Our Vision
+              </motion.h2>
+              <motion.p 
+                variants={staggerItem}
+                className="text-gray-300 text-lg"
+              >
+                At Gurukulam, we envision a future where education transcends traditional boundaries.
+              </motion.p>
+            </motion.div>
+
+            <motion.div
+              variants={slideInRight}
+              className="relative"
+            >
+              <div className="aspect-w-16 aspect-h-9 rounded-2xl overflow-hidden shadow-xl">
+                <img
+                  src="/images/vision.jpg"
+                  alt="Gurukulam Vision"
+                  className="object-cover w-full h-full"
+                />
+              </div>
+            </motion.div>
+          </motion.div>
+        </div>
+      </motion.section>
     </div>
   );
 };

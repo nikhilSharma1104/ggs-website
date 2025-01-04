@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
   const location = useLocation();
 
   const navigation = [
@@ -19,64 +20,114 @@ const Navbar: React.FC = () => {
     { name: 'Contact', href: '/contact' },
   ];
 
-  // Handle scroll effect
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
+      setIsScrolled(window.scrollY > 10);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close mobile menu on route change
   useEffect(() => {
     setIsOpen(false);
   }, [location]);
 
   return (
     <motion.nav
+      className={`fixed w-full z-50 transition-all duration-300 ${
+        isScrolled || isOpen ? 'bg-primary-900/95 backdrop-blur-lg shadow-lg' : 'bg-transparent'
+      }`}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      className={`fixed w-full z-50 transition-all duration-300 ${
-        scrolled
-          ? 'bg-primary-900/95 backdrop-blur-sm shadow-lg'
-          : 'bg-transparent'
-      }`}
+      transition={{
+        type: "spring",
+        bounce: isMobile ? 0.1 : 0.3,
+        duration: isMobile ? 0.4 : 0.6
+      }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex-shrink-0 flex items-center">
-            <Link to="/" className="flex items-center space-x-3">
+        <div className="flex justify-between items-center py-4">
+          {/* Logo */}
+          <motion.div
+            initial={{ opacity: 0, x: isMobile ? -20 : -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{
+              type: "spring",
+              bounce: isMobile ? 0.1 : 0.3,
+              duration: isMobile ? 0.3 : 0.5
+            }}
+          >
+            <Link to="/" className="flex items-center space-x-2 md:space-x-3">
               <img
                 src="/logo.png"
                 alt="Gurukulam Global School"
-                className={`transition-all duration-300 ${
-                  scrolled ? 'h-10' : 'h-12'
+                className={`transition-all duration-300 h-8 md:h-12 ${
+                  isScrolled ? 'md:h-10' : 'md:h-12'
                 }`}
               />
               <div className="flex flex-col">
-                <span className={`font-bold text-lg md:text-xl lg:text-2xl text-white transition-all duration-300 ${
-                  scrolled ? 'text-lg' : 'text-xl'
+                <span className={`font-bold text-sm md:text-xl lg:text-2xl text-white transition-all duration-300 ${
+                  isScrolled ? 'md:text-lg' : 'md:text-xl'
                 }`}>
                   Gurukulam Global School
                 </span>
-                <span className={`text-sm text-secondary-400 transition-opacity duration-300 ${
-                  scrolled ? 'opacity-0 h-0' : 'opacity-100'
+                <span className={`text-xs md:text-sm text-secondary-400 transition-opacity duration-300 ${
+                  isScrolled ? 'opacity-0 h-0' : 'opacity-100'
                 }`}>
                   Nurturing Future Leaders
                 </span>
               </div>
             </Link>
-          </div>
+          </motion.div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-1">
+          {/* Mobile Menu Button */}
+          <motion.button
+            className="md:hidden text-white"
+            onClick={() => setIsOpen(!isOpen)}
+            whileHover={{ scale: isMobile ? 1.05 : 1.1 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <span className="sr-only">Open menu</span>
+            <svg
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              {isOpen ? (
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              ) : (
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              )}
+            </svg>
+          </motion.button>
+
+          {/* Desktop Menu */}
+          <motion.div
+            className="hidden md:flex space-x-1"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: isMobile ? 0.3 : 0.5 }}
+          >
             {navigation.map((item, index) => (
               <motion.div
                 key={item.href}
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
+                transition={{
+                  delay: index * (isMobile ? 0.1 : 0.2),
+                  duration: isMobile ? 0.3 : 0.5
+                }}
               >
                 <Link
                   to={item.href}
@@ -102,41 +153,21 @@ const Navbar: React.FC = () => {
                 </Link>
               </motion.div>
             ))}
-          </div>
-
-          {/* Mobile Menu Button */}
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 text-white hover:text-secondary-500 transition-colors"
-          >
-            <div className="w-6 h-5 relative flex flex-col justify-between">
-              <motion.span
-                animate={isOpen ? { rotate: 45, y: 8 } : { rotate: 0, y: 0 }}
-                className="w-full h-0.5 bg-current transform origin-left transition-all"
-              />
-              <motion.span
-                animate={isOpen ? { opacity: 0 } : { opacity: 1 }}
-                className="w-full h-0.5 bg-current opacity-100 transition-opacity"
-              />
-              <motion.span
-                animate={isOpen ? { rotate: -45, y: -8 } : { rotate: 0, y: 0 }}
-                className="w-full h-0.5 bg-current transform origin-left transition-all"
-              />
-            </div>
-          </motion.button>
+          </motion.div>
         </div>
 
         {/* Mobile Menu */}
         <AnimatePresence>
           {isOpen && (
             <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3 }}
               className="md:hidden overflow-hidden bg-primary-800/95 backdrop-blur-lg rounded-b-2xl"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{
+                duration: isMobile ? 0.2 : 0.3,
+                ease: "easeInOut"
+              }}
             >
               <div className="px-4 py-2">
                 {navigation.map((item, index) => (
@@ -144,7 +175,10 @@ const Navbar: React.FC = () => {
                     key={item.href}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
+                    transition={{
+                      delay: index * (isMobile ? 0.05 : 0.1),
+                      duration: isMobile ? 0.2 : 0.3
+                    }}
                   >
                     <Link
                       to={item.href}

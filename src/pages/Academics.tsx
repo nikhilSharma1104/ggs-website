@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { FadeIn, slideInLeft, slideInRight, staggerContainer, staggerItem } from '../components/animations';
+import { fadeIn, slideInLeft, slideInRight, staggerContainer, staggerItem } from '../components/animations';
 
 interface StageCardProps {
   title: string;
@@ -180,7 +180,11 @@ const Academics: React.FC = () => {
       {/* Features Section */}
       <section className="py-20 relative overflow-hidden">
         <div className="container mx-auto px-4">
-          <FadeIn>
+          <motion.div
+            variants={fadeIn}
+            initial="hidden"
+            animate="show"
+          >
             <div className="text-center mb-16">
               <h2 className="text-4xl font-bold text-white mb-4">
                 Our Academic Features
@@ -189,7 +193,7 @@ const Academics: React.FC = () => {
                 Discover what makes our academic program unique and effective
               </p>
             </div>
-          </FadeIn>
+          </motion.div>
 
           <motion.div 
             variants={slideInLeft}

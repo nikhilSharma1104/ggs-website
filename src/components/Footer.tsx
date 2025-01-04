@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 const Footer = () => {
   const [isHovered, setIsHovered] = useState<string | null>(null);
-  
+
   const socialLinks = [
     { icon: "fab fa-facebook", url: "https://facebook.com", name: "Facebook" },
     { icon: "fab fa-instagram", url: "https://instagram.com", name: "Instagram" },
@@ -74,7 +74,7 @@ const Footer = () => {
                   <div className="flex items-center space-x-3 p-2 rounded-lg border border-primary-800/50">
                     <span className="text-xl">📍</span>
                     <div>
-                      <p className="text-secondary-200">136 A, Madhuvan Enclave,</p>
+                      <p className="text-secondary-200">136, Madhuvan Enclave,</p>
                       <p className="text-gray-300">Near Natraj Mutri, Krishna Nagar,</p>
                       <p className="text-gray-300">Mathura, UP - 281003</p>
                     </div>
@@ -82,8 +82,9 @@ const Footer = () => {
                   <div className="flex items-center space-x-3 p-2 rounded-lg border border-primary-800/50">
                     <span className="text-xl">📞</span>
                     <div>
-                      <p className="text-gray-300">+91 7505335080</p>
-                      <p className="text-gray-300">+91 7617645050</p>
+                      <a href="tel:+917505335080" className="text-gray-300 hover:text-secondary-300 transition-colors">+91 7505335080</a>
+                      <br />
+                      <a href="tel:+917617645050" className="text-gray-300 hover:text-secondary-300 transition-colors">+91 7617645050</a>
                     </div>
                   </div>
                 </div>

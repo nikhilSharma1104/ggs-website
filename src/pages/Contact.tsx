@@ -39,6 +39,7 @@ const Contact: React.FC = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
+
       ...prev,
       [name]: value
     }));
@@ -48,7 +49,7 @@ const Contact: React.FC = () => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus('idle');
-    
+
     try {
       await submitContactForm(formData);
       setSubmitStatus('success');
@@ -109,13 +110,13 @@ const Contact: React.FC = () => {
             initial="hidden"
             animate="show"
           >
-            <motion.h1 
+            <motion.h1
               variants={staggerItem}
               className="text-6xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white via-secondary-200 to-secondary-400 text-transparent bg-clip-text"
             >
               Contact Us
             </motion.h1>
-            <motion.p 
+            <motion.p
               variants={staggerItem}
               className="text-xl md:text-2xl text-gray-300 mb-8"
             >
@@ -207,9 +208,9 @@ const Contact: React.FC = () => {
                     type="submit"
                     disabled={isSubmitting}
                     className={`px-8 py-4 rounded-full font-bold text-white 
-                      ${isSubmitting 
-                        ? 'bg-gray-600 cursor-not-allowed' 
-                        : 'bg-gradient-to-r from-secondary-500 to-secondary-600 hover:from-secondary-600 hover:to-secondary-700 transform hover:scale-105'} 
+                      ${isSubmitting
+                        ? 'bg-gray-600 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-secondary-500 to-secondary-600 hover:from-secondary-600 hover:to-secondary-700 transform hover:scale-105'}
                       transition-all duration-200 shadow-lg`}
                   >
                     {isSubmitting ? (
@@ -266,9 +267,9 @@ const Contact: React.FC = () => {
             >
               <div className="text-4xl mb-4">📍</div>
               <h3 className="text-xl font-bold text-secondary-300 mb-2">Visit Us</h3>
-              <p className="text-gray-300">136 A, Madhuvan Enclave,</p>
+              <p className="text-gray-300">136, Madhuvan Enclave,</p>
               <p className="text-gray-300">Near Natraj Mutri, Krishna Nagar,</p>
-              <p className="text-gray-300">Mathura, Uttar Pradesh - 281003</p>
+              <p className="text-gray-300">Mathura, UP - 281003</p>
             </motion.div>
 
             {/* Phone Card */}
@@ -279,8 +280,8 @@ const Contact: React.FC = () => {
             >
               <div className="text-4xl mb-4">📞</div>
               <h3 className="text-xl font-bold text-secondary-300 mb-2">Call Us</h3>
-              <p className="text-gray-300">+91 7505335080</p>
-              <p className="text-gray-300">+91 7617645050</p>
+              <a href="tel:+917505335080" className="block text-gray-300 hover:text-secondary-300 transition-colors">+91 7505335080</a>
+              <a href="tel:+917617645050" className="block text-gray-300 hover:text-secondary-300 transition-colors">+91 7617645050</a>
               <p className="text-gray-300">Mon - Sat: 9:00 AM - 5:00 PM</p>
             </motion.div>
 
