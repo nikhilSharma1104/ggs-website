@@ -275,12 +275,13 @@ const Butterfly: React.FC<{ className?: string }> = ({ className = "" }) => (
 
 const HeroSection: React.FC<HeroSectionProps> = ({ onOpenVideo }) => {
   return (
-    <motion.div 
-      className="relative min-h-screen flex items-center justify-center overflow-hidden"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 1 }}
-    >
+    <div className="pt-16 w-full">
+      <motion.div 
+        className="relative min-h-screen flex items-center justify-center overflow-hidden"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1 }}
+      >
       {/* Animated Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900">
         {/* Floating Particles */}
@@ -462,6 +463,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onOpenVideo }) => {
         </div>
       </div>
     </motion.div>
+    </div>
   );
 };
 

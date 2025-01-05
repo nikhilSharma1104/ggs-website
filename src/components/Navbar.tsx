@@ -34,7 +34,7 @@ const Navbar: React.FC = () => {
 
   return (
     <motion.nav
-      className={`fixed w-full z-50 transition-all duration-300 ${
+      className={`fixed w-full top-0 z-[100] transition-all duration-300 ${
         isScrolled || isOpen ? 'bg-primary-900/95 backdrop-blur-lg shadow-lg' : 'bg-transparent'
       }`}
       initial={{ y: -100 }}
