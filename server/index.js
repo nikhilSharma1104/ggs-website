@@ -25,55 +25,90 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 // Create email transporter
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
-});
+const createTransporter = async () => {
+  try {
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      },
+      tls: {
+        rejectUnauthorized: false
+      }
+    });
 
-// Verify email configuration on startup
-transporter.verify((error, success) => {
-  if (error) {
-    console.error('Email configuration error:', error);
-  } else {
-    console.log('Email server is ready to send messages');
+    // Verify the connection
+    await transporter.verify();
+    console.log('Email server connection verified');
+    return transporter;
+  } catch (error) {
+    console.error('Failed to create email transporter:', error);
+    return null;
   }
+};
+
+let emailTransporter = null;
+createTransporter().then(transporter => {
+  emailTransporter = transporter;
 });
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
-  const emailConfigured = process.env.EMAIL_USER && process.env.EMAIL_PASS;
-  res.status(200).json({ 
-    status: 'healthy',
-    email: emailConfigured ? 'configured' : 'missing',
-    emailUser: process.env.EMAIL_USER ? 'set' : 'missing',
-    emailPass: process.env.EMAIL_PASS ? 'set' : 'missing',
-    cors: 'enabled for gurukulamglobalschool.in and github.io'
-  });
+app.get('/api/health', async (req, res) => {
+  try {
+    // Try to create transporter if it doesn't exist
+    if (!emailTransporter) {
+      emailTransporter = await createTransporter();
+    }
+
+    const emailConfigured = emailTransporter !== null;
+    
+    res.status(200).json({ 
+      status: 'healthy',
+      email: {
+        configured: emailConfigured,
+        user: process.env.EMAIL_USER ? 'set' : 'missing',
+        pass: process.env.EMAIL_PASS ? 'set' : 'missing',
+        transporter: emailConfigured ? 'connected' : 'failed'
+      },
+      cors: {
+        enabled: true,
+        domains: corsOptions.origin
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'unhealthy',
+      error: error.message
+    });
+  }
 });
 
 // Contact form endpoint
 app.post('/api/contact', async (req, res) => {
-  console.log('Received contact form submission:', req.body);
+  console.log('Received contact form submission');
   
   try {
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-      throw new Error('Email configuration missing');
+    if (!emailTransporter) {
+      emailTransporter = await createTransporter();
+      if (!emailTransporter) {
+        throw new Error('Email service not available');
+      }
     }
 
     const { name, email, phone, subject, message } = req.body;
+    console.log('Form data:', { name, email, phone, subject });
 
-    // Validate required fields
     if (!name || !email || !message) {
       throw new Error('Missing required fields');
     }
 
-    // Email content
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: process.env.CONTACT_EMAIL || process.env.EMAIL_USER,
+      replyTo: email,
       subject: `New Contact Form Submission: ${subject}`,
       html: `
         <h2>New Contact Form Submission</h2>
@@ -86,12 +121,14 @@ app.post('/api/contact', async (req, res) => {
       `
     };
 
-    // Send email
-    await transporter.sendMail(mailOptions);
-    console.log('Contact form email sent successfully');
-    res.status(200).json({ message: 'Message sent successfully!' });
+    const info = await emailTransporter.sendMail(mailOptions);
+    console.log('Email sent successfully:', info.messageId);
+    res.status(200).json({ 
+      message: 'Message sent successfully!',
+      messageId: info.messageId
+    });
   } catch (error) {
-    console.error('Error sending contact form email:', error);
+    console.error('Error sending email:', error);
     res.status(500).json({ 
       message: 'Failed to send message. Please try again.',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
@@ -101,16 +138,19 @@ app.post('/api/contact', async (req, res) => {
 
 // Admissions endpoint
 app.post('/api/admissions', async (req, res) => {
-  console.log('Received admissions form submission:', req.body);
+  console.log('Received admissions form submission');
   
   try {
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-      throw new Error('Email configuration missing');
+    if (!emailTransporter) {
+      emailTransporter = await createTransporter();
+      if (!emailTransporter) {
+        throw new Error('Email service not available');
+      }
     }
 
     const { studentName, grade, parentName, email, phone, message } = req.body;
+    console.log('Form data:', { studentName, grade, parentName, email, phone });
 
-    // Validate required fields
     if (!studentName || !grade || !parentName || !email || !phone) {
       throw new Error('Missing required fields');
     }
@@ -118,6 +158,7 @@ app.post('/api/admissions', async (req, res) => {
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: process.env.CONTACT_EMAIL || process.env.EMAIL_USER,
+      replyTo: email,
       subject: `New Admission Inquiry: ${grade}`,
       html: `
         <h2>New Admission Inquiry</h2>
@@ -131,11 +172,14 @@ app.post('/api/admissions', async (req, res) => {
       `
     };
 
-    await transporter.sendMail(mailOptions);
-    console.log('Admission form email sent successfully');
-    res.status(200).json({ message: 'Application submitted successfully!' });
+    const info = await emailTransporter.sendMail(mailOptions);
+    console.log('Email sent successfully:', info.messageId);
+    res.status(200).json({ 
+      message: 'Application submitted successfully!',
+      messageId: info.messageId
+    });
   } catch (error) {
-    console.error('Error sending admission form email:', error);
+    console.error('Error sending email:', error);
     res.status(500).json({ 
       message: 'Failed to submit application. Please try again.',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
@@ -145,16 +189,19 @@ app.post('/api/admissions', async (req, res) => {
 
 // Careers endpoint
 app.post('/api/careers', async (req, res) => {
-  console.log('Received careers form submission:', req.body);
+  console.log('Received careers form submission');
   
   try {
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-      throw new Error('Email configuration missing');
+    if (!emailTransporter) {
+      emailTransporter = await createTransporter();
+      if (!emailTransporter) {
+        throw new Error('Email service not available');
+      }
     }
 
     const { position, department, firstName, lastName, email, phone, experience, education, coverLetter } = req.body;
+    console.log('Form data:', { position, department, firstName, lastName, email, phone });
 
-    // Validate required fields
     if (!position || !department || !firstName || !lastName || !email || !phone || !experience || !education || !coverLetter) {
       throw new Error('Missing required fields');
     }
@@ -162,6 +209,7 @@ app.post('/api/careers', async (req, res) => {
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: process.env.CONTACT_EMAIL || process.env.EMAIL_USER,
+      replyTo: email,
       subject: `New Career Application: ${position}`,
       html: `
         <h2>New Career Application</h2>
@@ -177,11 +225,14 @@ app.post('/api/careers', async (req, res) => {
       `
     };
 
-    await transporter.sendMail(mailOptions);
-    console.log('Career application email sent successfully');
-    res.status(200).json({ message: 'Application submitted successfully!' });
+    const info = await emailTransporter.sendMail(mailOptions);
+    console.log('Email sent successfully:', info.messageId);
+    res.status(200).json({ 
+      message: 'Application submitted successfully!',
+      messageId: info.messageId
+    });
   } catch (error) {
-    console.error('Error sending career application email:', error);
+    console.error('Error sending email:', error);
     res.status(500).json({ 
       message: 'Failed to submit application. Please try again.',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
