@@ -1,15 +1,29 @@
 {
   "short_name": "GGS",
   "name": "Gurukulam Global School",
+  "description": "A premier educational institution offering holistic education with modern facilities and traditional values.",
   "icons": [
     {
       "src": "logo.png",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "logo192.png",
       "type": "image/png",
       "sizes": "192x192"
+    },
+    {
+      "src": "logo512.png",
+      "type": "image/png",
+      "sizes": "512x512"
     }
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#1a365d",
+  "background_color": "#ffffff",
+  "categories": ["education", "school"],
+  "lang": "en-US",
+  "orientation": "any"
 }

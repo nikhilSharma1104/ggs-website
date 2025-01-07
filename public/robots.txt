@@ -1,3 +1,20 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /private/
+Disallow: /*?*
+
+# Allow important pages to be crawled
+Allow: /about
+Allow: /academics
+Allow: /admissions
+Allow: /campus-life
+Allow: /events
+Allow: /gallery
+Allow: /contact
+Allow: /careers
+
+# Sitemap location
+Sitemap: https://www.gurukulamglobalschool.in/sitemap.xml
