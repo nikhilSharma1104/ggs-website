@@ -157,10 +157,37 @@ npm test
 
 ## 🚀 Deployment
 
-Deploy to GitHub Pages:
-```bash
-npm run deploy
-```
+### GitHub Pages Deployment
+
+The project is configured to automatically deploy to GitHub Pages using GitHub Actions. Here's how it works:
+
+1. **Set up GitHub Secrets:**
+   - Go to your repository's Settings
+   - Navigate to Secrets and Variables > Actions
+   - Add the following secrets:
+     ```
+     REACT_APP_GOOGLE_CALENDAR_API_KEY
+     REACT_APP_WHATSAPP_NUMBER
+     REACT_APP_API_URL
+     REACT_APP_CALENDAR_API_URL
+     REACT_APP_CONTACT_API_URL
+     REACT_APP_MONGODB_URI
+     ```
+
+2. **Automatic Deployment:**
+   - Every push to the `haha` branch triggers a deployment
+   - GitHub Actions will:
+     - Build the project with environment variables
+     - Deploy to the gh-pages branch
+     - Update the live site
+
+3. **Manual Deployment:**
+   If you need to deploy manually:
+   ```bash
+   npm run deploy
+   ```
+
+> Note: The deployment process uses GitHub Actions to securely inject environment variables during the build process.
 
 ## 📄 License
 
