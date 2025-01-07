@@ -203,15 +203,15 @@ const Contact: React.FC = () => {
                   />
                 </motion.div>
 
-                <motion.div variants={fadeInVariant} className="flex justify-center">
+                <motion.div className="flex justify-center">
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className={`px-8 py-4 rounded-full font-bold text-white 
-                      ${isSubmitting
-                        ? 'bg-gray-600 cursor-not-allowed'
-                        : 'bg-gradient-to-r from-secondary-500 to-secondary-600 hover:from-secondary-600 hover:to-secondary-700 transform hover:scale-105'}
-                      transition-all duration-200 shadow-lg`}
+                    className={`px-8 py-3 rounded-lg font-semibold text-white transition-all transform hover:scale-105 ${
+                      isSubmitting
+                        ? 'bg-gray-500 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-secondary-500 to-secondary-600 hover:from-secondary-600 hover:to-secondary-700'
+                    }`}
                   >
                     {isSubmitting ? (
                       <span className="flex items-center">
@@ -221,35 +221,36 @@ const Contact: React.FC = () => {
                         </svg>
                         Sending...
                       </span>
-                    ) : 'Send Message 📨'}
+                    ) : (
+                      'Send Message'
+                    )}
                   </button>
                 </motion.div>
+
+                {/* Status Messages */}
+                <AnimatePresence>
+                  {submitStatus === 'success' && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      className="text-green-400 text-center p-4 bg-green-900/20 rounded-lg"
+                    >
+                      Message sent successfully! We'll get back to you soon.
+                    </motion.div>
+                  )}
+                  {submitStatus === 'error' && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      className="text-red-400 text-center p-4 bg-red-900/20 rounded-lg"
+                    >
+                      Failed to send message. Please try again or contact us directly.
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </form>
-
-              {/* Status Messages */}
-              <AnimatePresence>
-                {submitStatus === 'success' && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    className="mt-6 p-4 bg-green-900/20 border border-green-500/30 text-green-400 rounded-lg text-center"
-                  >
-                    Thank you for your message! We'll get back to you soon! 🎉
-                  </motion.div>
-                )}
-
-                {submitStatus === 'error' && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    className="mt-6 p-4 bg-red-900/20 border border-red-500/30 text-red-400 rounded-lg text-center"
-                  >
-                    Oops! Something went wrong. Please try again later. 😔
-                  </motion.div>
-                )}
-              </AnimatePresence>
             </div>
           </div>
         </div>

@@ -7,8 +7,10 @@ interface ContactFormData {
 }
 
 export const submitContactForm = async (formData: ContactFormData) => {
+  const API_URL = process.env.REACT_APP_CONTACT_API_URL || 'http://localhost:5000/api/contact';
+  
   try {
-    const response = await fetch('http://localhost:5000/api/contact', {
+    const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
