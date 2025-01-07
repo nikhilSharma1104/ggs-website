@@ -8,8 +8,10 @@ interface AdmissionFormData {
 }
 
 export const submitAdmissionApplication = async (formData: AdmissionFormData) => {
+  const API_URL = process.env.REACT_APP_ADMISSION_API_URL || 'http://localhost:5000/api/admissions';
+  
   try {
-    const response = await fetch('http://localhost:5000/api/admissions', {
+    const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

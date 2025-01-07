@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import axios from 'axios';
 import { FaChalkboardTeacher, FaUserTie, FaUsers, FaFileUpload } from 'react-icons/fa';
+import { submitCareerApplication, type CareerFormData } from '../services/careerService';
 
 const Careers: React.FC = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<CareerFormData>({
     position: '',
     department: '',
     firstName: '',
@@ -13,7 +13,7 @@ const Careers: React.FC = () => {
     phone: '',
     experience: '',
     education: '',
-    resume: null as File | null,
+    resume: null,
     coverLetter: ''
   });
 
@@ -41,7 +41,7 @@ const Careers: React.FC = () => {
     setSubmitStatus(null);
 
     try {
-      const response = await axios.post('/api/careers/apply', formData);
+      await submitCareerApplication(formData);
       setSubmitStatus({
         type: 'success',
         message: 'Application submitted successfully! We will review your application and get back to you soon.'
@@ -61,7 +61,7 @@ const Careers: React.FC = () => {
     } catch (error) {
       setSubmitStatus({
         type: 'error',
-        message: 'Error submitting application. Please try again.'
+        message: 'Failed to submit application. Please try again later.'
       });
     } finally {
       setIsSubmitting(false);
