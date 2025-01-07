@@ -11,7 +11,8 @@ const corsOptions = {
   origin: [
     'https://gurukulamglobalschool.in',
     'https://www.gurukulamglobalschool.in',
-    'http://localhost:3000'
+    'http://localhost:3000',
+    'https://nikhilsharma1104.github.io'
   ],
   methods: ['POST', 'GET', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -32,24 +33,47 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+// Verify email configuration on startup
+transporter.verify((error, success) => {
+  if (error) {
+    console.error('Email configuration error:', error);
+  } else {
+    console.log('Email server is ready to send messages');
+  }
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
+  const emailConfigured = process.env.EMAIL_USER && process.env.EMAIL_PASS;
   res.status(200).json({ 
     status: 'healthy',
-    email: process.env.EMAIL_USER ? 'configured' : 'missing',
-    cors: 'enabled for gurukulamglobalschool.in'
+    email: emailConfigured ? 'configured' : 'missing',
+    emailUser: process.env.EMAIL_USER ? 'set' : 'missing',
+    emailPass: process.env.EMAIL_PASS ? 'set' : 'missing',
+    cors: 'enabled for gurukulamglobalschool.in and github.io'
   });
 });
 
 // Contact form endpoint
 app.post('/api/contact', async (req, res) => {
+  console.log('Received contact form submission:', req.body);
+  
   try {
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+      throw new Error('Email configuration missing');
+    }
+
     const { name, email, phone, subject, message } = req.body;
+
+    // Validate required fields
+    if (!name || !email || !message) {
+      throw new Error('Missing required fields');
+    }
 
     // Email content
     const mailOptions = {
       from: process.env.EMAIL_USER,
-      to: process.env.CONTACT_EMAIL,
+      to: process.env.CONTACT_EMAIL || process.env.EMAIL_USER,
       subject: `New Contact Form Submission: ${subject}`,
       html: `
         <h2>New Contact Form Submission</h2>
@@ -68,18 +92,32 @@ app.post('/api/contact', async (req, res) => {
     res.status(200).json({ message: 'Message sent successfully!' });
   } catch (error) {
     console.error('Error sending contact form email:', error);
-    res.status(500).json({ message: 'Failed to send message. Please try again.' });
+    res.status(500).json({ 
+      message: 'Failed to send message. Please try again.',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 });
 
 // Admissions endpoint
 app.post('/api/admissions', async (req, res) => {
+  console.log('Received admissions form submission:', req.body);
+  
   try {
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+      throw new Error('Email configuration missing');
+    }
+
     const { studentName, grade, parentName, email, phone, message } = req.body;
+
+    // Validate required fields
+    if (!studentName || !grade || !parentName || !email || !phone) {
+      throw new Error('Missing required fields');
+    }
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
-      to: process.env.CONTACT_EMAIL,
+      to: process.env.CONTACT_EMAIL || process.env.EMAIL_USER,
       subject: `New Admission Inquiry: ${grade}`,
       html: `
         <h2>New Admission Inquiry</h2>
@@ -98,18 +136,32 @@ app.post('/api/admissions', async (req, res) => {
     res.status(200).json({ message: 'Application submitted successfully!' });
   } catch (error) {
     console.error('Error sending admission form email:', error);
-    res.status(500).json({ message: 'Failed to submit application. Please try again.' });
+    res.status(500).json({ 
+      message: 'Failed to submit application. Please try again.',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 });
 
 // Careers endpoint
 app.post('/api/careers', async (req, res) => {
+  console.log('Received careers form submission:', req.body);
+  
   try {
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+      throw new Error('Email configuration missing');
+    }
+
     const { position, department, firstName, lastName, email, phone, experience, education, coverLetter } = req.body;
+
+    // Validate required fields
+    if (!position || !department || !firstName || !lastName || !email || !phone || !experience || !education || !coverLetter) {
+      throw new Error('Missing required fields');
+    }
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
-      to: process.env.CONTACT_EMAIL,
+      to: process.env.CONTACT_EMAIL || process.env.EMAIL_USER,
       subject: `New Career Application: ${position}`,
       html: `
         <h2>New Career Application</h2>
@@ -130,7 +182,10 @@ app.post('/api/careers', async (req, res) => {
     res.status(200).json({ message: 'Application submitted successfully!' });
   } catch (error) {
     console.error('Error sending career application email:', error);
-    res.status(500).json({ message: 'Failed to submit application. Please try again.' });
+    res.status(500).json({ 
+      message: 'Failed to submit application. Please try again.',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 });
 
