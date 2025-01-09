@@ -8,9 +8,10 @@ interface AdmissionFormData {
 }
 
 export const submitAdmissionApplication = async (formData: AdmissionFormData) => {
-  const API_URL = process.env.REACT_APP_ADMISSION_API_URL || 'http://localhost:5000/api/admissions';
+  const API_URL = process.env.REACT_APP_ADMISSION_API_URL || 'https://ggs-website-api.onrender.com/api/admissions';
   
   try {
+    console.log('Submitting to:', API_URL);
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
@@ -20,11 +21,18 @@ export const submitAdmissionApplication = async (formData: AdmissionFormData) =>
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to submit application');
+      if (response.headers.get('content-type')?.includes('application/json')) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to submit application');
+      } else {
+        const errorText = await response.text();
+        console.error('Non-JSON error response:', errorText);
+        throw new Error('Failed to submit application. Server returned an invalid response.');
+      }
     }
 
-    return await response.json();
+    const data = await response.json();
+    return data;
   } catch (error) {
     console.error('Error submitting application:', error);
     throw error;
