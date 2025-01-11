@@ -203,7 +203,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Contact
 
-Nikhil Sharma - [Your Contact Information]
+Nikhil Sharma - nikhil.shrma.1104@gmail.com
 
 Project Link: [https://github.com/nikhilSharma1104/ggs-website](https://github.com/nikhilSharma1104/ggs-website)
 
