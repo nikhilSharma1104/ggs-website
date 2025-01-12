@@ -7,7 +7,11 @@ interface ContactFormData {
 }
 
 export const submitContactForm = async (formData: ContactFormData) => {
-  const API_URL = process.env.REACT_APP_CONTACT_API_URL || 'http://localhost:5000/api/contact';
+  // Use the environment variable, fallback to localhost for development
+  const API_URL = process.env.REACT_APP_CONTACT_API_URL || 
+    (process.env.NODE_ENV === 'production' 
+      ? 'https://your-server-domain.com/api/contact'  // Replace with your actual server domain
+      : 'http://localhost:5000/api/contact');
   
   try {
     const response = await fetch(API_URL, {
