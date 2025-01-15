@@ -22,17 +22,30 @@ export const submitCareerApplication = async (formData: CareerFormData) => {
       }
     });
 
+    console.log('Submitting career application:', {
+      url: API_URL,
+      formData: Object.fromEntries(formDataObj.entries())
+    });
+
     const response = await fetch(API_URL, {
       method: 'POST',
       body: formDataObj,
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to submit career application');
+      let errorMessage = 'Failed to submit career application';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorMessage;
+      } catch (e) {
+        console.error('Error parsing error response:', e);
+      }
+      throw new Error(errorMessage);
     }
 
-    return await response.json();
+    const result = await response.json();
+    console.log('Career application submitted successfully:', result);
+    return result;
   } catch (error) {
     console.error('Error submitting career application:', error);
     throw error;

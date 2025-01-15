@@ -12,6 +12,9 @@ const express = require('express');
 const cors = require('cors');
 const nodemailer = require('nodemailer');
 const multer = require('multer');
+const { google } = require('googleapis');
+const { authenticate } = require('@google-cloud/local-auth');
+const fs = require('fs').promises;
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -59,6 +62,43 @@ const upload = multer({
     }
   }
 });
+
+// Google Drive setup
+async function getGoogleDriveService() {
+  const auth = await authenticate({
+    keyfilePath: path.join(__dirname, 'credentials.json'),
+    scopes: ['https://www.googleapis.com/auth/drive.file'],
+  });
+  return google.drive({ version: 'v3', auth });
+}
+
+// Upload file to Google Drive
+async function uploadToGoogleDrive(filePath, fileName) {
+  try {
+    const driveService = await getGoogleDriveService();
+    const fileMetadata = {
+      name: fileName,
+      parents: [process.env.GOOGLE_DRIVE_FOLDER_ID] // Folder ID where resumes will be stored
+    };
+    
+    const media = {
+      mimeType: 'application/pdf',
+      body: fs.createReadStream(filePath)
+    };
+    
+    const file = await driveService.files.create({
+      resource: fileMetadata,
+      media: media,
+      fields: 'id, webViewLink'
+    });
+    
+    console.log('File uploaded to Google Drive:', file.data);
+    return file.data;
+  } catch (error) {
+    console.error('Error uploading to Google Drive:', error);
+    throw error;
+  }
+}
 
 // Create email transporter
 const createTransporter = async () => {
@@ -246,11 +286,11 @@ app.post('/api/careers', upload.single('resume'), async (req, res) => {
       throw new Error('Missing required fields');
     }
 
-    // Check if a resume was uploaded
-    const resumeAttachment = req.file ? {
-      filename: req.file.originalname,
-      path: req.file.path
-    } : null;
+    let driveFileInfo = null;
+    // Upload resume to Google Drive if present
+    if (req.file) {
+      driveFileInfo = await uploadToGoogleDrive(req.file.path, req.file.originalname);
+    }
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
@@ -266,36 +306,30 @@ app.post('/api/careers', upload.single('resume'), async (req, res) => {
         <p><strong>Phone:</strong> ${phone}</p>
         <p><strong>Experience:</strong> ${experience}</p>
         <p><strong>Education:</strong> ${education}</p>
-        <h3>Cover Letter:</h3>
+        <p><strong>Cover Letter:</strong></p>
         <p>${coverLetter}</p>
-      `,
-      attachments: resumeAttachment ? [resumeAttachment] : []
+        ${driveFileInfo ? `<p><strong>Resume:</strong> <a href="${driveFileInfo.webViewLink}">View on Google Drive</a></p>` : ''}
+      `
     };
 
-    const info = await emailTransporter.sendMail(mailOptions);
-    console.log('Email sent successfully:', info.messageId);
-
-    // Clean up the uploaded file after sending
-    if (resumeAttachment) {
-      const fs = require('fs').promises;
-      await fs.unlink(resumeAttachment.path);
-    }
-
+    await emailTransporter.sendMail(mailOptions);
     res.status(200).json({ 
-      message: 'Application submitted successfully!',
-      messageId: info.messageId
+      message: 'Application submitted successfully',
+      driveFileLink: driveFileInfo ? driveFileInfo.webViewLink : null
     });
+
   } catch (error) {
-    console.error('Error handling career application:', error);
+    console.error('Error processing career application:', error);
     res.status(500).json({ 
       message: 'Failed to submit application. Please try again.',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
-
-    // Clean up the uploaded file if there was an error
+  } finally {
+    // Clean up uploaded file
     if (req.file) {
-      const fs = require('fs').promises;
-      fs.unlink(req.file.path).catch(console.error);
+      fs.unlink(req.file.path, (err) => {
+        if (err) console.error('Error deleting temporary file:', err);
+      });
     }
   }
 });

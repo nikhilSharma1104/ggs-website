@@ -28,7 +28,7 @@ const jobApplicationSchema = new mongoose.Schema({
     required: true
   },
   experience: {
-    type: Number,
+    type: String,
     required: true
   },
   education: {
@@ -37,11 +37,11 @@ const jobApplicationSchema = new mongoose.Schema({
   },
   resumeUrl: {
     type: String,
-    required: true
+    required: false
   },
   coverLetter: {
     type: String,
-    required: true
+    required: false
   },
   status: {
     type: String,
