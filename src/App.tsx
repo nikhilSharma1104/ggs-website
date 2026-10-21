@@ -104,6 +104,8 @@ const Shell: React.FC = () => {
   const [assistantOpen, setAssistantOpen] = useState(false);
   const [introDone, setIntroDone] = useState(false);
   const journeyShownRef = useRef(false);
+  // The opening animation always plays before the game: on every home-page load and whenever ?journey is used.
+  const [opensWithJourney] = useState(() => window.location.pathname === '/' || new URLSearchParams(window.location.search).has('journey'));
   const pathRef = useRef(location.pathname);
   pathRef.current = location.pathname;
 
@@ -149,7 +151,7 @@ const Shell: React.FC = () => {
 
   return (
     <AdmissionContext.Provider value={ctx}>
-      <IntroCurtain onDone={() => setIntroDone(true)} skip={isAutomated()} />
+      <IntroCurtain onDone={() => setIntroDone(true)} skip={isAutomated()} always={opensWithJourney} />
       <ScrollProgress />
       <div className="flex min-h-screen flex-col">
         <Navbar onApply={openAdmission} />

@@ -6,7 +6,7 @@ import { school } from '../data/site';
 
 // First-visit intro: crest and rings draw in, then three layered panels
 // (navy, gold, ivory) sweep upward in sequence to reveal the site.
-// Shown once per browser session; clicking anywhere skips it.
+// Plays on every home-page load (and before the journey), once per session elsewhere; clicking anywhere skips it.
 
 const SESSION_KEY = 'ggs-intro-seen';
 
@@ -18,9 +18,10 @@ const seenThisSession = () => {
   }
 };
 
-const IntroCurtain: React.FC<{ onDone: () => void; skip?: boolean }> = ({ onDone, skip }) => {
+const IntroCurtain: React.FC<{ onDone: () => void; skip?: boolean; always?: boolean }> = ({ onDone, skip, always }) => {
   const reduce = useReducedMotion();
-  const [show, setShow] = useState(() => !skip && !seenThisSession());
+  // `always`: play on every load (home page), otherwise once per session
+  const [show, setShow] = useState(() => !skip && (always || !seenThisSession()));
 
   useEffect(() => {
     if (!show) {
