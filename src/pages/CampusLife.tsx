@@ -7,6 +7,7 @@ import CampusScene from '../components/art/CampusScene';
 import { facilityArt } from '../components/art/Illustrations';
 import { GoldList, Reveal, SectionHeading, usePointerParallax, VideoModal } from '../components/ui';
 import { activities, facilities, school } from '../data/site';
+import { photos } from '../data/photos';
 
 const TourBanner: React.FC<{ onPlay: () => void }> = ({ onPlay }) => {
   const ref = useRef<HTMLElement>(null);
@@ -64,12 +65,23 @@ const CampusLife: React.FC = () => {
           <div className="mt-16 space-y-6">
             {facilities.map((f, i) => {
               const Art = facilityArt[f.key];
+              const photo = photos.facilities[f.key];
               return (
                 <Reveal key={f.key}>
                   <div className={`grid items-center gap-8 overflow-hidden rounded-3xl p-8 sm:p-12 lg:grid-cols-[auto_1fr_1fr] lg:gap-14 ${i % 2 ? 'bg-ink-900 text-ivory' : 'bg-white ring-1 ring-ink-900/[0.06]'}`}>
-                    <div className={`grid h-32 w-32 place-items-center rounded-full ${i % 2 ? 'bg-white/5 ring-1 ring-gold-300/30' : 'bg-gold-50 ring-1 ring-gold-500/25'}`}>
-                      <Art className={`h-20 w-20 ${i % 2 ? 'text-gold-300' : 'text-gold-600'}`} animate />
-                    </div>
+                    {photo ? (
+                      <img
+                        src={photo.src}
+                        alt={photo.alt}
+                        loading="lazy"
+                        style={{ objectPosition: photo.focus ?? '50% 50%' }}
+                        className="h-56 w-full rounded-t-[999px] rounded-b-2xl object-cover ring-1 ring-gold-400/30 lg:h-64 lg:w-52"
+                      />
+                    ) : (
+                      <div className={`grid h-32 w-32 place-items-center rounded-full ${i % 2 ? 'bg-white/5 ring-1 ring-gold-300/30' : 'bg-gold-50 ring-1 ring-gold-500/25'}`}>
+                        <Art className={`h-20 w-20 ${i % 2 ? 'text-gold-300' : 'text-gold-600'}`} animate />
+                      </div>
+                    )}
                     <div>
                       <span className={`font-display text-lg italic ${i % 2 ? 'text-gold-300' : 'text-gold-600'}`}>0{i + 1}</span>
                       <h3 className={`mt-1 font-display text-4xl ${i % 2 ? 'text-ivory' : ''}`}>{f.title}</h3>

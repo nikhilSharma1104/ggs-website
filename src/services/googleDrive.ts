@@ -48,8 +48,10 @@ const fetchImagesFromDrive = async (folderId: string): Promise<DriveImage[]> => 
       id: file.id,
       name: file.name,
       mimeType: file.mimeType,
-      webViewLink: `https://drive.google.com/uc?export=view&id=${file.id}`,
-      thumbnailLink: file.thumbnailLink || `https://drive.google.com/thumbnail?id=${file.id}`,
+      // lh3 links serve publicly shared Drive images directly; the old
+      // uc?export=view links are no longer reliable inside <img> tags.
+      webViewLink: `https://lh3.googleusercontent.com/d/${file.id}=w1800`,
+      thumbnailLink: `https://lh3.googleusercontent.com/d/${file.id}=w800`,
       category: getCategoryFromFileName(file.name),
     }));
   } catch (error) {

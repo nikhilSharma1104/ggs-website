@@ -6,6 +6,7 @@ import PageHero from '../components/PageHero';
 import { useEscape, useScrollLock } from '../components/ui';
 import { getImagesFromFolder } from '../services/googleDrive';
 import { galleryImages } from '../data/galleryImages';
+import { photos } from '../data/photos';
 
 interface GalleryImage {
   id: string;
@@ -16,8 +17,17 @@ interface GalleryImage {
   fullSizeUrl: string;
 }
 
-// Bundled set shown until (or unless) the Google Drive folder is configured.
-const localImages: GalleryImage[] = galleryImages.map((img) => ({
+// The school's own photos (from Instagram / Facebook) come first.
+const schoolImages: GalleryImage[] = photos.gallery.map((p, i) => ({
+  id: `school-${i}`,
+  url: p.src,
+  fullSizeUrl: p.src,
+  title: p.alt,
+  category: p.category ?? 'Campus',
+}));
+
+// Generic placeholders, used only while the school has no photos of its own loaded.
+const stockImages: GalleryImage[] = galleryImages.map((img) => ({
   id: String(img.id),
   url: `${img.url}?auto=format&fit=crop&w=800&q=70`,
   fullSizeUrl: `${img.url}?auto=format&fit=crop&w=1800&q=80`,
@@ -32,7 +42,7 @@ const driveConfigured = Boolean(process.env.REACT_APP_GOOGLE_DRIVE_GALLERY_FOLDE
 const aspects = ['aspect-[4/5]', 'aspect-square', 'aspect-[4/3]', 'aspect-[3/4]', 'aspect-[5/4]'];
 
 const Gallery: React.FC = () => {
-  const [images, setImages] = useState<GalleryImage[]>(localImages);
+  const [driveImages, setDriveImages] = useState<GalleryImage[]>([]);
   const [category, setCategory] = useState('All');
   const [selected, setSelected] = useState<number | null>(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -50,15 +60,20 @@ const Gallery: React.FC = () => {
           category: img.category || 'Campus',
           fullSizeUrl: img.webViewLink,
         }));
-      if (mapped.length) setImages(mapped);
+      setDriveImages(mapped);
     } catch (err) {
-      console.error('Error fetching Drive gallery, keeping bundled images:', err);
+      console.error('Error fetching Drive gallery:', err);
     }
   }, []);
 
   useEffect(() => {
     loadDrive();
   }, [loadDrive]);
+
+  const images = useMemo(() => {
+    const real = [...schoolImages, ...driveImages];
+    return real.length ? real : stockImages;
+  }, [driveImages]);
 
   const categories = useMemo(() => ['All', ...Array.from(new Set(images.map((i) => i.category)))], [images]);
   const filtered = useMemo(() => (category === 'All' ? images : images.filter((i) => i.category === category)), [images, category]);

@@ -23,6 +23,8 @@ import {
 } from 'react-icons/fi';
 import SEO from '../components/SEO';
 import CampusScene from '../components/art/CampusScene';
+import PhotoLayer from '../components/art/PhotoLayer';
+import { photos } from '../data/photos';
 import { Mandala, Ornament, stageArt, programArt } from '../components/art/Illustrations';
 import { Reveal, SectionHeading, useMediaQuery, usePointerParallax, VideoModal } from '../components/ui';
 import { NoticeTicker, Counter, EventCountdown, TestimonialCarousel } from '../components/widgets';
@@ -58,7 +60,11 @@ const Hero: React.FC<{ onTour: () => void }> = ({ onTour }) => {
 
   return (
     <section ref={ref} className="relative isolate flex min-h-[100svh] flex-col overflow-hidden bg-ink-950">
-      <CampusScene pointerX={pointer.x} pointerY={pointer.y} scroll={scrollYProgress} buildingOffset={wide ? 330 : 0} className="absolute inset-0 -z-10 h-full w-full" />
+      {photos.hero ? (
+        <PhotoLayer photo={photos.hero} pointerX={pointer.x} pointerY={pointer.y} scroll={scrollYProgress} className="absolute inset-0 -z-10" />
+      ) : (
+        <CampusScene pointerX={pointer.x} pointerY={pointer.y} scroll={scrollYProgress} buildingOffset={wide ? 330 : 0} className="absolute inset-0 -z-10 h-full w-full" />
+      )}
       <div className="absolute inset-0 -z-10 bg-gradient-to-r from-ink-950/95 via-ink-950/60 to-transparent" />
       <div className="absolute inset-x-0 top-0 -z-10 h-48 bg-gradient-to-b from-ink-950/80 to-transparent" />
 
@@ -218,7 +224,11 @@ const WelcomeArt: React.FC = () => {
   const still = usePointerParallax();
   return (
     <>
-      <CampusScene pointerX={still.x} pointerY={still.y} className="absolute inset-0 h-full w-full scale-[1.9] origin-[45%_78%]" />
+      {photos.building ? (
+        <PhotoLayer photo={photos.building} pointerX={still.x} pointerY={still.y} plain className="absolute inset-0" />
+      ) : (
+        <CampusScene pointerX={still.x} pointerY={still.y} className="absolute inset-0 h-full w-full scale-[1.9] origin-[45%_78%]" />
+      )}
       <div className="absolute inset-0 bg-gradient-to-t from-ink-950/80 via-transparent to-transparent" />
       <div className="absolute inset-x-0 bottom-0 p-8 text-center">
         <p className="font-display text-2xl italic text-ivory">&ldquo;Where tradition meets innovation.&rdquo;</p>

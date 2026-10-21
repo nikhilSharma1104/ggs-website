@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { FiChevronRight } from 'react-icons/fi';
 import CampusScene from './art/CampusScene';
+import PhotoLayer from './art/PhotoLayer';
+import { photos } from '../data/photos';
 import { Mandala } from './art/Illustrations';
 import { usePointerParallax } from './ui';
 
@@ -31,13 +33,17 @@ const PageHero: React.FC<PageHeroProps> = ({ eyebrow, title, lede, crumbs = [], 
 
   return (
     <section ref={ref} className="relative isolate overflow-hidden bg-ink-950 pb-20 pt-40 sm:pb-28 sm:pt-48">
-      <CampusScene
-        pointerX={pointer.x}
-        pointerY={pointer.y}
-        scroll={scrollYProgress}
-        compact
-        className="absolute inset-0 -z-10 h-full w-full opacity-70"
-      />
+      {photos.banner ? (
+        <PhotoLayer photo={photos.banner} pointerX={pointer.x} pointerY={pointer.y} scroll={scrollYProgress} plain className="absolute inset-0 -z-10 opacity-60" />
+      ) : (
+        <CampusScene
+          pointerX={pointer.x}
+          pointerY={pointer.y}
+          scroll={scrollYProgress}
+          compact
+          className="absolute inset-0 -z-10 h-full w-full opacity-70"
+        />
+      )}
       <div className="absolute inset-0 -z-10 bg-gradient-to-r from-ink-950 via-ink-950/80 to-ink-950/20" />
       <motion.div style={{ x: ringX, y: ringY }} className="pointer-events-none absolute -right-40 -top-40 -z-10 h-[34rem] w-[34rem] text-gold-300/15">
         <Mandala className="h-full w-full animate-spin-slow" />

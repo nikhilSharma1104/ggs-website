@@ -29,6 +29,9 @@ jobs:
           echo "REACT_APP_CALENDAR_API_URL=${{ secrets.REACT_APP_CALENDAR_API_URL }}" >> .env
           echo "REACT_APP_CONTACT_API_URL=${{ secrets.REACT_APP_CONTACT_API_URL }}" >> .env
           echo "REACT_APP_MONGODB_URI=${{ secrets.REACT_APP_MONGODB_URI }}" >> .env
+          echo "REACT_APP_GOOGLE_API_KEY=${{ secrets.REACT_APP_GOOGLE_API_KEY }}" >> .env
+          echo "REACT_APP_GOOGLE_DRIVE_GALLERY_FOLDER_ID=${{ secrets.REACT_APP_GOOGLE_DRIVE_GALLERY_FOLDER_ID }}" >> .env
+          echo "REACT_APP_PROSPECTUS_DRIVE_ID=${{ secrets.REACT_APP_PROSPECTUS_DRIVE_ID }}" >> .env
 
       - name: Build
         run: npm run build
