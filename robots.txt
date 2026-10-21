@@ -2,19 +2,7 @@
 User-agent: *
 Allow: /
 Disallow: /api/
-Disallow: /admin/
-Disallow: /private/
+# GitHub Pages SPA redirect URLs (/?/path) duplicate real pages
 Disallow: /*?*
 
-# Allow important pages to be crawled
-Allow: /about
-Allow: /academics
-Allow: /admissions
-Allow: /campus-life
-Allow: /events
-Allow: /gallery
-Allow: /contact
-Allow: /careers
-
-# Sitemap location
 Sitemap: https://www.gurukulamglobalschool.in/sitemap.xml
