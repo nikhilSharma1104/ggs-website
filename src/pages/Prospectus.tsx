@@ -14,7 +14,7 @@ const Prospectus: React.FC = () => {
   const request = `https://wa.me/${school.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent('Hello! Please share the Gurukulam Global School prospectus.')}`;
   return (
     <>
-      <SEO title="Prospectus" description="Discover the Gurukulam experience through our comprehensive school prospectus." />
+      <SEO />
       <PageHero
         eyebrow="School Prospectus"
         title={

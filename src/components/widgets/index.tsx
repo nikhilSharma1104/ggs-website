@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import {
   motion,
   AnimatePresence,
@@ -9,7 +9,7 @@ import {
   useSpring,
   useReducedMotion,
 } from 'framer-motion';
-import { FiArrowUp, FiArrowLeft, FiArrowRight, FiCalendar, FiBell } from 'react-icons/fi';
+import { FiArrowUp, FiArrowLeft, FiArrowRight, FiCalendar, FiBell, FiHome, FiEdit3, FiPhone } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 import { notices, school, testimonials, upcomingEvents } from '../../data/site';
 
@@ -234,10 +234,26 @@ export const TestimonialCarousel: React.FC = () => {
   );
 };
 
+const DockLink: React.FC<{ to: string; icon: React.ReactNode; label: string }> = ({ to, icon, label }) => (
+  <NavLink to={to} end className={({ isActive }) => `flex flex-col items-center gap-1 py-1 ${isActive ? 'text-gold-300' : 'active:text-gold-300'}`}>
+    <span className="text-[19px]">{icon}</span>
+    <span className="text-[10px] font-medium">{label}</span>
+  </NavLink>
+);
+
 /* ------------------------------------------------------------------ */
 /* Floating actions: WhatsApp, back to top, admissions side tab        */
 /* ------------------------------------------------------------------ */
-export const FloatingActions: React.FC<{ onAdmissions: () => void }> = ({ onAdmissions }) => {
+/** Small spinning gold orb used as the AI guide's icon. */
+const AiOrb: React.FC<{ className?: string }> = ({ className = 'h-6 w-6' }) => (
+  <span className={`relative inline-grid place-items-center ${className}`} aria-hidden="true">
+    <span className="absolute inset-0 animate-[spin_5s_linear_infinite] rounded-full bg-[conic-gradient(from_0deg,#ECD89C,#BA9032,#FBF7EC,#D2AA48,#ECD89C)]" />
+    <span className="absolute inset-[22%] rounded-full bg-ink-950" />
+    <span className="relative font-display text-[0.6em] italic leading-none text-gold-200">G</span>
+  </span>
+);
+
+export const FloatingActions: React.FC<{ onAdmissions: () => void; onAssistant: () => void }> = ({ onAdmissions, onAssistant }) => {
   const [scrolled, setScrolled] = useState(false);
   const [hint, setHint] = useState(false);
 
@@ -254,6 +270,22 @@ export const FloatingActions: React.FC<{ onAdmissions: () => void }> = ({ onAdmi
 
   return (
     <>
+      {/* AI guide launcher (desktop) */}
+      <motion.button
+        onClick={onAssistant}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 3.4 }}
+        whileHover={{ y: -2 }}
+        className="fixed bottom-5 left-5 z-[90] hidden items-center gap-3 rounded-full bg-ink-950 py-2 pl-2 pr-5 text-sm font-semibold text-ivory shadow-lift ring-1 ring-gold-400/30 lg:flex"
+      >
+        <AiOrb className="h-10 w-10 text-[40px]" />
+        <span className="text-left leading-tight">
+          Ask Gurukulam AI
+          <span className="block text-[11px] font-medium text-gold-300/80">Talk or type &middot; English / हिन्दी</span>
+        </span>
+      </motion.button>
+
       {/* Vertical admissions tab on the right edge (desktop) */}
       <motion.button
         onClick={onAdmissions}
@@ -266,7 +298,7 @@ export const FloatingActions: React.FC<{ onAdmissions: () => void }> = ({ onAdmi
         Admissions Open
       </motion.button>
 
-      <div className="fixed bottom-5 right-5 z-[90] flex flex-col items-end gap-3">
+      <div className="fixed bottom-[calc(6.5rem+env(safe-area-inset-bottom))] right-4 z-[90] flex flex-col items-end gap-3 lg:bottom-5 lg:right-5">
         <AnimatePresence>
           {scrolled && (
             <motion.button
@@ -283,7 +315,7 @@ export const FloatingActions: React.FC<{ onAdmissions: () => void }> = ({ onAdmi
           )}
         </AnimatePresence>
 
-        <div className="relative flex items-center">
+        <div className="relative hidden items-center lg:flex">
           <AnimatePresence>
             {hint && (
               <motion.div
@@ -313,20 +345,36 @@ export const FloatingActions: React.FC<{ onAdmissions: () => void }> = ({ onAdmi
         </div>
       </div>
 
-      {/* Mobile sticky enquire bar */}
-      <motion.div
-        initial={{ y: 80 }}
+      {/* Mobile app-style dock */}
+      <motion.nav
+        initial={{ y: 100 }}
         animate={{ y: 0 }}
-        transition={{ delay: 3, type: 'spring', stiffness: 140, damping: 20 }}
-        className="fixed inset-x-0 bottom-0 z-[85] flex gap-2 border-t border-ink-900/10 bg-ivory/90 p-3 pr-24 backdrop-blur-lg lg:hidden"
+        transition={{ delay: 2.6, type: 'spring', stiffness: 140, damping: 20 }}
+        className="fixed inset-x-0 bottom-0 z-[85] lg:hidden"
+        aria-label="Quick actions"
       >
-        <button onClick={onAdmissions} className="btn-gold flex-1 py-2.5">
-          Admissions Open
-        </button>
-        <a href={`tel:${school.phones[1].replace(/\s/g, '')}`} className="btn-outline py-2.5">
-          Call
-        </a>
-      </motion.div>
+        <div className="mx-3 mb-[max(0.75rem,env(safe-area-inset-bottom))] grid grid-cols-5 items-end rounded-[22px] bg-ink-950/90 px-2 pb-2 pt-2 text-ivory/70 shadow-lift ring-1 ring-white/10 backdrop-blur-xl">
+          <DockLink to="/" icon={<FiHome />} label="Home" />
+          <button onClick={onAssistant} className="flex flex-col items-center gap-1 py-1 text-gold-200" aria-label="Ask Gurukulam AI">
+            <AiOrb className="h-[22px] w-[22px] text-[22px]" />
+            <span className="text-[10px] font-semibold">Ask AI</span>
+          </button>
+          <button onClick={onAdmissions} className="-mt-7 flex flex-col items-center gap-1" aria-label="Apply for admission">
+            <span className="grid h-14 w-14 place-items-center rounded-full bg-gradient-to-b from-gold-200 to-gold-500 text-ink-950 shadow-glow ring-4 ring-ink-950">
+              <FiEdit3 size={20} />
+            </span>
+            <span className="text-[10px] font-semibold text-gold-300">Apply</span>
+          </button>
+          <a href={`tel:${school.phones[1].replace(/\s/g, '')}`} className="flex flex-col items-center gap-1 py-1 active:text-gold-300">
+            <FiPhone size={19} />
+            <span className="text-[10px] font-medium">Call</span>
+          </a>
+          <a href={wa} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-1 py-1 text-[#4ade80] active:opacity-70">
+            <FaWhatsapp size={20} />
+            <span className="text-[10px] font-medium text-ivory/70">WhatsApp</span>
+          </a>
+        </div>
+      </motion.nav>
     </>
   );
 };

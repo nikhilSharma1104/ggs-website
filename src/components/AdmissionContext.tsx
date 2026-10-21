@@ -1,6 +1,10 @@
 import { createContext, useContext } from 'react';
 
-/** Lets any page open the admission popup without prop drilling. */
-export const AdmissionContext = createContext<{ openAdmission: () => void }>({ openAdmission: () => undefined });
+/** Site-wide actions any page can trigger without prop drilling. */
+export const AdmissionContext = createContext<{
+  openAdmission: () => void;
+  openJourney: () => void;
+  openAssistant: () => void;
+}>({ openAdmission: () => undefined, openJourney: () => undefined, openAssistant: () => undefined });
 
 export const useAdmission = () => useContext(AdmissionContext);

@@ -43,7 +43,7 @@ const CampusLife: React.FC = () => {
   const [tour, setTour] = useState(false);
   return (
     <>
-      <SEO title="Campus Life" description="Sports, academic, arts and student-life facilities at Gurukulam Global School, Mathura. Take the virtual campus tour." />
+      <SEO />
       <PageHero
         eyebrow="Campus Life"
         title={

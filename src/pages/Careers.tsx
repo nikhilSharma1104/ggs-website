@@ -74,7 +74,7 @@ const Careers: React.FC = () => {
 
   return (
     <>
-      <SEO title="Careers" description="Teach at Gurukulam Global School, Mathura. Join a growing institution that values growth, innovation and excellence in education." />
+      <SEO />
       <PageHero
         eyebrow="Careers at GGS"
         title={

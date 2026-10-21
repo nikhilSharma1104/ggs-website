@@ -334,6 +334,9 @@ app.post('/api/careers', upload.single('resume'), async (req, res) => {
   }
 });
 
+// AI guide (Groq, grounded in the website's content)
+require('./assistant')(app);
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

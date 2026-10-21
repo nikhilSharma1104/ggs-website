@@ -29,6 +29,10 @@ const gold = {
 };
 
 module.exports = {
+  future: {
+    // Touch screens keep :hover "stuck" after a tap; only apply hover styles where hover exists.
+    hoverOnlyWhenSupported: true,
+  },
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
   theme: {
     extend: {
@@ -43,6 +47,7 @@ module.exports = {
       },
       fontFamily: {
         display: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+        devanagari: ['"Tiro Devanagari Hindi"', 'serif'],
         sans: ['Manrope', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
         // Old pages referenced font-comic; map it to the body face instead of Comic Sans.
         comic: ['Manrope', 'system-ui', 'sans-serif'],

@@ -99,7 +99,7 @@ const Gallery: React.FC = () => {
 
   return (
     <>
-      <SEO title="Gallery" description="Moments and memories from life at Gurukulam Global School, Mathura." />
+      <SEO />
       <PageHero
         eyebrow="Our Gallery"
         title={

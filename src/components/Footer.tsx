@@ -4,6 +4,7 @@ import { FiPhone, FiMail, FiMapPin, FiClock, FiArrowUpRight } from 'react-icons/
 import { FaFacebookF, FaInstagram, FaYoutube, FaWhatsapp } from 'react-icons/fa';
 import { navigation, school, stages, telHref } from '../data/site';
 import { Mandala, Ornament } from './art/Illustrations';
+import Wordmark from './Wordmark';
 
 const Footer: React.FC = () => {
   const socials = [
@@ -14,7 +15,7 @@ const Footer: React.FC = () => {
   ];
 
   return (
-    <footer className="relative isolate overflow-hidden bg-ink-950 pb-24 text-ivory/70 lg:pb-0">
+    <footer className="relative isolate overflow-hidden bg-ink-950 pb-[calc(7rem+env(safe-area-inset-bottom))] text-ivory/70 lg:pb-0">
       <div className="pointer-events-none absolute -right-48 -top-48 -z-10 h-[40rem] w-[40rem] text-gold-300/[0.07]">
         <Mandala className="h-full w-full animate-spin-slow" />
       </div>
@@ -22,7 +23,8 @@ const Footer: React.FC = () => {
       <div className="container pt-20">
         {/* Crest + statement */}
         <div className="flex flex-col items-center text-center">
-          <img src="/images/logo-128.png" alt={school.name} className="h-20 w-20" loading="lazy" />
+          <img src="/images/logo-128.png" alt="" className="h-16 w-16" loading="lazy" />
+          <Wordmark variant="footer" align="center" className="mt-4" />
           <p className="mt-6 max-w-2xl font-display text-2xl italic leading-snug text-ivory sm:text-3xl">
             &ldquo;Where tradition meets innovation in education.&rdquo;
           </p>

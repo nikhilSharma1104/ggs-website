@@ -5,7 +5,7 @@ import PageHero from '../components/PageHero';
 
 const NotFound: React.FC = () => (
   <>
-    <SEO title="Page not found" />
+    <SEO title="Page not found" noindex />
     <PageHero
       eyebrow="Error 404"
       title={

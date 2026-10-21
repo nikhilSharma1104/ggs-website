@@ -11,7 +11,7 @@ const docIcons = [FiFileText, FiBookOpen, FiHeart, FiCamera, FiHome];
 
 const Admissions: React.FC = () => (
   <>
-    <SEO title="Admissions" description={`Admissions open for session ${admissionSession()} at Gurukulam Global School, Mathura. Playgroup to Grade 8. Apply online.`} />
+    <SEO />
     <PageHero
       eyebrow={`Admissions · Session ${admissionSession()}`}
       title={

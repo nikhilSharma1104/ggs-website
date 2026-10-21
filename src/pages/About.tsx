@@ -16,7 +16,7 @@ const About: React.FC = () => {
 
   return (
     <>
-      <SEO title="About Us" description="Gurukulam Global School, Mathura: where tradition meets innovation in education. Our vision, mission, values and journey since 2022." />
+      <SEO />
       <PageHero
         eyebrow="About Gurukulam"
         title={

@@ -1,84 +1,75 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
+import { useLocation } from 'react-router-dom';
+import { OG_IMAGE, SITE_URL, routeMeta } from '../data/seo';
 
 interface SEOProps {
+  /** Overrides; by default everything comes from src/data/seo.ts for the current route. */
   title?: string;
   description?: string;
-  keywords?: string;
   image?: string;
-  url?: string;
-  type?: string;
+  noindex?: boolean;
+  /** Extra JSON-LD objects for this page (e.g. FAQPage) */
+  jsonLd?: object[];
 }
 
-const defaultDescription = "Gurukulam Global School, Mathura - a premier school offering holistic, NEP 2020-aligned education from Playgroup to Grade 8, with modern facilities and traditional values.";
-const defaultKeywords = "Gurukulam Global School, best school in Mathura, school in Krishna Nagar Mathura, Vrindavan school, admissions, holistic education, academic excellence";
-const defaultImage = "https://www.gurukulamglobalschool.in/logo.png";
-const defaultUrl = "https://www.gurukulamglobalschool.in";
+const SITE_NAME = 'Gurukulam Global School';
 
-export const SEO: React.FC<SEOProps> = ({
-  title = "Gurukulam Global School",
-  description = defaultDescription,
-  keywords = defaultKeywords,
-  image = defaultImage,
-  url = defaultUrl,
-  type = "website"
-}) => {
-  const fullTitle = title === "Gurukulam Global School" 
-    ? title 
-    : `${title} | Gurukulam Global School`;
+/** Pages are served from /path/index.html on GitHub Pages, so canonical URLs end in a slash. */
+const canonicalUrl = (path: string) => `${SITE_URL}${path === '/' ? '/' : `${path.replace(/\/+$/, '')}/`}`;
+
+export const SEO: React.FC<SEOProps> = ({ title, description, image = OG_IMAGE, noindex, jsonLd = [] }) => {
+  const { pathname } = useLocation();
+  const meta = routeMeta(pathname);
+  const fullTitle = title ? `${title} | ${SITE_NAME}` : meta?.title ?? SITE_NAME;
+  const desc = description ?? meta?.description ?? '';
+  const url = canonicalUrl(pathname);
+
+  // Breadcrumb trail from the URL, e.g. Home > Academics > Middle Stage
+  const segments = pathname.split('/').filter(Boolean);
+  const breadcrumb =
+    segments.length > 0
+      ? {
+          '@context': 'https://schema.org',
+          '@type': 'BreadcrumbList',
+          itemListElement: [{ path: '/', name: 'Home' }, ...segments.map((_, i) => ({ path: `/${segments.slice(0, i + 1).join('/')}`, name: '' }))].map((c, i) => ({
+            '@type': 'ListItem',
+            position: i + 1,
+            name: c.name || routeMeta(c.path)?.title.split(/ [|–] /)[0] || c.path,
+            item: canonicalUrl(c.path),
+          })),
+        }
+      : null;
 
   return (
     <Helmet>
-      {/* Basic Meta Tags */}
+      <html lang="en-IN" />
       <title>{fullTitle}</title>
-      <meta name="description" content={description} />
-      <meta name="keywords" content={keywords} />
-      <meta name="robots" content="index, follow" />
-      <link rel="canonical" href={url} />
+      <meta name="description" content={desc} />
+      <meta name="robots" content={noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large'} />
+      {!noindex && <link rel="canonical" href={url} />}
 
-      {/* Open Graph Meta Tags */}
+      <meta property="og:type" content="website" />
+      <meta property="og:site_name" content={SITE_NAME} />
+      <meta property="og:locale" content="en_IN" />
       <meta property="og:title" content={fullTitle} />
-      <meta property="og:description" content={description} />
-      <meta property="og:image" content={image} />
+      <meta property="og:description" content={desc} />
       <meta property="og:url" content={url} />
-      <meta property="og:type" content={type} />
-      <meta property="og:site_name" content="Gurukulam Global School" />
+      <meta property="og:image" content={image} />
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
 
-      {/* Twitter Card Meta Tags */}
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={fullTitle} />
-      <meta name="twitter:description" content={description} />
+      <meta name="twitter:description" content={desc} />
       <meta name="twitter:image" content={image} />
 
-      {/* Schema.org Structured Data */}
-      <script type="application/ld+json">
-        {JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "EducationalOrganization",
-          "name": "Gurukulam Global School",
-          "description": description,
-          "url": defaultUrl,
-          "logo": defaultImage,
-          "sameAs": [
-            "https://www.facebook.com/gurukulamglobalschool",
-            "https://www.instagram.com/gurukulamglobalschool"
-          ],
-          "address": {
-            "@type": "PostalAddress",
-            "streetAddress": "136, Madhuvan Enclave, Near Natraj Murti, Krishna Nagar",
-            "addressLocality": "Mathura",
-            "addressRegion": "Uttar Pradesh",
-            "postalCode": "281003",
-            "addressCountry": "IN"
-          },
-          "contactPoint": {
-            "@type": "ContactPoint",
-            "telephone": "+917617645050",
-            "email": "gurukulamglobalschool@gmail.com",
-            "contactType": "admissions"
-          }
-        })}
-      </script>
+      {breadcrumb && <script type="application/ld+json">{JSON.stringify(breadcrumb)}</script>}
+      {jsonLd.map((obj, i) => (
+        <script key={i} type="application/ld+json">
+          {JSON.stringify(obj)}
+        </script>
+      ))}
     </Helmet>
   );
 };

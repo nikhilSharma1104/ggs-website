@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Mandala } from './art/Illustrations';
+import Wordmark from './Wordmark';
 import { school } from '../data/site';
 
 // First-visit intro: crest and rings draw in, then three layered panels
@@ -17,9 +18,9 @@ const seenThisSession = () => {
   }
 };
 
-const IntroCurtain: React.FC<{ onDone: () => void }> = ({ onDone }) => {
+const IntroCurtain: React.FC<{ onDone: () => void; skip?: boolean }> = ({ onDone, skip }) => {
   const reduce = useReducedMotion();
-  const [show, setShow] = useState(() => !seenThisSession());
+  const [show, setShow] = useState(() => !skip && !seenThisSession());
 
   useEffect(() => {
     if (!show) {
@@ -31,7 +32,8 @@ const IntroCurtain: React.FC<{ onDone: () => void }> = ({ onDone }) => {
     } catch {
       /* ignore */
     }
-    const t = setTimeout(() => setShow(false), reduce ? 600 : 2600);
+    // phones get a shorter intro so content arrives sooner
+    const t = setTimeout(() => setShow(false), reduce ? 600 : window.innerWidth < 768 ? 2300 : 2800);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [show]);
@@ -73,34 +75,14 @@ const IntroCurtain: React.FC<{ onDone: () => void }> = ({ onDone }) => {
             <motion.img
               src="/images/logo-256.png"
               alt=""
-              className="relative h-28 w-28 drop-shadow-[0_10px_40px_rgba(210,170,72,0.45)] sm:h-36 sm:w-36"
+              className="relative h-24 w-24 drop-shadow-[0_10px_40px_rgba(210,170,72,0.45)] sm:h-36 sm:w-36"
               initial={{ scale: 0.7, opacity: 0, y: 10 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
             />
-            <motion.div
-              className="relative mt-8 overflow-hidden"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-            >
-              <motion.h1
-                className="font-display text-3xl font-medium text-ivory sm:text-5xl"
-                initial={{ y: '110%' }}
-                animate={{ y: 0 }}
-                transition={{ duration: 0.9, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
-              >
-                {school.name}
-              </motion.h1>
-            </motion.div>
-            <motion.div
-              className="relative mt-4 h-px bg-gradient-to-r from-transparent via-gold-300 to-transparent"
-              initial={{ width: 0 }}
-              animate={{ width: 240 }}
-              transition={{ duration: 1, delay: 0.9, ease: 'easeInOut' }}
-            />
+            <Wordmark variant="intro" align="center" delay={0.3} className="mt-6 scale-[0.62] sm:scale-75" />
             <motion.p
-              className="relative mt-4 text-[11px] font-semibold uppercase tracking-[0.4em] text-gold-300"
+              className="relative -mt-4 text-[11px] font-semibold uppercase tracking-[0.4em] text-gold-300"
               initial={{ opacity: 0, letterSpacing: '0.1em' }}
               animate={{ opacity: 1, letterSpacing: '0.4em' }}
               transition={{ duration: 1.2, delay: 1.1 }}

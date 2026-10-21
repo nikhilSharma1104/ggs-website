@@ -9,7 +9,7 @@ import { academicFeatures, specializedPrograms, stages } from '../data/site';
 
 const Academics: React.FC = () => (
   <>
-    <SEO title="Academics" description="Foundational, Preparatory and Middle stages at Gurukulam Global School, Mathura: NEP 2020-aligned learning from Nursery to Class 8." />
+    <SEO />
     <PageHero
       eyebrow="Academic Excellence"
       title={

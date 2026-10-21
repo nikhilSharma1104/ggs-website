@@ -16,7 +16,7 @@ const Events: React.FC = () => {
 
   return (
     <>
-      <SEO title="Events" description="Sports Day, Science Exhibition, Cultural Festival and more: the Gurukulam Global School events calendar." />
+      <SEO />
       <PageHero
         eyebrow="School Events"
         title={

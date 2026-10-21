@@ -47,7 +47,7 @@ const Contact: React.FC = () => {
 
   return (
     <>
-      <SEO title="Contact" description="Contact Gurukulam Global School, 136 Madhuvan Enclave, Krishna Nagar, Mathura. Call +91 7505335080 or email gurukulamglobalschool@gmail.com." />
+      <SEO />
       <PageHero
         eyebrow="Contact Us"
         title={

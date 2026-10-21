@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { motion, AnimatePresence, useDragControls, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { FiX, FiCheckCircle } from 'react-icons/fi';
 import AdmissionForm from './AdmissionForm';
 import { Mandala } from './art/Illustrations';
@@ -34,7 +34,10 @@ const AdmissionPopup: React.FC<AdmissionPopupProps> = ({ isOpen, onClose }) => {
   useScrollLock(isOpen);
   useEscape(isOpen, onClose);
 
+  const dragControls = useDragControls();
+
   const onMove = (e: React.PointerEvent) => {
+    if (e.pointerType !== 'mouse') return;
     const r = panelRef.current?.getBoundingClientRect();
     if (!r) return;
     mx.set(((e.clientX - r.left) / r.width) * 2 - 1);
@@ -68,13 +71,29 @@ const AdmissionPopup: React.FC<AdmissionPopupProps> = ({ isOpen, onClose }) => {
               my.set(0);
             }}
             style={{ rotateX: tiltX, rotateY: tiltY, transformPerspective: 1600 }}
+            drag="y"
+            dragListener={false}
+            dragControls={dragControls}
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={{ top: 0, bottom: 0.7 }}
+            onDragEnd={(_, info) => {
+              if (info.offset.y > 120 || info.velocity.y > 600) onClose();
+            }}
             variants={{
               hidden: { opacity: 0, y: 60, scale: 0.96 },
               show: { opacity: 1, y: 0, scale: 1 },
             }}
             transition={{ type: 'spring', stiffness: 160, damping: 22 }}
-            className="relative grid max-h-[94vh] w-full max-w-5xl overflow-hidden rounded-t-[28px] bg-ivory shadow-lift sm:rounded-[28px] md:grid-cols-[0.9fr_1.1fr]"
+            className="relative grid max-h-[92svh] w-full max-w-5xl overflow-hidden rounded-t-[28px] bg-ivory shadow-lift sm:rounded-[28px] md:grid-cols-[0.9fr_1.1fr]"
           >
+            {/* grab handle: drag the sheet down to dismiss on phones */}
+            <div
+              onPointerDown={(e) => dragControls.start(e)}
+              className="absolute inset-x-0 top-0 z-30 flex h-9 touch-none justify-center pt-2.5 sm:hidden"
+              aria-hidden="true"
+            >
+              <span className="h-1.5 w-12 rounded-full bg-ivory/40" />
+            </div>
             <button
               onClick={onClose}
               className="absolute right-4 top-4 z-20 grid h-10 w-10 place-items-center rounded-full bg-ink-950/40 text-ivory backdrop-blur transition hover:bg-gold-400 hover:text-ink-950 md:bg-ink-900/5 md:text-ink-900"
@@ -84,7 +103,7 @@ const AdmissionPopup: React.FC<AdmissionPopupProps> = ({ isOpen, onClose }) => {
             </button>
 
             {/* Layered art panel */}
-            <div className="relative isolate overflow-hidden bg-ink-950 px-7 pb-8 pt-10 text-ivory sm:px-10 md:py-12">
+            <div className="relative isolate overflow-hidden bg-ink-950 px-6 pb-6 pt-9 text-ivory sm:px-10 sm:pb-8 sm:pt-10 md:py-12">
               <motion.div style={back} className="absolute -left-24 -top-24 -z-10 h-[30rem] w-[30rem] text-gold-300/15">
                 <Mandala className="h-full w-full animate-spin-slow" />
               </motion.div>
@@ -151,7 +170,7 @@ const AdmissionPopup: React.FC<AdmissionPopupProps> = ({ isOpen, onClose }) => {
             <motion.div
               variants={{ hidden: { opacity: 0 }, show: { opacity: 1 } }}
               transition={{ delay: 0.3 }}
-              className="overflow-y-auto px-6 pb-8 pt-7 sm:px-10 md:py-12"
+              className="overflow-y-auto overscroll-contain px-6 pb-[max(2rem,env(safe-area-inset-bottom))] pt-6 sm:px-10 md:py-12"
             >
               <span className="eyebrow">Quick enquiry</span>
               <h3 className="mt-3 font-display text-3xl">Start the admission process</h3>

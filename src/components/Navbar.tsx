@@ -6,6 +6,7 @@ import { FaFacebookF, FaInstagram, FaYoutube } from 'react-icons/fa';
 import Weather from './widgets/Weather';
 import { navigation, school, telHref } from '../data/site';
 import { Mandala } from './art/Illustrations';
+import Wordmark from './Wordmark';
 
 // Home lives on the logo and Careers in the utility bar, keeping the main row airy.
 const primaryNav = navigation.filter((n) => n.name !== 'Home' && n.name !== 'Careers');
@@ -40,7 +41,7 @@ const Navbar: React.FC<{ onApply: () => void }> = ({ onApply }) => {
 
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-[100]">
+      <header className="fixed inset-x-0 top-0 z-[100] pt-[env(safe-area-inset-top)]">
         {/* Utility bar */}
         <motion.div
           animate={{ height: scrolled ? 0 : 'auto', opacity: scrolled ? 0 : 1 }}
@@ -89,16 +90,9 @@ const Navbar: React.FC<{ onApply: () => void }> = ({ onApply }) => {
               <img
                 src="/images/logo-128.png"
                 alt=""
-                className={`transition-all duration-500 ${solid ? 'h-11 w-11' : 'h-14 w-14'} drop-shadow-[0_4px_12px_rgba(210,170,72,0.35)]`}
+                className={`transition-all duration-500 ${solid ? 'h-10 w-10 sm:h-11 sm:w-11' : 'h-12 w-12 sm:h-14 sm:w-14'} drop-shadow-[0_4px_12px_rgba(210,170,72,0.35)]`}
               />
-              <span className="leading-tight">
-                <span className={`block font-display text-xl font-semibold transition-colors sm:text-2xl ${solid ? 'text-ink-900' : 'text-ivory'}`}>
-                  Gurukulam
-                </span>
-                <span className={`block text-[10px] font-semibold uppercase tracking-[0.32em] transition-colors ${solid ? 'text-gold-600' : 'text-gold-300'}`}>
-                  Global School
-                </span>
-              </span>
+              <Wordmark variant="nav" tone={solid ? 'dark' : 'light'} />
             </Link>
 
             {/* Desktop links */}

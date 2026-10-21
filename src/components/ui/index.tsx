@@ -47,8 +47,54 @@ export const SectionHeading: React.FC<{
  * Normalised pointer position (-1..1) relative to the window, spring-smoothed.
  * Touch devices simply stay at 0 so layers rest in place.
  */
+/* Device tilt ------------------------------------------------------- */
+// iOS 13+ only delivers deviceorientation after a permission prompt that must
+// be triggered by a tap; Android and others deliver it straight away.
+
+export type TiltPermission = 'prompt' | 'granted' | 'denied' | 'unsupported';
+
+const initialTilt = (): TiltPermission => {
+  if (typeof window === 'undefined' || !('DeviceOrientationEvent' in window)) return 'unsupported';
+  const DOE = (window as any).DeviceOrientationEvent;
+  return typeof DOE.requestPermission === 'function' ? 'prompt' : 'granted';
+};
+
+let tiltPermission: TiltPermission = initialTilt();
+const tiltListeners = new Set<() => void>();
+
+export const requestTilt = async () => {
+  const DOE = (window as any).DeviceOrientationEvent;
+  if (!DOE?.requestPermission) return;
+  try {
+    tiltPermission = (await DOE.requestPermission()) === 'granted' ? 'granted' : 'denied';
+  } catch {
+    tiltPermission = 'denied';
+  }
+  tiltListeners.forEach((l) => l());
+};
+
+export const useTiltPermission = () => {
+  const [state, setState] = useState(tiltPermission);
+  useEffect(() => {
+    const l = () => setState(tiltPermission);
+    tiltListeners.add(l);
+    return () => {
+      tiltListeners.delete(l);
+    };
+  }, []);
+  return state;
+};
+
+const clamp = (v: number) => Math.max(-1, Math.min(1, v));
+
+/**
+ * Normalised (-1..1), spring-smoothed motion input for parallax layers:
+ * mouse position on desktop, phone tilt on mobile, and finger position as a
+ * fallback when no gyroscope data arrives.
+ */
 export const usePointerParallax = () => {
   const reduce = useReducedMotion();
+  const permission = useTiltPermission();
   const rawX = useMotionValue(0);
   const rawY = useMotionValue(0);
   const x = useSpring(rawX, { stiffness: 60, damping: 20, mass: 0.6 });
@@ -56,14 +102,40 @@ export const usePointerParallax = () => {
 
   useEffect(() => {
     if (reduce) return;
+    let lastOrientation = 0;
+    let baseBeta: number | null = null;
+
     const onMove = (e: PointerEvent) => {
       if (e.pointerType !== 'mouse') return;
       rawX.set((e.clientX / window.innerWidth) * 2 - 1);
       rawY.set((e.clientY / window.innerHeight) * 2 - 1);
     };
+    const onOrient = (e: DeviceOrientationEvent) => {
+      if (e.gamma == null || e.beta == null) return;
+      lastOrientation = Date.now();
+      // calibrate to however the phone is being held when we start
+      if (baseBeta === null) baseBeta = e.beta;
+      const landscape = Math.abs((window.screen.orientation?.angle ?? 0) % 180) === 90;
+      const gx = landscape ? e.beta - baseBeta : e.gamma;
+      const gy = landscape ? e.gamma : e.beta - baseBeta;
+      rawX.set(clamp(gx / 22));
+      rawY.set(clamp(gy / 22));
+    };
+    const onTouch = (e: TouchEvent) => {
+      if (Date.now() - lastOrientation < 1000 || !e.touches[0]) return;
+      rawX.set(clamp((e.touches[0].clientX / window.innerWidth) * 2 - 1));
+      rawY.set(clamp((e.touches[0].clientY / window.innerHeight) * 2 - 1));
+    };
+
     window.addEventListener('pointermove', onMove);
-    return () => window.removeEventListener('pointermove', onMove);
-  }, [rawX, rawY, reduce]);
+    window.addEventListener('touchmove', onTouch, { passive: true });
+    if (permission === 'granted') window.addEventListener('deviceorientation', onOrient);
+    return () => {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('touchmove', onTouch);
+      window.removeEventListener('deviceorientation', onOrient);
+    };
+  }, [rawX, rawY, reduce, permission]);
 
   return { x, y };
 };

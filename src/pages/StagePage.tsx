@@ -19,7 +19,7 @@ const StagePage: React.FC<{ stageKey: StageKey }> = ({ stageKey }) => {
 
   return (
     <>
-      <SEO title={stage.title} description={`${stage.title} (${stage.classes}, ${stage.ages}) at Gurukulam Global School: ${stage.tagline}.`} />
+      <SEO />
       <PageHero
         eyebrow={`${stage.classes} · ${stage.ages}`}
         title={stage.title}

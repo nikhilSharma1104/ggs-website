@@ -20,20 +20,26 @@ import {
   FiHeart,
   FiTrendingUp,
   FiStar,
+  FiSmartphone,
+  FiRotateCw,
+  FiMic,
+  FiCompass,
 } from 'react-icons/fi';
 import SEO from '../components/SEO';
+import { knowledgeEntries } from '../data/knowledge';
 import CampusScene from '../components/art/CampusScene';
 import PhotoLayer from '../components/art/PhotoLayer';
 import { photos } from '../data/photos';
-import { Mandala, Ornament, stageArt, programArt } from '../components/art/Illustrations';
-import { Reveal, SectionHeading, useMediaQuery, usePointerParallax, VideoModal } from '../components/ui';
+import { Mandala, Ornament, programArt } from '../components/art/Illustrations';
+import { Reveal, SectionHeading, requestTilt, useMediaQuery, usePointerParallax, useTiltPermission, VideoModal } from '../components/ui';
+import Wordmark from '../components/Wordmark';
 import { NoticeTicker, Counter, EventCountdown, TestimonialCarousel } from '../components/widgets';
+import StageCoverflow from '../components/widgets/StageCoverflow';
 import { useAdmission } from '../components/AdmissionContext';
 import {
   school,
   stats,
   pillars,
-  stages,
   specializedPrograms,
   activities,
   campusFeatures,
@@ -50,7 +56,8 @@ const Hero: React.FC<{ onTour: () => void }> = ({ onTour }) => {
   const ref = useRef<HTMLElement>(null);
   const pointer = usePointerParallax();
   const wide = useMediaQuery('(min-width: 1024px)');
-  const { openAdmission } = useAdmission();
+  const tilt = useTiltPermission();
+  const { openAdmission, openJourney } = useAdmission();
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
   const contentY = useTransform(scrollYProgress, [0, 1], [0, 160]);
   const contentOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
@@ -67,46 +74,59 @@ const Hero: React.FC<{ onTour: () => void }> = ({ onTour }) => {
       )}
       <div className="absolute inset-0 -z-10 bg-gradient-to-r from-ink-950/95 via-ink-950/60 to-transparent" />
       <div className="absolute inset-x-0 top-0 -z-10 h-48 bg-gradient-to-b from-ink-950/80 to-transparent" />
+      {/* phones: the campus sits behind the copy, so deepen the tint for legibility */}
+      <div className="absolute inset-0 -z-10 bg-ink-950/45 sm:hidden" />
 
-      <motion.div style={{ y: contentY, opacity: contentOpacity }} className="container flex flex-1 items-center pb-44 pt-36 sm:pb-48">
-        <motion.div variants={container} initial="hidden" animate="show" className="max-w-3xl">
+      <motion.div style={{ y: contentY, opacity: contentOpacity }} className="container flex flex-1 items-center pb-28 pt-32 sm:pb-48 sm:pt-36">
+        <motion.div variants={container} initial="hidden" animate="show" className="w-full max-w-3xl">
           <motion.button
             variants={item}
             onClick={openAdmission}
-            className="group inline-flex items-center gap-3 rounded-full border border-gold-300/30 bg-white/5 py-1.5 pl-1.5 pr-4 text-xs text-ivory/85 backdrop-blur-md transition hover:border-gold-300/60"
+            className="group inline-flex max-w-full items-center gap-2.5 rounded-full border border-gold-300/30 bg-ink-950/40 py-1.5 pl-1.5 pr-4 text-[11px] text-ivory/85 backdrop-blur-md transition hover:border-gold-300/60 sm:text-xs"
           >
-            <span className="rounded-full bg-gold-300 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-ink-950">New</span>
-            Admissions open for session {admissionSession()}
-            <FiArrowRight className="transition group-hover:translate-x-1" />
+            <span className="flex-none rounded-full bg-gold-300 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-ink-950">New</span>
+            <span className="truncate">Admissions open &middot; {admissionSession()}</span>
+            <FiArrowRight className="flex-none transition group-hover:translate-x-1" />
           </motion.button>
 
-          <motion.p variants={item} className="mt-8 text-[11px] font-semibold uppercase tracking-[0.4em] text-gold-300">
-            {school.name} &middot; Mathura
+          <Wordmark variant="hero" as="h1" tiltX={pointer.x} tiltY={pointer.y} delay={0.35} className="mt-7 sm:mt-9" />
+
+          <motion.p variants={item} className="mt-6 font-display text-[1.65rem] leading-tight text-ivory sm:text-4xl">
+            Nurturing minds, <em className="text-gold-200">shaping futures.</em>
           </motion.p>
-          <motion.h1 variants={item} className="mt-5 font-display text-[3.2rem] font-medium leading-[0.95] text-ivory sm:text-7xl lg:text-[6.2rem]">
-            Nurturing minds,
-            <br />
-            <span className="gold-text animate-shimmer italic">shaping futures.</span>
-          </motion.h1>
-          <motion.p variants={item} className="mt-7 max-w-xl text-lg leading-relaxed text-ivory/75 sm:text-xl">
+          <motion.p variants={item} className="mt-3 max-w-xl text-[15px] leading-relaxed text-ivory/70 sm:text-lg">
             Building tomorrow&rsquo;s leaders where tradition meets innovation &mdash; a modern Gurukul in the heart of Braj.
           </motion.p>
 
-          <motion.div variants={item} className="mt-10 flex flex-wrap items-center gap-4">
-            <button onClick={openAdmission} className="btn-gold px-7 py-3.5">
+          <motion.div variants={item} className="mt-8 grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:items-center sm:gap-4">
+            <button onClick={openAdmission} className="btn-gold px-5 py-3.5 sm:px-7">
               Apply Now <FiArrowRight />
             </button>
-            <Link to="/academics" className="btn-ghost px-7 py-3.5 text-ivory">
-              Explore Academics
+            <Link to="/academics" className="btn-ghost px-5 py-3.5 text-ivory sm:px-7">
+              Academics
             </Link>
-            <button onClick={onTour} className="group ml-1 inline-flex items-center gap-3 text-sm font-semibold text-ivory">
+            <button onClick={onTour} className="group col-span-2 inline-flex items-center gap-3 text-sm font-semibold text-ivory sm:ml-1">
               <span className="relative grid h-12 w-12 place-items-center rounded-full border border-ivory/30 transition group-hover:border-gold-300 group-hover:bg-gold-300 group-hover:text-ink-950">
                 <span className="absolute inset-0 animate-ping rounded-full border border-gold-300/40 [animation-duration:2.6s]" />
                 <FiPlay className="ml-0.5" />
               </span>
-              Virtual Tour
+              Watch the Virtual Tour
             </button>
           </motion.div>
+
+          <motion.button variants={item} onClick={openJourney} className="mt-5 inline-flex items-center gap-2 text-xs font-semibold text-gold-200/90 underline-offset-4 hover:underline">
+            <FiCompass /> New here? Play the 60-second Gurukul Journey
+          </motion.button>
+
+          {tilt === 'prompt' && (
+            <motion.button
+              variants={item}
+              onClick={requestTilt}
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-xs font-semibold text-gold-200 backdrop-blur-md lg:hidden"
+            >
+              <FiSmartphone className="animate-[float_2.4s_ease-in-out_infinite]" /> Tap, then tilt your phone to explore in 3D
+            </motion.button>
+          )}
         </motion.div>
       </motion.div>
 
@@ -115,7 +135,7 @@ const Hero: React.FC<{ onTour: () => void }> = ({ onTour }) => {
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-        className="absolute inset-x-0 bottom-0"
+        className="absolute inset-x-0 bottom-0 hidden sm:block"
       >
         <div className="container">
           <div className="grid grid-cols-2 border-t border-white/15 lg:grid-cols-4">
@@ -261,7 +281,7 @@ const StatsBand: React.FC = () => (
 /* ------------------------------------------------------------------ */
 
 const StagesSection: React.FC = () => (
-  <section className="bg-ivory-100 py-24 sm:py-32">
+  <section className="overflow-hidden bg-ivory-100 py-24 sm:py-32">
     <div className="container">
       <SectionHeading
         eyebrow="Academic Excellence"
@@ -272,35 +292,8 @@ const StagesSection: React.FC = () => (
         }
         lede="Nurturing young minds through innovative teaching methods and a comprehensive curriculum aligned with the National Education Policy 2020."
       />
-      <div className="mt-16 grid gap-6 lg:grid-cols-3">
-        {stages.map((s, i) => {
-          const Art = stageArt[s.key];
-          return (
-            <Reveal key={s.key} delay={i * 0.1}>
-              <Link
-                to={s.slug}
-                className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-ink-900/[0.07] bg-ivory p-8 transition duration-500 hover:-translate-y-1.5 hover:border-gold-400/50 hover:shadow-lift sm:p-10"
-              >
-                <div className="absolute inset-x-0 top-0 h-1 origin-left scale-x-0 bg-gradient-to-r from-gold-500 to-gold-300 transition-transform duration-500 group-hover:scale-x-100" />
-                <div className="flex items-start justify-between">
-                  <span className="font-display text-6xl italic text-ink-900/10">{['I', 'II', 'III'][i]}</span>
-                  <Art className="h-24 w-24 text-gold-600 transition duration-700 group-hover:rotate-6 group-hover:scale-110" animate />
-                </div>
-                <div className="mt-6 text-xs font-semibold uppercase tracking-[0.2em] text-gold-700">
-                  {s.classes} &middot; {s.ages}
-                </div>
-                <h3 className="mt-3 font-display text-3xl">{s.title}</h3>
-                <p className="mt-3 flex-1 leading-relaxed text-ink-700/75">{s.summary}</p>
-                <span className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-ink-900">
-                  Discover the stage
-                  <span className="grid h-8 w-8 place-items-center rounded-full border border-ink-900/15 transition group-hover:border-gold-500 group-hover:bg-gold-400">
-                    <FiArrowRight />
-                  </span>
-                </span>
-              </Link>
-            </Reveal>
-          );
-        })}
+      <div className="mt-12 sm:mt-16">
+        <StageCoverflow />
       </div>
     </div>
   </section>
@@ -354,6 +347,58 @@ const Programs: React.FC = () => (
 );
 
 /* ------------------------------------------------------------------ */
+
+const ExperienceSection: React.FC = () => {
+  const { openJourney, openAssistant } = useAdmission();
+  return (
+    <section className="relative isolate overflow-hidden bg-gradient-to-b from-ink-950 via-[#0A1630] to-ink-950 py-24 text-ivory sm:py-32">
+      <div className="pointer-events-none absolute inset-0 -z-10 opacity-60 [background-image:radial-gradient(1px_1px_at_20%_30%,#FBF7EC,transparent),radial-gradient(1px_1px_at_70%_20%,#FBF7EC,transparent),radial-gradient(1.5px_1.5px_at_40%_70%,#ECD89C,transparent),radial-gradient(1px_1px_at_85%_60%,#FBF7EC,transparent),radial-gradient(1px_1px_at_10%_85%,#FBF7EC,transparent)]" />
+      <div className="container">
+        <SectionHeading
+          dark
+          eyebrow="Experience Gurukulam"
+          title={
+            <>
+              Play it. Ask it. <em className="gold-text">Feel it.</em>
+            </>
+          }
+          lede="Two ways to get to know the school in a minute, made for your phone."
+        />
+        <div className="mx-auto mt-14 grid max-w-5xl gap-5 md:grid-cols-2">
+          <Reveal>
+            <button onClick={openJourney} className="group relative block h-full w-full overflow-hidden rounded-[28px] border border-gold-300/25 bg-white/[0.04] p-8 text-left transition hover:border-gold-300/60 sm:p-10">
+              <div className="absolute -right-16 -top-16 h-56 w-56 text-gold-300/15 transition duration-700 group-hover:rotate-45">
+                <Mandala className="h-full w-full" />
+              </div>
+              <span className="text-[11px] font-semibold uppercase tracking-eyebrow text-gold-300">60-second game</span>
+              <h3 className="mt-3 font-display text-4xl text-ivory">The Gurukul Journey</h3>
+              <p className="mt-3 max-w-sm text-ivory/70">Light the lamp, grow the Gurukul tree, swing open the gates and discover our values, in four tap-and-swipe chapters.</p>
+              <span className="mt-8 inline-flex items-center gap-3 font-semibold text-gold-200">
+                <span className="grid h-12 w-12 place-items-center rounded-full bg-gold-300 text-ink-950 shadow-glow transition group-hover:scale-110">
+                  <FiPlay className="ml-0.5" />
+                </span>
+                Play the journey
+              </span>
+            </button>
+          </Reveal>
+          <Reveal delay={0.1}>
+            <button onClick={openAssistant} className="group relative block h-full w-full overflow-hidden rounded-[28px] bg-gradient-to-br from-gold-200 via-gold-300 to-gold-500 p-8 text-left text-ink-950 sm:p-10">
+              <span className="text-[11px] font-semibold uppercase tracking-eyebrow text-ink-800">AI guide &middot; voice enabled</span>
+              <h3 className="mt-3 font-display text-4xl">Ask Gurukulam AI</h3>
+              <p className="mt-3 max-w-sm text-ink-900/75">Talk or type in English or हिन्दी. Ask about admissions, classes, campus or timings and hear the answer read aloud.</p>
+              <span className="mt-8 inline-flex items-center gap-3 font-semibold">
+                <span className="grid h-12 w-12 place-items-center rounded-full bg-ink-950 text-gold-200 transition group-hover:scale-110">
+                  <FiMic />
+                </span>
+                Start a conversation
+              </span>
+            </button>
+          </Reveal>
+        </div>
+      </div>
+    </section>
+  );
+};
 
 const AtAGlance: React.FC<{ onTour: () => void }> = ({ onTour }) => {
   const quick = [
@@ -464,6 +509,48 @@ const lifeTabs = [
   },
 ];
 
+const canHover = () => window.matchMedia('(hover: hover)').matches;
+
+/** 3D card: front shows the title, a tap (or hover on desktop) turns it over to reveal the detail. */
+const FlipCard: React.FC<{ index: number; icon: React.ReactNode; title: string; description: string }> = ({ index, icon, title, description }) => {
+  const [flipped, setFlipped] = useState(false);
+  const face = 'absolute inset-0 flex flex-col rounded-3xl p-7 [backface-visibility:hidden] [-webkit-backface-visibility:hidden]';
+  return (
+    <button
+      onClick={(e) => {
+        // mouse users flip on hover; keyboard (detail 0) and touch toggle on activation
+        if (e.detail > 0 && canHover()) return;
+        setFlipped((f) => !f);
+      }}
+      onMouseEnter={() => canHover() && setFlipped(true)}
+      onMouseLeave={() => canHover() && setFlipped(false)}
+      className="block h-56 w-full text-left [perspective:1200px]"
+      aria-pressed={flipped}
+      aria-label={`${title}: ${description}`}
+    >
+      <motion.div
+        className="relative h-full w-full [transform-style:preserve-3d]"
+        animate={{ rotateY: flipped ? 180 : 0 }}
+        transition={{ type: 'spring', stiffness: 120, damping: 16 }}
+      >
+        <div className={`${face} overflow-hidden bg-ivory ring-1 ring-ink-900/[0.06]`}>
+          <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-gold-200/40" />
+          <span className="relative grid h-12 w-12 place-items-center rounded-2xl border border-gold-500/30 text-xl text-gold-700">{icon}</span>
+          <span className="relative mt-auto font-display text-sm italic text-gold-600">0{index + 1}</span>
+          <h3 className="relative mt-1 font-display text-2xl">{title}</h3>
+          <span className="relative mt-3 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-ink-500">
+            <FiRotateCw /> Tap to flip
+          </span>
+        </div>
+        <div className={`${face} justify-center bg-ink-900 text-ivory [transform:rotateY(180deg)]`}>
+          <span className="text-[11px] font-semibold uppercase tracking-eyebrow text-gold-300">{title}</span>
+          <p className="mt-3 font-display text-2xl leading-snug text-ivory">{description}</p>
+        </div>
+      </motion.div>
+    </button>
+  );
+};
+
 const LifeTabs: React.FC = () => {
   const [active, setActive] = useState(lifeTabs[0].key);
   const tab = lifeTabs.find((t) => t.key === active)!;
@@ -472,7 +559,7 @@ const LifeTabs: React.FC = () => {
       <div className="container">
         <div className="flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-end">
           <SectionHeading align="left" eyebrow="Life at Gurukulam" title="Beyond the classroom" />
-          <Reveal>
+          <Reveal className="w-full min-w-0 lg:w-auto">
             <div className="no-scrollbar -mx-5 flex gap-1 overflow-x-auto px-5 sm:mx-0 sm:rounded-full sm:bg-white sm:p-1.5 sm:shadow-soft">
               {lifeTabs.map((t) => (
                 <button
@@ -505,21 +592,8 @@ const LifeTabs: React.FC = () => {
               {tab.items.map((it, i) => {
                 const Icon = tab.icons[i % tab.icons.length];
                 return (
-                  <motion.div
-                    key={it.title}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.07 }}
-                    className="group relative overflow-hidden rounded-3xl bg-ivory p-8 ring-1 ring-ink-900/[0.06] transition hover:shadow-lift"
-                  >
-                    <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-gold-200/40 transition duration-700 group-hover:scale-[2.4]" />
-                    <div className="relative">
-                      <span className="grid h-12 w-12 place-items-center rounded-2xl border border-gold-500/30 text-xl text-gold-700">
-                        <Icon />
-                      </span>
-                      <h3 className="mt-6 font-display text-2xl">{it.title}</h3>
-                      <p className="mt-2 leading-relaxed text-ink-700/75">{it.description}</p>
-                    </div>
+                  <motion.div key={it.title} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}>
+                    <FlipCard index={i} icon={<Icon />} title={it.title} description={it.description} />
                   </motion.div>
                 );
               })}
@@ -574,19 +648,39 @@ const ClosingCTA: React.FC = () => {
   );
 };
 
+/** FAQPage structured data (rich results in Google) from the AI guide's knowledge. */
+const homeFaq = () => {
+  const pick: Record<string, string> = {
+    Admissions: 'How do I apply for admission at Gurukulam Global School?',
+    'Classes offered': 'Which classes does Gurukulam Global School offer?',
+    'Documents required': 'What documents are required for admission?',
+    'Location and directions': 'Where is Gurukulam Global School located?',
+    'Contact and timings': 'What are the school office timings and contact details?',
+    'Special programs': 'What special programs does the school offer?',
+  };
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: knowledgeEntries()
+      .filter((e) => pick[e.topic])
+      .map((e) => ({ '@type': 'Question', name: pick[e.topic], acceptedAnswer: { '@type': 'Answer', text: e.answer } })),
+  };
+};
+
 /* ------------------------------------------------------------------ */
 
 const Home: React.FC = () => {
   const [tour, setTour] = useState(false);
   return (
     <>
-      <SEO />
+      <SEO jsonLd={[homeFaq()]} />
       <Hero onTour={() => setTour(true)} />
       <NoticeTicker />
       <Welcome />
       <StatsBand />
       <StagesSection />
       <Programs />
+      <ExperienceSection />
       <AtAGlance onTour={() => setTour(true)} />
       <LifeTabs />
       <Testimonials />
