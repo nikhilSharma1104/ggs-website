@@ -1,306 +1,185 @@
-import React, { useState, useRef } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
-import { slideInLeft, slideInRight, staggerContainer, staggerItem } from '../components/animations';
-import { submitContactForm } from '../services/contactService';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FiMapPin, FiPhone, FiMail, FiClock, FiArrowRight, FiLoader, FiCheckCircle, FiAlertCircle, FiArrowUpRight } from 'react-icons/fi';
+import { FaWhatsapp } from 'react-icons/fa';
+import SEO from '../components/SEO';
+import PageHero from '../components/PageHero';
+import { Reveal } from '../components/ui';
+import { submitContactForm, ContactFormData } from '../services/contactService';
+import { school, telHref } from '../data/site';
 
-const fadeInVariant = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.5 } }
-};
-
-interface ContactForm {
-  name: string;
-  email: string;
-  phone: string;
-  subject: string;
-  message: string;
-}
+const empty: ContactFormData = { name: '', email: '', phone: '', subject: '', message: '' };
 
 const Contact: React.FC = () => {
-  const [formData, setFormData] = useState<ContactForm>({
-    name: '',
-    email: '',
-    phone: '',
-    subject: '',
-    message: ''
-  });
+  const [form, setForm] = useState<ContactFormData>(empty);
+  const [submitting, setSubmitting] = useState(false);
+  const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
-  const formRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: formRef,
-    offset: ["start end", "end start"],
-  });
+  const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
 
-  const y = useTransform(scrollYProgress, [0, 1], [100, -100]);
-  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    setSubmitStatus('idle');
-
+    setSubmitting(true);
+    setStatus('idle');
     try {
-      await submitContactForm(formData);
-      setSubmitStatus('success');
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        subject: '',
-        message: ''
-      });
-    } catch (error) {
-      setSubmitStatus('error');
-      console.error('Error submitting form:', error);
+      await submitContactForm(form);
+      setStatus('success');
+      setForm(empty);
+    } catch (err) {
+      console.error('Error submitting form:', err);
+      setStatus('error');
     } finally {
-      setIsSubmitting(false);
+      setSubmitting(false);
     }
   };
 
+  const cards = [
+    {
+      Icon: FiMapPin,
+      title: 'Visit Us',
+      lines: [school.address.line1, school.address.line2, school.address.city],
+      href: school.mapLink,
+      cta: 'Get directions',
+    },
+    { Icon: FiPhone, title: 'Call Us', lines: [...school.phones, school.hours], href: telHref(school.phones[0]), cta: 'Call now' },
+    { Icon: FiMail, title: 'Email Us', lines: [school.email], href: `mailto:${school.email}`, cta: 'Write to us' },
+  ];
+
   return (
-    <div className="bg-primary-900 min-h-screen">
-      {/* Hero Section */}
-      <motion.section
-        className="relative min-h-[60vh] flex items-center justify-center overflow-hidden"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1 }}
-      >
-        {/* Animated Background with Enhanced Particles */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900">
-          {[...Array(50)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-2 h-2 bg-gradient-to-r from-secondary-500 to-primary-500 rounded-full"
-              style={{
-                top: `${Math.random() * 100}%`,
-                left: `${Math.random() * 100}%`,
-                filter: "blur(1px)",
-              }}
-              animate={{
-                y: [0, -30, 0],
-                x: [0, 30, 0],
-                scale: [1, 1.5, 1],
-                opacity: [0.2, 0.5, 0.2],
-              }}
-              transition={{
-                duration: 3 + Math.random() * 2,
-                repeat: Infinity,
-                delay: Math.random() * 2,
-              }}
-            />
+    <>
+      <SEO title="Contact" description="Contact Gurukulam Global School, 136 Madhuvan Enclave, Krishna Nagar, Mathura. Call +91 7505335080 or email gurukulamglobalschool@gmail.com." />
+      <PageHero
+        eyebrow="Contact Us"
+        title={
+          <>
+            We&rsquo;d love to <em className="gold-text">hear from you</em>
+          </>
+        }
+        lede="Questions about admissions, a campus visit, or anything else, our office is happy to help."
+        crumbs={[{ name: 'Contact' }]}
+      />
+
+      <section className="relative z-10 -mt-12">
+        <div className="container grid gap-5 md:grid-cols-3">
+          {cards.map(({ Icon, title, lines, href, cta }, i) => (
+            <Reveal key={title} delay={i * 0.08}>
+              <a
+                href={href}
+                target={href.startsWith('http') ? '_blank' : undefined}
+                rel="noopener noreferrer"
+                className="group flex h-full flex-col rounded-3xl bg-ivory p-8 shadow-lift ring-1 ring-ink-900/5 transition hover:-translate-y-1"
+              >
+                <span className="grid h-12 w-12 place-items-center rounded-2xl bg-ink-900 text-xl text-gold-300 transition group-hover:bg-gold-400 group-hover:text-ink-950">
+                  <Icon />
+                </span>
+                <h2 className="mt-6 font-display text-2xl">{title}</h2>
+                <div className="mt-2 flex-1 space-y-0.5 break-words text-ink-700/80">
+                  {lines.map((l) => (
+                    <p key={l}>{l}</p>
+                  ))}
+                </div>
+                <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-gold-700">
+                  {cta} <FiArrowUpRight className="transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                </span>
+              </a>
+            </Reveal>
           ))}
         </div>
+      </section>
 
-        <div className="container mx-auto px-4 relative z-10 text-center">
-          <motion.div
-            className="max-w-4xl mx-auto"
-            variants={staggerContainer}
-            initial="hidden"
-            animate="show"
-          >
-            <motion.h1
-              variants={staggerItem}
-              className="text-6xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white via-secondary-200 to-secondary-400 text-transparent bg-clip-text"
-            >
-              Contact Us
-            </motion.h1>
-            <motion.p
-              variants={staggerItem}
-              className="text-xl md:text-2xl text-gray-300 mb-8"
-            >
-              We'd Love to Hear From You! 🌟
-            </motion.p>
-          </motion.div>
-        </div>
-      </motion.section>
-
-      {/* Contact Form Section */}
-      <motion.section
-        ref={formRef}
-        className="py-20 px-4 relative z-10"
-        style={{ y, opacity }}
-      >
-        <div className="container mx-auto max-w-4xl">
-          <div className="bg-primary-800/50 backdrop-blur-lg rounded-3xl shadow-xl border border-primary-700 overflow-hidden">
-            <div className="p-8 md:p-12">
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <motion.div variants={slideInLeft}>
-                    <label className="block text-secondary-200 font-semibold mb-2">Name</label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-3 rounded-lg bg-primary-700/50 border border-primary-600 text-white placeholder-gray-400 focus:border-secondary-500 focus:ring-2 focus:ring-secondary-500/20 transition-all"
-                      placeholder="Your Name"
-                    />
-                  </motion.div>
-
-                  <motion.div variants={slideInRight}>
-                    <label className="block text-secondary-200 font-semibold mb-2">Email</label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-3 rounded-lg bg-primary-700/50 border border-primary-600 text-white placeholder-gray-400 focus:border-secondary-500 focus:ring-2 focus:ring-secondary-500/20 transition-all"
-                      placeholder="your.email@example.com"
-                    />
-                  </motion.div>
-
-                  <motion.div variants={slideInLeft}>
-                    <label className="block text-secondary-200 font-semibold mb-2">Phone</label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-3 rounded-lg bg-primary-700/50 border border-primary-600 text-white placeholder-gray-400 focus:border-secondary-500 focus:ring-2 focus:ring-secondary-500/20 transition-all"
-                      placeholder="Your Phone Number"
-                    />
-                  </motion.div>
-
-                  <motion.div variants={slideInRight}>
-                    <label className="block text-secondary-200 font-semibold mb-2">Subject</label>
-                    <input
-                      type="text"
-                      name="subject"
-                      value={formData.subject}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-3 rounded-lg bg-primary-700/50 border border-primary-600 text-white placeholder-gray-400 focus:border-secondary-500 focus:ring-2 focus:ring-secondary-500/20 transition-all"
-                      placeholder="Message Subject"
-                    />
-                  </motion.div>
+      <section className="grain bg-ivory py-24 sm:py-28">
+        <div className="container grid gap-12 lg:grid-cols-[1.1fr_0.9fr]">
+          <Reveal>
+            <span className="eyebrow">Send a message</span>
+            <h2 className="display-md mt-4">Write to the school office</h2>
+            <form onSubmit={onSubmit} className="mt-10 grid gap-5 sm:grid-cols-2">
+              {(
+                [
+                  ['name', 'Name', 'text', 'Your Name'],
+                  ['email', 'Email', 'email', 'your.email@example.com'],
+                  ['phone', 'Phone', 'tel', 'Your Phone Number'],
+                  ['subject', 'Subject', 'text', 'Message Subject'],
+                ] as const
+              ).map(([name, label, type, placeholder]) => (
+                <div key={name}>
+                  <label htmlFor={`c-${name}`} className="field-label">
+                    {label}
+                  </label>
+                  <input id={`c-${name}`} name={name} type={type} required value={form[name]} onChange={onChange} placeholder={placeholder} className="field" />
                 </div>
-
-                <motion.div variants={fadeInVariant}>
-                  <label className="block text-secondary-200 font-semibold mb-2">Message</label>
-                  <textarea
-                    name="message"
-                    value={formData.message}
-                    onChange={handleChange}
-                    required
-                    rows={6}
-                    className="w-full px-4 py-3 rounded-lg bg-primary-700/50 border border-primary-600 text-white placeholder-gray-400 focus:border-secondary-500 focus:ring-2 focus:ring-secondary-500/20 transition-all resize-none"
-                    placeholder="Your Message"
-                  />
-                </motion.div>
-
-                <motion.div className="flex justify-center">
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className={`px-8 py-3 rounded-lg font-semibold text-white transition-all transform hover:scale-105 ${
-                      isSubmitting
-                        ? 'bg-gray-500 cursor-not-allowed'
-                        : 'bg-gradient-to-r from-secondary-500 to-secondary-600 hover:from-secondary-600 hover:to-secondary-700'
-                    }`}
-                  >
-                    {isSubmitting ? (
-                      <span className="flex items-center">
-                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Sending...
-                      </span>
-                    ) : (
-                      'Send Message'
-                    )}
-                  </button>
-                </motion.div>
-
-                {/* Status Messages */}
-                <AnimatePresence>
-                  {submitStatus === 'success' && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0 }}
-                      className="text-green-400 text-center p-4 bg-green-900/20 rounded-lg"
-                    >
-                      Message sent successfully! We'll get back to you soon.
-                    </motion.div>
+              ))}
+              <div className="sm:col-span-2">
+                <label htmlFor="c-message" className="field-label">
+                  Message
+                </label>
+                <textarea id="c-message" name="message" required rows={6} value={form.message} onChange={onChange} placeholder="Your Message" className="field resize-none" />
+              </div>
+              <div className="flex flex-col gap-4 sm:col-span-2 sm:flex-row sm:items-center sm:justify-between">
+                <AnimatePresence mode="wait">
+                  {status === 'success' && (
+                    <motion.p key="ok" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="flex items-center gap-2 text-sm font-medium text-emerald-700">
+                      <FiCheckCircle /> Message sent successfully! We&rsquo;ll get back to you soon.
+                    </motion.p>
                   )}
-                  {submitStatus === 'error' && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0 }}
-                      className="text-red-400 text-center p-4 bg-red-900/20 rounded-lg"
-                    >
-                      Failed to send message. Please try again or contact us directly.
-                    </motion.div>
+                  {status === 'error' && (
+                    <motion.p key="err" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="flex items-center gap-2 text-sm font-medium text-maroon">
+                      <FiAlertCircle /> Failed to send message. Please try again or contact us directly.
+                    </motion.p>
                   )}
+                  {status === 'idle' && <span key="idle" />}
                 </AnimatePresence>
-              </form>
+                <button type="submit" disabled={submitting} className="btn-ink group flex-none">
+                  {submitting ? (
+                    <>
+                      <FiLoader className="animate-spin" /> Sending…
+                    </>
+                  ) : (
+                    <>
+                      Send Message <FiArrowRight className="transition group-hover:translate-x-1" />
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </Reveal>
+
+          <Reveal delay={0.1} className="flex flex-col gap-5">
+            <div className="h-80 overflow-hidden rounded-3xl shadow-soft ring-1 ring-ink-900/10 lg:h-auto lg:flex-1">
+              <iframe
+                src={school.mapEmbed}
+                className="h-full min-h-[20rem] w-full"
+                style={{ border: 0 }}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title={`${school.name} location`}
+                allowFullScreen
+              />
             </div>
-          </div>
-        </div>
-      </motion.section>
-
-      {/* Contact Information Cards */}
-      <section className="py-20 px-4 relative z-10">
-        <div className="container mx-auto max-w-6xl">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Address Card */}
-            <motion.div
-              variants={staggerItem}
-              whileHover={{ scale: 1.05 }}
-              className="bg-primary-800/50 backdrop-blur-lg p-8 rounded-3xl shadow-lg border border-primary-700 text-center"
-            >
-              <div className="text-4xl mb-4">📍</div>
-              <h3 className="text-xl font-bold text-secondary-300 mb-2">Visit Us</h3>
-              <p className="text-gray-300">136, Madhuvan Enclave,</p>
-              <p className="text-gray-300">Near Natraj Mutri, Krishna Nagar,</p>
-              <p className="text-gray-300">Mathura, UP - 281003</p>
-            </motion.div>
-
-            {/* Phone Card */}
-            <motion.div
-              variants={staggerItem}
-              whileHover={{ scale: 1.05 }}
-              className="bg-primary-800/50 backdrop-blur-lg p-8 rounded-3xl shadow-lg border border-primary-700 text-center"
-            >
-              <div className="text-4xl mb-4">📞</div>
-              <h3 className="text-xl font-bold text-secondary-300 mb-2">Call Us</h3>
-              <a href="tel:+917505335080" className="block text-gray-300 hover:text-secondary-300 transition-colors">+91 7505335080</a>
-              <a href="tel:+917617645050" className="block text-gray-300 hover:text-secondary-300 transition-colors">+91 7617645050</a>
-              <p className="text-gray-300">Mon - Sat: 9:00 AM - 5:00 PM</p>
-            </motion.div>
-
-            {/* Email Card */}
-            <motion.div
-              variants={staggerItem}
-              whileHover={{ scale: 1.05 }}
-              className="bg-primary-800/50 backdrop-blur-lg p-8 rounded-3xl shadow-lg border border-primary-700 text-center"
-            >
-              <div className="text-4xl mb-4">✉️</div>
-              <h3 className="text-xl font-bold text-secondary-300 mb-2">Email Us</h3>
-              <p className="text-gray-300">info@gurukulam.edu</p>
-              <p className="text-gray-300">admissions@gurukulam.edu</p>
-            </motion.div>
-          </div>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <a
+                href={`https://wa.me/${school.whatsapp.replace(/\D/g, '')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-4 rounded-2xl bg-[#25D366]/10 p-5 ring-1 ring-[#25D366]/30 transition hover:bg-[#25D366]/20"
+              >
+                <FaWhatsapp className="flex-none text-3xl text-[#1a9e4b]" />
+                <span>
+                  <span className="block font-semibold text-ink-900">WhatsApp</span>
+                  <span className="text-sm text-ink-600">Quick responses</span>
+                </span>
+              </a>
+              <div className="flex items-center gap-4 rounded-2xl bg-gold-50 p-5 ring-1 ring-gold-500/25">
+                <FiClock className="flex-none text-3xl text-gold-700" />
+                <span>
+                  <span className="block font-semibold text-ink-900">Office hours</span>
+                  <span className="text-sm text-ink-600">{school.hours}</span>
+                </span>
+              </div>
+            </div>
+          </Reveal>
         </div>
       </section>
-    </div>
+    </>
   );
 };
 

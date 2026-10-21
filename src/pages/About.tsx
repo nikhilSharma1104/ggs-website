@@ -1,472 +1,178 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useRef, useState } from 'react';
+import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
+import { FiPlus, FiMinus } from 'react-icons/fi';
+import SEO from '../components/SEO';
+import PageHero from '../components/PageHero';
+import { Mandala } from '../components/art/Illustrations';
+import { GoldList, Reveal, SectionHeading } from '../components/ui';
+import { Counter } from '../components/widgets';
+import { coreValues, mission, missionStatement, stats, timeline, vision, visionStatement } from '../data/site';
 
 const About: React.FC = () => {
-  const [selectedValue, setSelectedValue] = useState<number | null>(null);
-
-  const stats = [
-    { icon: "", value: "20+", label: "Expert Teachers", description: "Highly qualified educators dedicated to excellence" },
-    { icon: "", value: "400+", label: "Students", description: "Growing student community since 2022" },
-    { icon: "", value: "95%", label: "Success Rate", description: "Exceptional academic achievement" },
-    { icon: "", value: "2022", label: "Established", description: "A young and dynamic institution" },
-  ];
-
-  const getAccessibleAnimationVariants = (variant: any) => {
-    return variant;
-  };
-
-  const staggerContainer = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-      },
-    },
-  };
-
-  const staggerItem = {
-    hidden: { opacity: 0, x: -20 },
-    show: { opacity: 1, x: 0 },
-  };
-
-  const slideInLeft = {
-    hidden: { opacity: 0, x: -100 },
-    show: { opacity: 1, x: 0 },
-  };
-
-  const slideInRight = {
-    hidden: { opacity: 0, x: 100 },
-    show: { opacity: 1, x: 0 },
-  };
+  const [openValue, setOpenValue] = useState<number | null>(0);
+  const timelineRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: timelineRef, offset: ['start 70%', 'end 60%'] });
+  const lineScale = useSpring(scrollYProgress, { stiffness: 80, damping: 24 });
 
   return (
-    <div className="bg-primary-900 min-h-screen pt-16 md:pt-20">
-      {/* Hero Section with Parallax Effect */}
-      <motion.section
-        className="relative min-h-[60vh] md:min-h-[80vh] flex items-center justify-center overflow-hidden"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1 }}
-      >
-        {/* Animated Background with Enhanced Particles */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900">
-          {[...Array(50)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-2 h-2 bg-gradient-to-r from-secondary-500 to-primary-500 rounded-full"
-              style={{
-                top: `${Math.random() * 100}%`,
-                left: `${Math.random() * 100}%`,
-                filter: "blur(1px)",
-              }}
-              animate={{
-                y: [0, -30, 0],
-                x: [0, 30, 0],
-                scale: [1, 1.5, 1],
-                opacity: [0.2, 0.5, 0.2],
-              }}
-              transition={{
-                duration: 3 + Math.random() * 2,
-                repeat: Infinity,
-                delay: Math.random() * 2,
-              }}
-            />
+    <>
+      <SEO title="About Us" description="Gurukulam Global School, Mathura: where tradition meets innovation in education. Our vision, mission, values and journey since 2022." />
+      <PageHero
+        eyebrow="About Gurukulam"
+        title={
+          <>
+            Where tradition meets <em className="gold-text">innovation</em>
+          </>
+        }
+        lede="Welcome to Gurukulam Global School. Our mission is to nurture young minds and help them grow into responsible global citizens."
+        crumbs={[{ name: 'About' }]}
+      />
+
+      {/* Stats */}
+      <section className="relative z-10 -mt-12">
+        <div className="container">
+          <div className="grid grid-cols-2 overflow-hidden rounded-3xl bg-ivory shadow-lift ring-1 ring-ink-900/5 lg:grid-cols-4">
+            {stats.map((s, i) => (
+              <div key={s.label} className={`p-7 sm:p-9 ${i % 2 ? 'border-l' : ''} ${i > 1 ? 'border-t lg:border-t-0' : ''} ${i === 2 ? 'lg:border-l' : ''} border-ink-900/[0.07]`}>
+                <div className="font-display text-4xl text-ink-900 sm:text-5xl">
+                  <Counter to={s.value} suffix={s.suffix} plain={s.plain} />
+                </div>
+                <div className="mt-1 text-xs font-semibold uppercase tracking-[0.18em] text-gold-700">{s.label}</div>
+                <p className="mt-2 text-sm text-ink-600/80">{s.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Vision & mission */}
+      <section className="grain bg-ivory py-24 sm:py-32">
+        <div className="container grid gap-8 lg:grid-cols-2">
+          {[
+            { title: 'Our Vision', statement: visionStatement, points: vision },
+            { title: 'Our Mission', statement: missionStatement, points: mission },
+          ].map((b, i) => (
+            <Reveal key={b.title} delay={i * 0.1}>
+              <div className={`relative h-full overflow-hidden rounded-3xl p-9 sm:p-12 ${i === 0 ? 'bg-ink-900 text-ivory' : 'bg-white ring-1 ring-ink-900/[0.06]'}`}>
+                <div className={`pointer-events-none absolute -right-24 -top-24 h-72 w-72 ${i === 0 ? 'text-gold-300/10' : 'text-gold-500/10'}`}>
+                  <Mandala className="h-full w-full" />
+                </div>
+                <span className={`eyebrow ${i === 0 ? 'eyebrow-light' : ''}`}>{i === 0 ? 'Where we are going' : 'How we get there'}</span>
+                <h2 className={`mt-4 font-display text-4xl sm:text-5xl ${i === 0 ? 'text-ivory' : ''}`}>{b.title}</h2>
+                <p className={`mt-5 font-display text-xl italic leading-snug sm:text-2xl ${i === 0 ? 'text-gold-200' : 'text-ink-800'}`}>{b.statement}</p>
+                <div className={`my-8 h-px ${i === 0 ? 'bg-white/10' : 'bg-ink-900/10'}`} />
+                <GoldList items={b.points} dark={i === 0} />
+              </div>
+            </Reveal>
           ))}
         </div>
+      </section>
 
-        {/* Hero Content with Enhanced Typography */}
-        <div className="container mx-auto px-4 relative z-10 text-center py-8 md:py-0">
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.8 }}
-            className="mb-4 md:mb-8"
-          >
-            <motion.h1
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-bold text-white mb-4 md:mb-6 relative inline-block"
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.2 }}
-            >
-              About{" "}
-              <span className="text-secondary-500 relative">
-                Gurukulam
-                <motion.div
-                  className="absolute -bottom-2 left-0 w-full h-1 bg-secondary-500"
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ delay: 0.5, duration: 0.8 }}
-                />
-              </span>
-            </motion.h1>
-            <motion.p
-              className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-white/80 max-w-3xl mx-auto font-light px-4 sm:px-0"
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.4 }}
-            >
-              Where tradition meets innovation in education
-            </motion.p>
-          </motion.div>
-
-          {/* Stats Section with Hover Effects */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 mt-8 md:mt-16 px-4 sm:px-6 lg:px-8">
-            {stats.map((stat, index) => (
-              <motion.div
-                key={index}
-                className="bg-primary-800/50 p-6 rounded-xl backdrop-blur-sm border border-white/10
-                         hover:bg-primary-700/50 transition-all duration-300 cursor-pointer"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 + index * 0.1 }}
-                whileHover={{ scale: 1.05, y: -5 }}
-              >
-                <motion.div
-                  className="text-secondary-500 mb-4"
-                  animate={{ y: [0, -10, 0] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
-                  {stat.icon}
-                </motion.div>
-                <motion.div
-                  className="text-4xl font-bold text-white mb-2"
-                  animate={{ scale: [1, 1.1, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
-                  {stat.value}
-                </motion.div>
-                <div className="text-lg text-white/80 font-medium">{stat.label}</div>
-                <div className="text-sm text-white/60 mt-2">{stat.description}</div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-
-        {/* Decorative Elements */}
-        <motion.div
-          className="absolute top-1/4 right-10 w-64 h-64 bg-secondary-500/10 rounded-full blur-3xl"
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.3, 0.5, 0.3],
-          }}
-          transition={{ duration: 4, repeat: Infinity }}
-        />
-      </motion.section>
-
-      {/* Vision & Mission with Interactive Cards */}
-      <section className="py-20 relative overflow-hidden">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            {[
-              {
-                title: "Our Vision",
-                icon: "",
-                content: [
-                  "To be a globally recognized institution of academic excellence",
-                  "Nurturing future leaders with strong ethical values",
-                  "Creating innovative learning environments",
-                  "Fostering research and intellectual curiosity"
-                ]
-              },
-              {
-                title: "Our Mission",
-                icon: "",
-                content: [
-                  "Providing world-class education with Indian values",
-                  "Developing critical thinking and problem-solving skills",
-                  "Building character through experiential learning",
-                  "Creating responsible global citizens"
-                ]
-              }
-            ].map((item, index) => (
-              <motion.div
-                key={index}
-                className="bg-primary-800/50 p-8 rounded-2xl relative overflow-hidden group"
-                initial={{ opacity: 0, x: index === 0 ? -50 : 50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                whileHover={{ scale: 1.02 }}
-              >
-                <motion.div
-                  className="absolute -top-10 -right-10 w-40 h-40 bg-secondary-500/10 rounded-full blur-xl"
-                  animate={{
-                    scale: [1, 1.2, 1],
-                    opacity: [0.3, 0.5, 0.3],
-                  }}
-                  transition={{ duration: 4, repeat: Infinity }}
-                />
-                <div className="relative z-10">
-                  <motion.div
-                    className="text-5xl mb-6"
-                    animate={{
-                      y: [0, -10, 0],
-                      rotate: [0, 5, -5, 0]
-                    }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  >
-                    {item.icon}
-                  </motion.div>
-                  <h2 className="text-3xl font-bold text-white mb-6">{item.title}</h2>
-                  <div className="space-y-4">
-                    {item.content.map((point, idx) => (
+      {/* Core values accordion */}
+      <section className="bg-ivory-100 py-24 sm:py-32">
+        <div className="container grid gap-14 lg:grid-cols-[0.8fr_1.2fr]">
+          <SectionHeading
+            align="left"
+            eyebrow="Our Core Values"
+            title={
+              <>
+                Six values that shape <em className="text-gold-600">every day</em>
+              </>
+            }
+            lede="Our core values shape every aspect of education, fostering intellectual curiosity, moral integrity, and global awareness in our students."
+            className="lg:sticky lg:top-32 lg:self-start"
+          />
+          <div className="divide-y divide-ink-900/10 border-y border-ink-900/10">
+            {coreValues.map((v, i) => {
+              const open = openValue === i;
+              return (
+                <Reveal key={v.title} delay={i * 0.04}>
+                  <button onClick={() => setOpenValue(open ? null : i)} className="group flex w-full items-center gap-6 py-6 text-left" aria-expanded={open}>
+                    <span className="font-display text-lg italic text-gold-600">0{i + 1}</span>
+                    <span className="flex-1">
+                      <span className="block font-display text-3xl transition group-hover:text-gold-700">{v.title}</span>
+                      <span className="mt-1 block text-ink-600/80">{v.description}</span>
+                    </span>
+                    <span className={`grid h-10 w-10 flex-none place-items-center rounded-full border transition ${open ? 'border-gold-500 bg-gold-400 text-ink-950' : 'border-ink-900/15'}`}>
+                      {open ? <FiMinus /> : <FiPlus />}
+                    </span>
+                  </button>
+                  <AnimatePresence initial={false}>
+                    {open && (
                       <motion.div
-                        key={idx}
-                        className="flex items-center space-x-3"
-                        initial={{ opacity: 0, x: -20 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        transition={{ delay: idx * 0.1 }}
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                        className="overflow-hidden"
                       >
-                        <div className="w-2 h-2 bg-secondary-500 rounded-full" />
-                        <p className="text-white/80">{point}</p>
+                        <div className="flex flex-wrap gap-2 pb-7 pl-12">
+                          {v.details.map((d) => (
+                            <span key={d} className="rounded-full border border-gold-500/30 bg-gold-50 px-4 py-1.5 text-sm text-ink-800">
+                              {d}
+                            </span>
+                          ))}
+                        </div>
                       </motion.div>
-                    ))}
+                    )}
+                  </AnimatePresence>
+                </Reveal>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Timeline */}
+      <section className="relative isolate overflow-hidden bg-ink-950 py-24 text-ivory sm:py-32">
+        <div className="container">
+          <SectionHeading dark eyebrow="Since 2022" title="Our journey of excellence" />
+          <div ref={timelineRef} className="relative mx-auto mt-20 max-w-4xl">
+            <div className="absolute bottom-0 left-[19px] top-0 w-px bg-white/10 md:left-1/2" />
+            <motion.div style={{ scaleY: lineScale }} className="absolute bottom-0 left-[19px] top-0 w-px origin-top bg-gradient-to-b from-gold-300 to-gold-500 md:left-1/2" />
+            {timeline.map((m, i) => (
+              <div key={m.year} className={`relative mb-16 grid gap-6 pl-14 last:mb-0 md:grid-cols-2 md:gap-16 md:pl-0`}>
+                <div className="absolute left-[11px] top-3 h-[17px] w-[17px] rotate-45 border border-gold-300 bg-ink-950 md:left-1/2 md:-ml-[8px]">
+                  <span className="absolute inset-1 bg-gold-300" />
+                </div>
+                <Reveal className={`${i % 2 ? 'md:order-2' : 'md:text-right'}`}>
+                  <div className="font-display text-6xl text-gold-300 sm:text-7xl">{m.year}</div>
+                  <h3 className="mt-2 font-display text-3xl text-ivory">{m.title}</h3>
+                </Reveal>
+                <Reveal delay={0.1} className={`${i % 2 ? 'md:order-1 md:text-right' : ''}`}>
+                  <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-7">
+                    <p className="text-ivory/75">{m.description}</p>
+                    <ul className={`mt-5 space-y-2 text-sm text-ivory/60 ${i % 2 ? 'md:ml-auto' : ''}`}>
+                      {m.achievements.map((a) => (
+                        <li key={a} className={`flex items-center gap-3 ${i % 2 ? 'md:flex-row-reverse' : ''}`}>
+                          <span className="h-1.5 w-1.5 rotate-45 bg-gold-400" />
+                          {a}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Enhanced Core Values Section */}
-      <section className="py-20 bg-primary-800/30 relative overflow-hidden">
-        <div className="container mx-auto px-4">
-          <motion.h2
-            className="text-5xl font-bold text-white text-center mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            Our Core Values
-          </motion.h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                icon: "",
-                title: "Excellence",
-                description: "Pursuing the highest standards in academic and personal development",
-                details: ["Rigorous academic programs", "Continuous improvement", "Quality assessment"]
-              },
-              {
-                icon: "",
-                title: "Integrity",
-                description: "Building character through ethical practices and moral values",
-                details: ["Honest communication", "Ethical behavior", "Moral leadership"]
-              },
-              {
-                icon: "",
-                title: "Growth",
-                description: "Fostering continuous learning and personal development",
-                details: ["Skill development", "Personal growth", "Lifelong learning"]
-              },
-              {
-                icon: "",
-                title: "Global Mindset",
-                description: "Embracing diversity and international perspectives",
-                details: ["Cultural awareness", "Global citizenship", "International exposure"]
-              },
-              {
-                icon: "",
-                title: "Innovation",
-                description: "Encouraging creative thinking and problem-solving",
-                details: ["Creative solutions", "Modern technology", "Research mindset"]
-              },
-              {
-                icon: "",
-                title: "Compassion",
-                description: "Nurturing empathy and care for others",
-                details: ["Community service", "Emotional intelligence", "Social responsibility"]
-              },
-            ].map((value, index) => (
-              <motion.div
-                key={index}
-                className={`bg-primary-800/50 p-6 rounded-xl relative overflow-hidden group cursor-pointer
-                         ${selectedValue === index ? 'ring-2 ring-secondary-500' : ''}`}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ scale: 1.02 }}
-                onClick={() => setSelectedValue(selectedValue === index ? null : index)}
-              >
-                <motion.div
-                  className="text-4xl mb-4"
-                  animate={{
-                    y: [0, -10, 0],
-                    rotate: [0, 5, -5, 0]
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    delay: index * 0.2
-                  }}
-                >
-                  {value.icon}
-                </motion.div>
-                <h3 className="text-xl font-bold text-white mb-2">{value.title}</h3>
-                <p className="text-white/80 mb-4">{value.description}</p>
-
-                <AnimatePresence>
-                  {selectedValue === index && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="overflow-hidden"
-                    >
-                      <ul className="space-y-2 mt-4 border-t border-white/10 pt-4">
-                        {value.details.map((detail, idx) => (
-                          <motion.li
-                            key={idx}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: idx * 0.1 }}
-                            className="text-white/70 flex items-center space-x-2"
-                          >
-                            <div className="w-1.5 h-1.5 bg-secondary-500 rounded-full" />
-                            <span>{detail}</span>
-                          </motion.li>
-                        ))}
-                      </ul>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-                <motion.div
-                  className="absolute inset-0 bg-secondary-500/10 opacity-0 group-hover:opacity-100"
-                  transition={{ duration: 0.3 }}
-                />
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Enhanced Timeline Section */}
-      <section className="py-20 relative overflow-hidden">
-        <div className="container mx-auto px-4">
-          <motion.h2
-            className="text-5xl font-bold text-white text-center mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            Our Journey of Excellence
-          </motion.h2>
-          <div className="max-w-4xl mx-auto relative">
-            {/* Timeline Line */}
-            <div className="absolute left-16 top-0 bottom-0 w-0.5 bg-secondary-500/30" />
-
-            {[
-              {
-                year: "2022",
-                title: "Foundation",
-                description: "Establishment of Gurukulam Global School with a vision for excellence in education",
-                achievements: ["Started with first batch of students", "Modern campus facilities", "Innovative teaching methodology"]
-              },
-              {
-                year: "2023",
-                title: "Growth",
-                description: "Rapid expansion and enhancement of facilities",
-                achievements: ["Growing student community", "Enhanced infrastructure", "Enriched curriculum"]
-              },
-              {
-                year: "2024",
-                title: "Innovation",
-                description: "Integration of modern learning methods and technology",
-                achievements: ["Smart classrooms", "Digital learning integration", "400+ student strength"]
-              }
-            ].map((milestone, index) => (
-              <motion.div
-                key={index}
-                className="flex gap-8 mb-16 relative"
-                initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.2 }}
-              >
-                <div className="w-32 flex-shrink-0 text-secondary-500 font-bold text-3xl relative">
-                  {milestone.year}
-                  <motion.div
-                    className="absolute right-0 top-3 w-4 h-4 bg-secondary-500 rounded-full z-10"
-                    animate={{
-                      scale: [1, 1.5, 1],
-                      opacity: [0.5, 1, 0.5],
-                    }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  />
-                </div>
-                <div className="flex-grow bg-primary-800/50 p-6 rounded-xl hover:bg-primary-700/50 transition-all duration-300">
-                  <h3 className="text-2xl font-bold text-white mb-3">{milestone.title}</h3>
-                  <p className="text-white/80 mb-4">{milestone.description}</p>
-                  <ul className="space-y-2">
-                    {milestone.achievements.map((achievement, idx) => (
-                      <motion.li
-                        key={idx}
-                        initial={{ opacity: 0, x: -20 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        transition={{ delay: idx * 0.1 }}
-                        className="text-white/70 flex items-center space-x-2"
-                      >
-                        <div className="w-1.5 h-1.5 bg-secondary-500 rounded-full" />
-                        <span>{achievement}</span>
-                      </motion.li>
-                    ))}
-                  </ul>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Mobile Optimized Section */}
-      <motion.section
-        className="relative py-20 px-4"
-        initial="hidden"
-        animate="show"
-        variants={staggerContainer}
-      >
-        <div className="container mx-auto max-w-6xl">
-          <motion.div 
-            className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center"
-            variants={staggerContainer}
-          >
-            <motion.div
-              variants={slideInLeft}
-              className="space-y-6"
-            >
-              <motion.h2 
-                variants={staggerItem}
-                className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white via-secondary-200 to-secondary-400 text-transparent bg-clip-text"
-              >
-                Our Vision
-              </motion.h2>
-              <motion.p 
-                variants={staggerItem}
-                className="text-gray-300 text-lg"
-              >
-                At Gurukulam, we envision a future where education transcends traditional boundaries.
-              </motion.p>
-            </motion.div>
-
-            <motion.div
-              variants={slideInRight}
-              className="relative"
-            >
-              <div className="aspect-w-16 aspect-h-9 rounded-2xl overflow-hidden shadow-xl">
-                <img
-                  src="/images/vision.jpg"
-                  alt="Gurukulam Vision"
-                  className="object-cover w-full h-full"
-                />
+                </Reveal>
               </div>
-            </motion.div>
-          </motion.div>
+            ))}
+          </div>
         </div>
-      </motion.section>
-    </div>
+      </section>
+
+      {/* Closing statement */}
+      <section className="grain bg-ivory py-24 text-center sm:py-28">
+        <div className="container max-w-3xl">
+          <Reveal>
+            <span className="eyebrow">Join our educational journey</span>
+            <p className="mt-6 font-display text-3xl italic leading-snug text-ink-900 sm:text-4xl">
+              &ldquo;At Gurukulam, we envision a future where education transcends traditional boundaries.&rdquo;
+            </p>
+            <p className="mt-6 text-ink-700/75">
+              We believe in creating an environment where every child can discover their potential and grow into confident, capable individuals.
+            </p>
+          </Reveal>
+        </div>
+      </section>
+    </>
   );
 };
 

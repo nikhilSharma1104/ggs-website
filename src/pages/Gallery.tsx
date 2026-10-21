@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { FiX, FiChevronLeft, FiChevronRight, FiMaximize2, FiRefreshCw } from 'react-icons/fi';
+import SEO from '../components/SEO';
+import PageHero from '../components/PageHero';
+import { useEscape, useScrollLock } from '../components/ui';
 import { getImagesFromFolder } from '../services/googleDrive';
-import { FaTimes, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import { fadeIn, staggerContainer, staggerItem, getAccessibleAnimationVariants } from '../components/animations';
+import { galleryImages } from '../data/galleryImages';
 
 interface GalleryImage {
   id: string;
@@ -13,286 +16,215 @@ interface GalleryImage {
   fullSizeUrl: string;
 }
 
+// Bundled set shown until (or unless) the Google Drive folder is configured.
+const localImages: GalleryImage[] = galleryImages.map((img) => ({
+  id: String(img.id),
+  url: `${img.url}?auto=format&fit=crop&w=800&q=70`,
+  fullSizeUrl: `${img.url}?auto=format&fit=crop&w=1800&q=80`,
+  title: img.title,
+  category: img.category,
+  description: img.description,
+}));
+
+const driveConfigured = Boolean(process.env.REACT_APP_GOOGLE_DRIVE_GALLERY_FOLDER_ID && process.env.REACT_APP_GOOGLE_API_KEY);
+
+// Vary tile heights for a natural masonry rhythm.
+const aspects = ['aspect-[4/5]', 'aspect-square', 'aspect-[4/3]', 'aspect-[3/4]', 'aspect-[5/4]'];
+
 const Gallery: React.FC = () => {
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
-  const [images, setImages] = useState<GalleryImage[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [images, setImages] = useState<GalleryImage[]>(localImages);
+  const [category, setCategory] = useState('All');
+  const [selected, setSelected] = useState<number | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
-
-  // Create unique categories array
-  const categories = ['all', ...images
-    .map(img => img.category)
-    .filter((category, index, self) => self.indexOf(category) === index)
-  ];
-
-  // Filter images based on selected category
-  const filteredImages = selectedCategory === 'all'
-    ? images
-    : images.filter(img => img.category === selectedCategory);
-
-  const fetchImages = async (forceRefresh: boolean = false) => {
+  const loadDrive = useCallback(async (force = false) => {
+    if (!driveConfigured) return;
     try {
-      setLoading(true);
-      setError(null);
-
-      const folderId = process.env.REACT_APP_GOOGLE_DRIVE_GALLERY_FOLDER_ID;
-      const apiKey = process.env.REACT_APP_GOOGLE_API_KEY;
-
-      if (!folderId) {
-        throw new Error('Google Drive Gallery folder ID not configured');
-      }
-
-      if (!apiKey) {
-        throw new Error('Google Drive API key not configured');
-      }
-
-      const driveImages = await getImagesFromFolder(folderId, forceRefresh);
-
-      const galleryImages: GalleryImage[] = driveImages
-        .filter(img => img.mimeType.startsWith('image/'))
-        .map(img => ({
+      const drive = await getImagesFromFolder(process.env.REACT_APP_GOOGLE_DRIVE_GALLERY_FOLDER_ID as string, force);
+      const mapped = drive
+        .filter((img) => img.mimeType.startsWith('image/'))
+        .map((img) => ({
           id: img.id,
           url: img.thumbnailLink,
-          title: img.name.split('_').slice(1).join(' ').replace(/\.[^/.]+$/, ''),
-          category: img.category || 'Uncategorized',
-          description: '',
+          title: img.name.split('_').slice(1).join(' ').replace(/\.[^/.]+$/, '') || img.name,
+          category: img.category || 'Campus',
           fullSizeUrl: img.webViewLink,
         }));
-
-      setImages(galleryImages);
+      if (mapped.length) setImages(mapped);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch images');
-      console.error('Error fetching images:', err);
-    } finally {
-      setLoading(false);
+      console.error('Error fetching Drive gallery, keeping bundled images:', err);
     }
-  };
-
-  const refreshGallery = async () => {
-    try {
-      setIsRefreshing(true);
-      await fetchImages(true);
-    } finally {
-      setIsRefreshing(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchImages();
   }, []);
 
-  const navigateImage = (direction: 'prev' | 'next') => {
-    if (!selectedImage) return;
+  useEffect(() => {
+    loadDrive();
+  }, [loadDrive]);
 
-    const currentIndex = filteredImages.findIndex(img => img.id === selectedImage.id);
-    let newIndex;
+  const categories = useMemo(() => ['All', ...Array.from(new Set(images.map((i) => i.category)))], [images]);
+  const filtered = useMemo(() => (category === 'All' ? images : images.filter((i) => i.category === category)), [images, category]);
 
-    if (direction === 'prev') {
-      newIndex = currentIndex > 0 ? currentIndex - 1 : filteredImages.length - 1;
-    } else {
-      newIndex = currentIndex < filteredImages.length - 1 ? currentIndex + 1 : 0;
-    }
+  const step = useCallback(
+    (dir: 1 | -1) => setSelected((s) => (s === null ? s : (s + dir + filtered.length) % filtered.length)),
+    [filtered.length]
+  );
 
-    setSelectedImage(filteredImages[newIndex]);
-  };
+  useScrollLock(selected !== null);
+  useEscape(selected !== null, () => setSelected(null));
+  useEffect(() => {
+    if (selected === null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight') step(1);
+      if (e.key === 'ArrowLeft') step(-1);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [selected, step]);
+
+  const current = selected !== null ? filtered[selected] : null;
 
   return (
-    <div className="bg-primary-900 min-h-screen pt-16 md:pt-20">
-      {/* Header */}
-      <motion.section
-        className="relative py-12 md:py-20"
-        initial="hidden"
-        animate="show"
-        variants={getAccessibleAnimationVariants(staggerContainer)}
-      >
-        <div className="container mx-auto px-4">
-          <motion.div
-            className="text-center max-w-3xl mx-auto mb-12 md:mb-20"
-            variants={getAccessibleAnimationVariants(fadeIn)}
-          >
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white via-secondary-200 to-secondary-400 text-transparent bg-clip-text">
-              Our Gallery
-            </h1>
-            <p className="text-lg md:text-xl text-gray-300">
-              Capturing moments and memories from our vibrant school life
-            </p>
-          </motion.div>
+    <>
+      <SEO title="Gallery" description="Moments and memories from life at Gurukulam Global School, Mathura." />
+      <PageHero
+        eyebrow="Our Gallery"
+        title={
+          <>
+            Moments &amp; <em className="gold-text">memories</em>
+          </>
+        }
+        lede="Capturing moments and memories from our vibrant school life."
+        crumbs={[{ name: 'Gallery' }]}
+      />
 
-          <motion.button
-            onClick={refreshGallery}
-            disabled={isRefreshing}
-            className={`px-6 py-3 rounded-full text-sm font-medium transition-all
-              ${isRefreshing
-                ? 'bg-secondary-700 cursor-not-allowed'
-                : 'bg-secondary-500 hover:bg-secondary-600 active:bg-secondary-700'
-              } text-white shadow-lg shadow-secondary-500/30`}
-            whileHover={{ scale: isRefreshing ? 1 : 1.05 }}
-            whileTap={{ scale: isRefreshing ? 1 : 0.95 }}
-          >
-            {isRefreshing ? (
-              <span className="flex items-center">
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Refreshing...
-              </span>
-            ) : (
-              'Refresh Gallery'
+      <section className="grain min-h-[60vh] bg-ivory py-16 sm:py-24">
+        <div className="container">
+          <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
+            <div className="no-scrollbar -mx-5 flex max-w-full gap-2 overflow-x-auto px-5 sm:mx-0 sm:flex-wrap sm:px-0">
+              {categories.map((c) => {
+                const count = c === 'All' ? images.length : images.filter((i) => i.category === c).length;
+                return (
+                  <button
+                    key={c}
+                    onClick={() => setCategory(c)}
+                    className={`relative flex items-center gap-2 whitespace-nowrap rounded-full px-5 py-2.5 text-sm font-semibold transition ${
+                      category === c ? 'text-ivory' : 'bg-white text-ink-700 ring-1 ring-ink-900/10 hover:ring-gold-500'
+                    }`}
+                  >
+                    {category === c && <motion.span layoutId="gallery-filter" className="absolute inset-0 rounded-full bg-ink-900" transition={{ type: 'spring', stiffness: 380, damping: 32 }} />}
+                    <span className="relative">{c}</span>
+                    <span className={`relative text-xs ${category === c ? 'text-gold-300' : 'text-ink-400'}`}>{count}</span>
+                  </button>
+                );
+              })}
+            </div>
+            {driveConfigured && (
+              <button
+                onClick={async () => {
+                  setRefreshing(true);
+                  await loadDrive(true);
+                  setRefreshing(false);
+                }}
+                disabled={refreshing}
+                className="btn-outline flex-none"
+              >
+                <FiRefreshCw className={refreshing ? 'animate-spin' : ''} /> {refreshing ? 'Refreshing…' : 'Refresh Gallery'}
+              </button>
             )}
-          </motion.button>
+          </div>
+
+          <motion.div className="mt-10 columns-1 gap-5 sm:columns-2 lg:columns-3">
+            <AnimatePresence initial={false}>
+              {filtered.map((img, i) => (
+                <motion.button
+                  key={img.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.4, delay: Math.min(i * 0.03, 0.3) }}
+                  onClick={() => setSelected(i)}
+                  className={`group relative mb-5 block w-full overflow-hidden rounded-2xl bg-ink-100 ${aspects[i % aspects.length]}`}
+                >
+                  <img
+                    src={img.url}
+                    alt={img.title}
+                    loading="lazy"
+                    className="absolute inset-0 h-full w-full object-cover transition duration-[1.2s] ease-out group-hover:scale-[1.06]"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-ink-950/85 via-ink-950/10 to-transparent opacity-80 transition group-hover:opacity-100" />
+                  <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-5 text-left">
+                    <div>
+                      <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gold-300">{img.category}</span>
+                      <h3 className="mt-1 font-display text-xl text-ivory">{img.title}</h3>
+                    </div>
+                    <span className="grid h-9 w-9 flex-none translate-y-2 place-items-center rounded-full bg-ivory/90 text-ink-900 opacity-0 transition group-hover:translate-y-0 group-hover:opacity-100">
+                      <FiMaximize2 size={14} />
+                    </span>
+                  </div>
+                </motion.button>
+              ))}
+            </AnimatePresence>
+          </motion.div>
         </div>
-      </motion.section>
+      </section>
 
-      {/* Category Filter */}
-      <motion.div
-        className="flex flex-wrap justify-center gap-4 mb-12"
-        initial="hidden"
-        animate="show"
-        variants={getAccessibleAnimationVariants(staggerContainer)}
-      >
-        {categories.map((category) => (
-          <motion.button
-            key={category}
-            onClick={() => setSelectedCategory(category)}
-            className={`px-6 py-3 rounded-full text-sm font-medium transition-all
-              ${selectedCategory === category
-                ? 'bg-secondary-500 text-white shadow-lg shadow-secondary-500/30'
-                : 'bg-white/10 backdrop-blur-sm text-white/80 hover:bg-white/20 border border-white/20'
-              }`}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            {category.charAt(0).toUpperCase() + category.slice(1)}
-          </motion.button>
-        ))}
-      </motion.div>
-
-      {/* Loading State */}
-      {loading && (
-        <div className="flex justify-center items-center py-20">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-secondary-500"></div>
-        </div>
-      )}
-
-      {/* Error State */}
-      {error && (
-        <div className="text-center text-red-400 py-10">
-          <p>{error}</p>
-        </div>
-      )}
-
-      {/* Gallery Grid */}
-      <motion.div
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8"
-        variants={getAccessibleAnimationVariants(staggerContainer)}
-      >
-        <AnimatePresence>
-          {filteredImages.map((image) => (
-            <motion.div
-              key={image.id}
-              variants={getAccessibleAnimationVariants(staggerItem)}
-              whileHover={isMobile ? {} : { scale: 1.05 }}
-              className="relative group rounded-2xl overflow-hidden shadow-xl aspect-w-4 aspect-h-3"
-            >
-              <img
-                src={image.url}
-                alt={image.title}
-                className="w-full h-full object-cover transform transition-transform duration-300 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-                  <h3 className="text-lg font-semibold">{image.title}</h3>
-                  {image.description && (
-                    <p className="text-sm text-gray-200">{image.description}</p>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </motion.div>
-
-      {/* Lightbox */}
       <AnimatePresence>
-        {selectedImage && (
+        {current && (
           <motion.div
+            className="fixed inset-0 z-[150] flex flex-col bg-ink-950/95 backdrop-blur-md"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/95 backdrop-blur-xl z-50 flex items-center justify-center"
-            onClick={() => setSelectedImage(null)}
+            onClick={() => setSelected(null)}
+            role="dialog"
+            aria-modal="true"
+            aria-label={current.title}
           >
-            <div className="relative max-w-7xl w-full h-full flex items-center justify-center p-4">
-              <button
-                className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors z-50"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedImage(null);
-                }}
-              >
-                <FaTimes size={24} />
+            <div className="flex items-center justify-between p-5 text-ivory/70">
+              <span className="text-sm tabular-nums">
+                {(selected ?? 0) + 1} / {filtered.length}
+              </span>
+              <button className="grid h-11 w-11 place-items-center rounded-full bg-white/10 transition hover:bg-gold-300 hover:text-ink-950" aria-label="Close">
+                <FiX size={20} />
               </button>
-
-              <button
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-white/80 hover:text-white transition-colors z-50"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigateImage('prev');
-                }}
-              >
-                <FaChevronLeft size={24} />
-              </button>
-
-              <button
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/80 hover:text-white transition-colors z-50"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigateImage('next');
-                }}
-              >
-                <FaChevronRight size={24} />
-              </button>
-
-              <div
-                className="relative w-full h-full flex items-center justify-center"
-                onClick={(e) => e.stopPropagation()}
-              >
+            </div>
+            <div className="relative flex flex-1 items-center justify-center px-4 pb-4 sm:px-20" onClick={(e) => e.stopPropagation()}>
+              <AnimatePresence mode="wait">
                 <motion.img
-                  key={selectedImage.id}
-                  src={selectedImage.fullSizeUrl}
-                  alt={selectedImage.title}
-                  className="max-h-[85vh] max-w-full w-auto h-auto object-contain rounded-lg"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.2 }}
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    console.error('Failed to load full-size image:', selectedImage.fullSizeUrl);
-                    // If the full-size image fails, try using the thumbnail
-                    if (target.src !== selectedImage.url) {
-                      target.src = selectedImage.url;
-                    }
+                  key={current.id}
+                  src={current.fullSizeUrl}
+                  alt={current.title}
+                  drag="x"
+                  dragConstraints={{ left: 0, right: 0 }}
+                  onDragEnd={(_, info) => {
+                    if (info.offset.x < -60) step(1);
+                    if (info.offset.x > 60) step(-1);
                   }}
+                  onError={(e) => {
+                    const t = e.currentTarget;
+                    if (t.src !== current.url) t.src = current.url;
+                  }}
+                  initial={{ opacity: 0, scale: 0.97 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.97 }}
+                  transition={{ duration: 0.3 }}
+                  className="max-h-[72vh] max-w-full cursor-grab rounded-xl object-contain shadow-lift active:cursor-grabbing"
                 />
-              </div>
-
-              <div className="absolute bottom-4 left-0 right-0 text-center text-white bg-black/50 p-4 rounded-lg mx-4">
-                <h2 className="text-2xl font-medium mb-2">{selectedImage.title}</h2>
-                {selectedImage.description && (
-                  <p className="text-gray-300">{selectedImage.description}</p>
-                )}
-              </div>
+              </AnimatePresence>
+              <button onClick={() => step(-1)} className="absolute left-4 hidden h-12 w-12 place-items-center rounded-full bg-white/10 text-ivory transition hover:bg-gold-300 hover:text-ink-950 sm:grid" aria-label="Previous image">
+                <FiChevronLeft size={22} />
+              </button>
+              <button onClick={() => step(1)} className="absolute right-4 hidden h-12 w-12 place-items-center rounded-full bg-white/10 text-ivory transition hover:bg-gold-300 hover:text-ink-950 sm:grid" aria-label="Next image">
+                <FiChevronRight size={22} />
+              </button>
+            </div>
+            <div className="pb-8 text-center" onClick={(e) => e.stopPropagation()}>
+              <h2 className="font-display text-2xl text-ivory">{current.title}</h2>
+              {current.description && <p className="mt-1 text-sm text-ivory/60">{current.description}</p>}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </>
   );
 };
 

@@ -12,7 +12,7 @@ interface CareerFormData {
 }
 
 export const submitCareerApplication = async (formData: CareerFormData) => {
-  const API_URL = process.env.REACT_APP_CAREER_API_URL || 'http://localhost:5000/api/careers';
+  const API_URL = process.env.REACT_APP_CAREER_API_URL || 'https://ggs-website-api.onrender.com/api/careers';
   
   try {
     const formDataObj = new FormData();

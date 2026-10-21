@@ -1,246 +1,108 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import YouTube from 'react-youtube';
+import React, { useRef, useState } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { FiPlay } from 'react-icons/fi';
+import SEO from '../components/SEO';
+import PageHero from '../components/PageHero';
+import CampusScene from '../components/art/CampusScene';
+import { facilityArt } from '../components/art/Illustrations';
+import { GoldList, Reveal, SectionHeading, usePointerParallax, VideoModal } from '../components/ui';
+import { activities, facilities, school } from '../data/site';
 
-interface Facility {
-  title: string;
-  description: string;
-  icon: string;
-  items: string[];
-}
+const TourBanner: React.FC<{ onPlay: () => void }> = ({ onPlay }) => {
+  const ref = useRef<HTMLElement>(null);
+  const pointer = usePointerParallax();
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
+  const sceneScroll = useTransform(scrollYProgress, [0, 1], [-0.3, 0.5]);
+  return (
+    <section ref={ref} className="relative isolate overflow-hidden bg-ink-950 py-32 text-center sm:py-44">
+      <CampusScene pointerX={pointer.x} pointerY={pointer.y} scroll={sceneScroll} className="absolute inset-0 -z-10 h-full w-full" />
+      <div className="absolute inset-0 -z-10 bg-ink-950/50" />
+      <div className="container">
+        <Reveal>
+          <span className="eyebrow eyebrow-light">Take a Virtual Tour</span>
+          <h2 className="display-lg mx-auto mt-5 max-w-2xl text-ivory">Walk our campus from anywhere</h2>
+          <p className="mx-auto mt-5 max-w-xl text-lg text-ivory/70">Experience our campus facilities firsthand through our interactive virtual tour.</p>
+          <motion.button
+            onClick={onPlay}
+            whileHover={{ scale: 1.06 }}
+            whileTap={{ scale: 0.95 }}
+            className="relative mx-auto mt-10 grid h-24 w-24 place-items-center rounded-full bg-gold-300 text-2xl text-ink-950 shadow-glow"
+            aria-label="Start virtual tour"
+          >
+            <span className="absolute inset-0 animate-ping rounded-full bg-gold-300/40 [animation-duration:2.4s]" />
+            <FiPlay className="relative ml-1" />
+          </motion.button>
+        </Reveal>
+      </div>
+    </section>
+  );
+};
 
 const CampusLife: React.FC = () => {
-  const [showVideoModal, setShowVideoModal] = useState(false);
-  const facilities: Facility[] = [
-    {
-      title: 'Sports Facilities',
-      description: 'State-of-the-art sports facilities to nurture physical development and team spirit',
-      icon: '⚽',
-      items: [
-        'Olympic-size Swimming Pool',
-        'Indoor Sports Complex',
-        'Football Ground',
-        'Basketball Courts',
-        'Cricket Field',
-      ],
-    },
-    {
-      title: 'Academic Facilities',
-      description: 'Modern learning spaces equipped with the latest technology',
-      icon: '📚',
-      items: [
-        'Modern Classrooms',
-        'Science Laboratories',
-        'Computer Labs',
-        'Library & Resource Center',
-        'Smart Learning Spaces',
-      ],
-    },
-    {
-      title: 'Extra-Curricular',
-      description: 'Diverse spaces for artistic and creative expression',
-      icon: '🎨',
-      items: [
-        'Music Room',
-        'Dance Studio',
-        'Art & Craft Center',
-        'Theater Space',
-        'Yoga Center',
-      ],
-    },
-    {
-      title: 'Student Life',
-      description: 'Comfortable and engaging spaces for student activities',
-      icon: '🎭',
-      items: [
-        'Student Lounge',
-        'Cafeteria',
-        'Meditation Garden',
-        'Activity Rooms',
-        'Outdoor Learning Spaces',
-      ],
-    },
-  ];
-
+  const [tour, setTour] = useState(false);
   return (
-    <div className="min-h-screen bg-primary-900">
-      {/* Video Modal */}
-      <AnimatePresence>
-        {showVideoModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
-            onClick={() => setShowVideoModal(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.5, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.5, opacity: 0 }}
-              className="relative w-full max-w-4xl aspect-video bg-black rounded-xl overflow-hidden"
-              onClick={e => e.stopPropagation()}
-            >
-              <YouTube
-                videoId="6DHDX1rXrjU"
-                opts={{
-                  width: '100%',
-                  height: '100%',
-                  playerVars: {
-                    autoplay: 1,
-                    start: 7,
-                  },
-                }}
-                className="w-full h-full"
-              />
-              <button
-                onClick={() => setShowVideoModal(false)}
-                className="absolute top-4 right-4 text-white hover:text-secondary-500 transition-colors"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+    <>
+      <SEO title="Campus Life" description="Sports, academic, arts and student-life facilities at Gurukulam Global School, Mathura. Take the virtual campus tour." />
+      <PageHero
+        eyebrow="Campus Life"
+        title={
+          <>
+            A campus that <em className="gold-text">inspires</em>
+          </>
+        }
+        lede="Experience a vibrant and enriching environment that fosters growth and learning."
+        crumbs={[{ name: 'Campus Life' }]}
+      >
+        <button onClick={() => setTour(true)} className="btn-gold">
+          <FiPlay /> Start Virtual Tour
+        </button>
+      </PageHero>
 
-      {/* Hero Section */}
-      <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900">
-          {[...Array(20)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute text-4xl"
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{
-                opacity: [0.5, 1, 0.5],
-                scale: [1, 1.2, 1],
-                y: [0, -20, 0],
-                rotate: [0, 10, -10, 0],
-              }}
-              transition={{
-                duration: 4,
-                repeat: Infinity,
-                delay: i * 0.2,
-              }}
-              style={{
-                top: `${Math.random() * 100}%`,
-                left: `${Math.random() * 100}%`,
-              }}
-            >
-              {["🏫", "🎨", "⚽", "🎭", "📚", "🎵"][i % 6]}
-            </motion.div>
-          ))}
-        </div>
-
-        <div className="container mx-auto px-4 relative z-10 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">
-              Campus Life
-              <motion.div
-                className="h-1 w-24 bg-secondary-500 mx-auto mt-4"
-                initial={{ width: 0 }}
-                animate={{ width: 96 }}
-                transition={{ duration: 1, delay: 0.5 }}
-              />
-            </h1>
-            <p className="text-xl md:text-2xl text-white/80 max-w-3xl mx-auto">
-              Experience a vibrant and enriching environment that fosters growth and learning
-            </p>
-          </motion.div>
+      <section className="grain bg-ivory py-24 sm:py-32">
+        <div className="container">
+          <SectionHeading eyebrow="Our Facilities" title="Spaces for every kind of learner" />
+          <div className="mt-16 space-y-6">
+            {facilities.map((f, i) => {
+              const Art = facilityArt[f.key];
+              return (
+                <Reveal key={f.key}>
+                  <div className={`grid items-center gap-8 overflow-hidden rounded-3xl p-8 sm:p-12 lg:grid-cols-[auto_1fr_1fr] lg:gap-14 ${i % 2 ? 'bg-ink-900 text-ivory' : 'bg-white ring-1 ring-ink-900/[0.06]'}`}>
+                    <div className={`grid h-32 w-32 place-items-center rounded-full ${i % 2 ? 'bg-white/5 ring-1 ring-gold-300/30' : 'bg-gold-50 ring-1 ring-gold-500/25'}`}>
+                      <Art className={`h-20 w-20 ${i % 2 ? 'text-gold-300' : 'text-gold-600'}`} animate />
+                    </div>
+                    <div>
+                      <span className={`font-display text-lg italic ${i % 2 ? 'text-gold-300' : 'text-gold-600'}`}>0{i + 1}</span>
+                      <h3 className={`mt-1 font-display text-4xl ${i % 2 ? 'text-ivory' : ''}`}>{f.title}</h3>
+                      <p className={`mt-3 text-lg leading-relaxed ${i % 2 ? 'text-ivory/65' : 'text-ink-700/75'}`}>{f.description}</p>
+                    </div>
+                    <GoldList items={[...f.items]} dark={i % 2 === 1} className="sm:columns-2 sm:gap-6 sm:space-y-0 [&>li]:mb-3 [&>li]:break-inside-avoid lg:columns-1" />
+                  </div>
+                </Reveal>
+              );
+            })}
+          </div>
         </div>
       </section>
 
-      {/* Facilities Section */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <motion.h2
-            className="text-4xl font-bold text-white text-center mb-12"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-          >
-            Our Facilities
-            <motion.div
-              className="h-1 w-24 bg-secondary-500 mx-auto mt-4"
-              initial={{ width: 0 }}
-              whileInView={{ width: 96 }}
-              transition={{ duration: 1 }}
-            />
-          </motion.h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {facilities.map((facility, index) => (
-              <motion.div
-                key={index}
-                className="bg-primary-800/50 p-8 rounded-xl backdrop-blur-sm border border-white/10
-                          hover:border-secondary-500/50 transition-all duration-300"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ y: -5 }}
-              >
-                <motion.div
-                  className="text-6xl mb-4"
-                  animate={{
-                    y: [0, -10, 0],
-                    rotate: [0, 5, -5, 0],
-                  }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
-                  {facility.icon}
-                </motion.div>
-                <h3 className="text-2xl font-bold text-white mb-2">{facility.title}</h3>
-                <p className="text-white/80 mb-4">{facility.description}</p>
-                <ul className="space-y-2">
-                  {facility.items.map((item, itemIndex) => (
-                    <motion.li
-                      key={itemIndex}
-                      className="text-white/70 flex items-center space-x-2"
-                      initial={{ opacity: 0, x: -20 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.1 + itemIndex * 0.1 }}
-                    >
-                      <span className="text-secondary-500">•</span>
-                      <span>{item}</span>
-                    </motion.li>
-                  ))}
-                </ul>
-              </motion.div>
+      <section className="bg-ivory-100 py-24">
+        <div className="container">
+          <SectionHeading eyebrow="Our Activities" title="Discover the vibrant life at Gurukulam" lede="Engage in a wide range of activities that foster growth and development." />
+          <div className="mt-14 grid gap-5 md:grid-cols-3">
+            {activities.map((a, i) => (
+              <Reveal key={a.title} delay={i * 0.08}>
+                <div className="h-full rounded-3xl bg-white p-8 text-center ring-1 ring-ink-900/[0.06]">
+                  <h3 className="font-display text-2xl">{a.title}</h3>
+                  <p className="mt-2 text-ink-700/75">{a.description}</p>
+                </div>
+              </Reveal>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Virtual Tour CTA */}
-      <section className="py-20 bg-primary-800/30">
-        <div className="container mx-auto px-4 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            className="max-w-3xl mx-auto"
-          >
-            <h2 className="text-4xl font-bold text-white mb-6">Take a Virtual Tour</h2>
-            <p className="text-white/80 mb-8">
-              Experience our campus facilities firsthand through our interactive virtual tour
-            </p>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setShowVideoModal(true)}
-              className="bg-secondary-500 text-white px-8 py-3 rounded-full hover:bg-secondary-600 transition-colors"
-            >
-              Start Virtual Tour 🎥
-            </motion.button>
-          </motion.div>
-        </div>
-      </section>
-    </div>
+      <TourBanner onPlay={() => setTour(true)} />
+      <VideoModal open={tour} onClose={() => setTour(false)} videoId={school.virtualTourId} />
+    </>
   );
 };
 

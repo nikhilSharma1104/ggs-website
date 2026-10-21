@@ -1,166 +1,136 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import React from 'react';
 import { Link } from 'react-router-dom';
+import { FiPhone, FiMail, FiMapPin, FiClock, FiArrowUpRight } from 'react-icons/fi';
+import { FaFacebookF, FaInstagram, FaYoutube, FaWhatsapp } from 'react-icons/fa';
+import { navigation, school, stages, telHref } from '../data/site';
+import { Mandala, Ornament } from './art/Illustrations';
 
-const Footer = () => {
-  const [isHovered, setIsHovered] = useState<string | null>(null);
-
-  const socialLinks = [
-    { icon: "fab fa-facebook", url: "https://facebook.com", name: "Facebook" },
-    { icon: "fab fa-instagram", url: "https://instagram.com", name: "Instagram" },
-    { icon: "fab fa-twitter", url: "https://twitter.com", name: "Twitter" },
-    { icon: "fab fa-youtube", url: "https://youtube.com", name: "YouTube" }
-  ];
-
-  const quickLinks = [
-    { name: "About Us", path: "/about" },
-    { name: "Academics", path: "/academics" },
-    { name: "Admissions", path: "/admissions" },
-    { name: "Contact", path: "/contact" }
+const Footer: React.FC = () => {
+  const socials = [
+    { Icon: FaFacebookF, href: school.social.facebook, label: 'Facebook' },
+    { Icon: FaInstagram, href: school.social.instagram, label: 'Instagram' },
+    { Icon: FaYoutube, href: school.social.youtube, label: 'YouTube' },
+    { Icon: FaWhatsapp, href: `https://wa.me/${school.whatsapp.replace(/\D/g, '')}`, label: 'WhatsApp' },
   ];
 
   return (
-    <footer className="relative bg-primary-900 text-white pt-12 pb-6 overflow-hidden">
-      {/* Animated Background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(20)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-2 h-2 bg-gradient-to-r from-secondary-500 to-primary-500 rounded-full"
-            style={{
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-              filter: "blur(1px)",
-            }}
-            animate={{
-              y: [0, -30, 0],
-              x: [0, 30, 0],
-              scale: [1, 1.5, 1],
-              opacity: [0.1, 0.3, 0.1],
-            }}
-            transition={{
-              duration: 3 + Math.random() * 2,
-              repeat: Infinity,
-              delay: Math.random() * 2,
-            }}
-          />
-        ))}
+    <footer className="relative isolate overflow-hidden bg-ink-950 pb-24 text-ivory/70 lg:pb-0">
+      <div className="pointer-events-none absolute -right-48 -top-48 -z-10 h-[40rem] w-[40rem] text-gold-300/[0.07]">
+        <Mandala className="h-full w-full animate-spin-slow" />
       </div>
 
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
-          {/* Map and Contact Section */}
-          <div className="lg:col-span-2">
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* Map */}
-              <div className="h-[250px]">
-                <iframe 
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3538.874189167418!2d77.6549611!3d27.504287899999994!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x397371e014c8525f%3A0x9019ba62fabf9da7!2sGurukulam%20Global%20School%20-%20Best%20School%20in%20Mathura%20%7C%20Most%20Dynamic%20School%20In%20Mathura%20-%20Vridavan%20Region!5e0!3m2!1sen!2sin!4v1735657740426!5m2!1sen!2sin"
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  allowFullScreen={true}
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  title="Gurukulam Global School Location"
-                  className="rounded-lg"
-                />
-              </div>
+      <div className="container pt-20">
+        {/* Crest + statement */}
+        <div className="flex flex-col items-center text-center">
+          <img src="/images/logo-128.png" alt={school.name} className="h-20 w-20" loading="lazy" />
+          <p className="mt-6 max-w-2xl font-display text-2xl italic leading-snug text-ivory sm:text-3xl">
+            &ldquo;Where tradition meets innovation in education.&rdquo;
+          </p>
+          <Ornament className="mt-6 h-4 w-32 text-gold-400/60" />
+        </div>
 
-              {/* Contact Info */}
-              <div>
-                <h3 className="text-xl font-bold text-secondary-300 mb-4">Contact Us</h3>
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-3 p-2 rounded-lg border border-primary-800/50">
-                    <span className="text-xl">📍</span>
-                    <div>
-                      <p className="text-secondary-200">136, Madhuvan Enclave,</p>
-                      <p className="text-gray-300">Near Natraj Mutri, Krishna Nagar,</p>
-                      <p className="text-gray-300">Mathura, UP - 281003</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-3 p-2 rounded-lg border border-primary-800/50">
-                    <span className="text-xl">📞</span>
-                    <div>
-                      <a href="tel:+917505335080" className="text-gray-300 hover:text-secondary-300 transition-colors">+91 7505335080</a>
-                      <br />
-                      <a href="tel:+917617645050" className="text-gray-300 hover:text-secondary-300 transition-colors">+91 7617645050</a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+        <div className="mt-16 grid gap-12 border-t border-white/10 pt-14 md:grid-cols-2 lg:grid-cols-12">
+          <div className="lg:col-span-4">
+            <h3 className="font-display text-2xl text-ivory">Visit us</h3>
+            <ul className="mt-6 space-y-4 text-sm">
+              <li className="flex gap-3">
+                <FiMapPin className="mt-0.5 flex-none text-gold-300" />
+                <a href={school.mapLink} target="_blank" rel="noopener noreferrer" className="transition hover:text-gold-200">
+                  {school.address.line1},<br />
+                  {school.address.line2},<br />
+                  {school.address.city}
+                </a>
+              </li>
+              <li className="flex gap-3">
+                <FiPhone className="mt-0.5 flex-none text-gold-300" />
+                <span>
+                  {school.phones.map((p) => (
+                    <a key={p} href={telHref(p)} className="block transition hover:text-gold-200">
+                      {p}
+                    </a>
+                  ))}
+                </span>
+              </li>
+              <li className="flex gap-3">
+                <FiMail className="mt-0.5 flex-none text-gold-300" />
+                <a href={`mailto:${school.email}`} className="break-all transition hover:text-gold-200">
+                  {school.email}
+                </a>
+              </li>
+              <li className="flex gap-3">
+                <FiClock className="mt-0.5 flex-none text-gold-300" />
+                {school.hours}
+              </li>
+            </ul>
           </div>
 
-          {/* Quick Links and Social */}
-          <div className="space-y-6">
-            {/* Quick Links */}
-            <div>
-              <h3 className="text-xl font-bold text-secondary-300 mb-4">Quick Links</h3>
-              <ul className="grid grid-cols-2 gap-2">
-                {quickLinks.map((link) => (
-                  <li key={link.name}>
-                    <Link
-                      to={link.path}
-                      className="text-gray-300 hover:text-secondary-300 transition-colors flex items-center space-x-1"
-                    >
-                      <span>➜</span>
-                      <span>{link.name}</span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
+          <div className="lg:col-span-2">
+            <h3 className="font-display text-2xl text-ivory">Explore</h3>
+            <ul className="mt-6 space-y-2.5 text-sm">
+              {navigation.map((n) => (
+                <li key={n.href}>
+                  <Link to={n.href} className="transition hover:text-gold-200">
+                    {n.name}
+                  </Link>
+                </li>
+              ))}
+              <li>
+                <Link to="/prospectus" className="transition hover:text-gold-200">
+                  Prospectus
+                </Link>
+              </li>
+            </ul>
+          </div>
 
-            {/* Social Links */}
-            <div>
-              <h3 className="text-xl font-bold text-secondary-300 mb-4">Connect With Us</h3>
-              <div className="flex gap-3">
-                {socialLinks.map((social) => (
-                  <motion.a
-                    key={social.name}
-                    href={social.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-primary-800/50 p-2 rounded-lg border border-primary-800/50"
-                    whileHover={{ scale: 1.1 }}
-                    onHoverStart={() => setIsHovered(social.name)}
-                    onHoverEnd={() => setIsHovered(null)}
-                  >
-                    <i className={`${social.icon} text-xl ${isHovered === social.name ? 'text-secondary-400' : 'text-gray-300'}`}></i>
-                  </motion.a>
-                ))}
-              </div>
-            </div>
+          <div className="lg:col-span-2">
+            <h3 className="font-display text-2xl text-ivory">Academics</h3>
+            <ul className="mt-6 space-y-3 text-sm">
+              {stages.map((s) => (
+                <li key={s.key}>
+                  <Link to={s.slug} className="transition hover:text-gold-200">
+                    {s.title}
+                    <span className="block text-xs text-ivory/40">{s.classes}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
 
-            {/* Newsletter - Simplified */}
-            <div>
-              <h3 className="text-xl font-bold text-secondary-300 mb-4">Newsletter</h3>
-              <div className="flex">
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="flex-1 px-3 py-2 rounded-l-lg bg-primary-800/50 border border-primary-700 text-white placeholder-gray-400"
-                />
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-secondary-500 hover:bg-secondary-600 text-white rounded-r-lg transition-colors"
-                >
-                  →
-                </button>
-              </div>
+          <div className="md:col-span-2 lg:col-span-4">
+            <div className="h-56 overflow-hidden rounded-2xl ring-1 ring-white/10">
+              <iframe
+                src={school.mapEmbed}
+                className="h-full w-full grayscale-[60%] invert-[0.88] hue-rotate-180"
+                style={{ border: 0 }}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title={`${school.name} location`}
+                allowFullScreen
+              />
             </div>
+            <a href={school.mapLink} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1.5 text-sm text-gold-300 transition hover:text-gold-200">
+              Get directions <FiArrowUpRight />
+            </a>
           </div>
         </div>
 
-        {/* Bottom Bar - Simplified */}
-        <div className="pt-6 border-t border-primary-800">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-400">
-            <p>&copy; {new Date().getFullYear()} Gurukulam Global School. All rights reserved.</p>
-            <div className="flex gap-4">
-              <Link to="/privacy" className="hover:text-secondary-300 transition-colors">Privacy</Link>
-              <Link to="/terms" className="hover:text-secondary-300 transition-colors">Terms</Link>
-            </div>
+        <div className="mt-14 flex flex-col items-center justify-between gap-6 border-t border-white/10 py-8 text-xs sm:flex-row">
+          <p>
+            &copy; {new Date().getFullYear()} {school.name}, Mathura. All rights reserved.
+          </p>
+          <div className="flex gap-2">
+            {socials.map(({ Icon, href, label }) => (
+              <a
+                key={label}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={label}
+                className="grid h-9 w-9 place-items-center rounded-full border border-white/10 transition hover:border-gold-300 hover:bg-gold-300 hover:text-ink-950"
+              >
+                <Icon />
+              </a>
+            ))}
           </div>
         </div>
       </div>

@@ -1,394 +1,241 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { FaChalkboardTeacher, FaUserTie, FaUsers, FaFileUpload } from 'react-icons/fa';
+import React, { useRef, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FiTrendingUp, FiUsers, FiAward, FiUploadCloud, FiFile, FiX, FiArrowRight, FiLoader } from 'react-icons/fi';
+import SEO from '../components/SEO';
+import PageHero from '../components/PageHero';
+import { Reveal, SectionHeading } from '../components/ui';
 import { submitCareerApplication, type CareerFormData } from '../services/careerService';
+import { careerReasons } from '../data/site';
+
+const empty: CareerFormData = {
+  position: '',
+  department: '',
+  firstName: '',
+  lastName: '',
+  email: '',
+  phone: '',
+  experience: '',
+  education: '',
+  resume: null,
+  coverLetter: '',
+};
+
+const reasonIcons = [FiTrendingUp, FiUsers, FiAward];
+const MAX_RESUME_BYTES = 10 * 1024 * 1024;
 
 const Careers: React.FC = () => {
-  const [formData, setFormData] = useState<CareerFormData>({
-    position: '',
-    department: '',
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    experience: '',
-    education: '',
-    resume: null,
-    coverLetter: ''
-  });
+  const [form, setForm] = useState<CareerFormData>(empty);
+  const [submitting, setSubmitting] = useState(false);
+  const [status, setStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [dragging, setDragging] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+  const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
+    setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+  const setResume = (file?: File) => {
+    if (!file) return;
+    if (file.size > MAX_RESUME_BYTES) {
+      setStatus({ type: 'error', message: 'Resume must be 10MB or smaller.' });
+      return;
+    }
+    setStatus(null);
+    setForm((p) => ({ ...p, resume: file }));
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files?.[0]) return;
-    setFormData(prev => ({
-      ...prev,
-      resume: e.target.files![0]
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    setSubmitStatus(null);
-
+    if (!form.resume) {
+      setStatus({ type: 'error', message: 'Please attach your resume.' });
+      return;
+    }
+    setSubmitting(true);
+    setStatus(null);
     try {
-      await submitCareerApplication(formData);
-      setSubmitStatus({
-        type: 'success',
-        message: 'Application submitted successfully! We will review your application and get back to you soon.'
-      });
-      setFormData({
-        position: '',
-        department: '',
-        firstName: '',
-        lastName: '',
-        email: '',
-        phone: '',
-        experience: '',
-        education: '',
-        resume: null,
-        coverLetter: ''
-      });
-    } catch (error) {
-      setSubmitStatus({
-        type: 'error',
-        message: 'Failed to submit application. Please try again later.'
-      });
+      await submitCareerApplication(form);
+      setStatus({ type: 'success', message: 'Application submitted successfully! We will review your application and get back to you soon.' });
+      setForm(empty);
+      if (fileRef.current) fileRef.current.value = '';
+    } catch {
+      setStatus({ type: 'error', message: 'Failed to submit application. Please try again later.' });
     } finally {
-      setIsSubmitting(false);
+      setSubmitting(false);
     }
   };
 
+  const text = (name: keyof CareerFormData, label: string, type = 'text', extra: React.InputHTMLAttributes<HTMLInputElement> = {}) => (
+    <div>
+      <label htmlFor={`car-${name}`} className="field-label">
+        {label}
+      </label>
+      <input id={`car-${name}`} name={name} type={type} required value={(form[name] as string) ?? ''} onChange={onChange} className="field" {...extra} />
+    </div>
+  );
+
   return (
-    <div className="bg-primary-900 min-h-screen">
-      {/* Hero Section with Parallax Effect */}
-      <motion.section
-        className="relative min-h-[80vh] flex items-center justify-center overflow-hidden"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1 }}
+    <>
+      <SEO title="Careers" description="Teach at Gurukulam Global School, Mathura. Join a growing institution that values growth, innovation and excellence in education." />
+      <PageHero
+        eyebrow="Careers at GGS"
+        title={
+          <>
+            Join our <em className="gold-text">team</em>
+          </>
+        }
+        lede="Shape the future of education with us."
+        crumbs={[{ name: 'Careers' }]}
       >
-        {/* Animated Background with Enhanced Particles */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900">
-          {[...Array(50)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-2 h-2 bg-gradient-to-r from-secondary-500 to-primary-500 rounded-full"
-              style={{
-                top: `${Math.random() * 100}%`,
-                left: `${Math.random() * 100}%`,
-                filter: "blur(1px)",
-              }}
-              animate={{
-                y: [0, -30, 0],
-                x: [0, 30, 0],
-                scale: [1, 1.5, 1],
-                opacity: [0.2, 0.5, 0.2],
-              }}
-              transition={{
-                duration: 3 + Math.random() * 2,
-                repeat: Infinity,
-                delay: Math.random() * 2,
-              }}
-            />
-          ))}
-        </div>
+        <a href="#apply" className="btn-gold">
+          Apply Now
+        </a>
+      </PageHero>
 
-        {/* Hero Content */}
-        <div className="container mx-auto px-4 relative z-10 text-center">
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.8 }}
-            className="mb-8"
-          >
-            <motion.h1
-              className="text-6xl md:text-8xl font-bold text-white mb-6 relative inline-block"
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.2 }}
-            >
-              Join Our{" "}
-              <span className="text-secondary-500 relative">
-                Team
-                <motion.div
-                  className="absolute -bottom-2 left-0 w-full h-1 bg-secondary-500"
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ delay: 0.5, duration: 0.8 }}
-                />
-              </span>
-            </motion.h1>
-            <motion.p
-              className="text-2xl md:text-3xl text-white/80 max-w-3xl mx-auto font-light"
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.4 }}
-            >
-              Shape the future of education with us
-            </motion.p>
-          </motion.div>
-        </div>
-      </motion.section>
-
-      {/* Why Join Us Section */}
-      <section className="py-20 relative z-10">
-        <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Why Join GGS?</h2>
-            <p className="text-xl text-white/80">
-              Be part of an institution that values growth, innovation, and excellence in education
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="bg-primary-800/50 p-8 rounded-xl backdrop-blur-sm border border-white/10"
-            >
-              <div className="text-secondary-500 text-4xl mb-4">
-                <FaChalkboardTeacher />
-              </div>
-              <h3 className="text-2xl font-semibold text-white mb-4">Professional Growth</h3>
-              <p className="text-white/70">
-                Regular training programs and workshops for continuous professional development. Stay ahead with modern teaching methodologies.
-              </p>
-            </motion.div>
-
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="bg-primary-800/50 p-8 rounded-xl backdrop-blur-sm border border-white/10"
-            >
-              <div className="text-secondary-500 text-4xl mb-4">
-                <FaUserTie />
-              </div>
-              <h3 className="text-2xl font-semibold text-white mb-4">Work Culture</h3>
-              <p className="text-white/70">
-                Join a collaborative environment that fosters innovation, creativity, and personal growth. Be part of a supportive community.
-              </p>
-            </motion.div>
-
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="bg-primary-800/50 p-8 rounded-xl backdrop-blur-sm border border-white/10"
-            >
-              <div className="text-secondary-500 text-4xl mb-4">
-                <FaUsers />
-              </div>
-              <h3 className="text-2xl font-semibold text-white mb-4">Benefits</h3>
-              <p className="text-white/70">
-                Enjoy competitive compensation, and opportunities for career advancement in a growing institution.
-              </p>
-            </motion.div>
+      <section className="grain bg-ivory py-24 sm:py-28">
+        <div className="container">
+          <SectionHeading eyebrow="Why Join GGS?" title="A place to grow as an educator" lede="Be part of an institution that values growth, innovation, and excellence in education." />
+          <div className="mt-14 grid gap-5 md:grid-cols-3">
+            {careerReasons.map((r, i) => {
+              const Icon = reasonIcons[i];
+              return (
+                <Reveal key={r.title} delay={i * 0.08}>
+                  <div className="h-full rounded-3xl bg-white p-9 ring-1 ring-ink-900/[0.06]">
+                    <span className="grid h-12 w-12 place-items-center rounded-2xl bg-ink-900 text-xl text-gold-300">
+                      <Icon />
+                    </span>
+                    <h3 className="mt-6 font-display text-3xl">{r.title}</h3>
+                    <p className="mt-3 leading-relaxed text-ink-700/75">{r.description}</p>
+                  </div>
+                </Reveal>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* Application Form Section */}
-      <section className="py-20 relative z-10">
-        <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="max-w-4xl mx-auto"
-          >
-            <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold text-white mb-4">Apply Now</h2>
-              <p className="text-xl text-white/80">
-                Take the first step towards an enriching career in education
-              </p>
-            </div>
-
-            <form onSubmit={handleSubmit} className="bg-primary-800/50 p-8 rounded-xl backdrop-blur-sm border border-white/10">
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+      <section id="apply" className="scroll-mt-24 bg-ivory-100 py-24 sm:py-28">
+        <div className="container max-w-4xl">
+          <SectionHeading eyebrow="Apply Now" title="Start your application" lede="Take the first step towards an enriching career in education." />
+          <Reveal delay={0.1}>
+            <form onSubmit={onSubmit} className="mt-12 rounded-3xl bg-ivory p-7 shadow-lift ring-1 ring-ink-900/5 sm:p-10">
+              <div className="grid gap-5 sm:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-medium text-white mb-2">Position</label>
-                  <select
-                    name="position"
-                    value={formData.position}
-                    onChange={handleInputChange}
-                    className="w-full bg-primary-700/50 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-secondary-500"
-                    required
-                  >
+                  <label htmlFor="car-position" className="field-label">
+                    Position
+                  </label>
+                  <select id="car-position" name="position" value={form.position} onChange={onChange} required className="field">
                     <option value="">Select Position</option>
                     <option value="Teacher">Teacher</option>
                     <option value="Administrative Staff">Administrative Staff</option>
                     <option value="Support Staff">Support Staff</option>
                   </select>
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">Department</label>
-                  <input
-                    type="text"
-                    name="department"
-                    value={formData.department}
-                    onChange={handleInputChange}
-                    className="w-full bg-primary-700/50 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-secondary-500"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">First Name</label>
-                  <input
-                    type="text"
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleInputChange}
-                    className="w-full bg-primary-700/50 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-secondary-500"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">Last Name</label>
-                  <input
-                    type="text"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleInputChange}
-                    className="w-full bg-primary-700/50 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-secondary-500"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">Email</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className="w-full bg-primary-700/50 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-secondary-500"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">Phone</label>
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleInputChange}
-                    className="w-full bg-primary-700/50 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-secondary-500"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">Years of Experience</label>
-                  <input
-                    type="number"
-                    name="experience"
-                    value={formData.experience}
-                    onChange={handleInputChange}
-                    className="w-full bg-primary-700/50 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-secondary-500"
-                    required
-                    min="0"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">Education</label>
-                  <input
-                    type="text"
-                    name="education"
-                    value={formData.education}
-                    onChange={handleInputChange}
-                    className="w-full bg-primary-700/50 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-secondary-500"
-                    required
-                  />
-                </div>
+                {text('department', 'Department')}
+                {text('firstName', 'First Name', 'text', { autoComplete: 'given-name' })}
+                {text('lastName', 'Last Name', 'text', { autoComplete: 'family-name' })}
+                {text('email', 'Email', 'email', { autoComplete: 'email' })}
+                {text('phone', 'Phone', 'tel', { autoComplete: 'tel' })}
+                {text('experience', 'Years of Experience', 'number', { min: 0 })}
+                {text('education', 'Education')}
               </div>
 
-              <div className="mt-6">
-                <label className="block text-sm font-medium text-white mb-2">Resume</label>
-                <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-white/10 border-dashed rounded-lg hover:border-secondary-500/50 transition-colors">
-                  <div className="space-y-1 text-center">
-                    <FaFileUpload className="mx-auto h-12 w-12 text-white/50" />
-                    <div className="flex text-sm text-white/70">
-                      <label
-                        htmlFor="resume-upload"
-                        className="relative cursor-pointer rounded-md font-medium text-secondary-500 hover:text-secondary-400"
+              <div className="mt-5">
+                <span className="field-label">Resume</span>
+                <div
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setDragging(true);
+                  }}
+                  onDragLeave={() => setDragging(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setDragging(false);
+                    setResume(e.dataTransfer.files?.[0]);
+                  }}
+                  className={`relative rounded-2xl border-2 border-dashed p-8 text-center transition ${
+                    dragging ? 'border-gold-500 bg-gold-50' : 'border-ink-900/15 hover:border-gold-500/60'
+                  }`}
+                >
+                  {form.resume ? (
+                    <div className="flex items-center justify-center gap-3 text-ink-800">
+                      <FiFile className="text-2xl text-gold-600" />
+                      <span className="max-w-[16rem] truncate font-medium">{form.resume.name}</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setForm((p) => ({ ...p, resume: null }));
+                          if (fileRef.current) fileRef.current.value = '';
+                        }}
+                        className="grid h-8 w-8 place-items-center rounded-full bg-ink-900/5 hover:bg-maroon/10 hover:text-maroon"
+                        aria-label="Remove file"
                       >
-                        <span>Upload a file</span>
-                        <input
-                          id="resume-upload"
-                          type="file"
-                          className="sr-only"
-                          onChange={handleFileUpload}
-                          accept=".pdf,.doc,.docx"
-                          required
-                        />
-                      </label>
-                      <p className="pl-1">or drag and drop</p>
+                        <FiX />
+                      </button>
                     </div>
-                    <p className="text-xs text-white/50">PDF, DOC up to 10MB</p>
-                  </div>
+                  ) : (
+                    <>
+                      <FiUploadCloud className="mx-auto text-4xl text-gold-600" />
+                      <p className="mt-3 text-sm text-ink-700">
+                        <label htmlFor="resume-upload" className="cursor-pointer font-semibold text-ink-900 underline decoration-gold-500 underline-offset-4">
+                          Upload a file
+                        </label>{' '}
+                        or drag and drop
+                      </p>
+                      <p className="mt-1 text-xs text-ink-500">PDF, DOC up to 10MB</p>
+                    </>
+                  )}
+                  <input id="resume-upload" ref={fileRef} type="file" accept=".pdf,.doc,.docx" className="sr-only" onChange={(e) => setResume(e.target.files?.[0])} />
                 </div>
               </div>
 
-              <div className="mt-6">
-                <label className="block text-sm font-medium text-white mb-2">Cover Letter</label>
+              <div className="mt-5">
+                <label htmlFor="car-cover" className="field-label">
+                  Cover Letter
+                </label>
                 <textarea
+                  id="car-cover"
                   name="coverLetter"
-                  value={formData.coverLetter}
-                  onChange={handleInputChange}
-                  rows={4}
-                  className="w-full bg-primary-700/50 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-secondary-500"
+                  rows={5}
                   required
+                  value={form.coverLetter}
+                  onChange={onChange}
                   placeholder="Tell us why you would be a great fit for this position..."
+                  className="field resize-none"
                 />
               </div>
 
-              {submitStatus && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className={`mt-6 p-4 rounded-lg ${
-                    submitStatus.type === 'success'
-                      ? 'bg-green-500/20 text-green-200 border border-green-500/30'
-                      : 'bg-red-500/20 text-red-200 border border-red-500/30'
-                  }`}
-                >
-                  {submitStatus.message}
-                </motion.div>
-              )}
+              <AnimatePresence>
+                {status && (
+                  <motion.p
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    className={`mt-5 rounded-xl px-4 py-3 text-sm ${
+                      status.type === 'success' ? 'bg-emerald-50 text-emerald-800 ring-1 ring-emerald-600/20' : 'bg-maroon/5 text-maroon ring-1 ring-maroon/20'
+                    }`}
+                  >
+                    {status.message}
+                  </motion.p>
+                )}
+              </AnimatePresence>
 
               <div className="mt-8 flex justify-end">
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className={`px-8 py-3 bg-secondary-500 text-white rounded-lg font-medium hover:bg-secondary-400 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2 focus:ring-offset-primary-900 transition-colors
-                    ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
-                >
-                  {isSubmitting ? 'Submitting...' : 'Submit Application'}
+                <button type="submit" disabled={submitting} className="btn-ink group">
+                  {submitting ? (
+                    <>
+                      <FiLoader className="animate-spin" /> Submitting…
+                    </>
+                  ) : (
+                    <>
+                      Submit Application <FiArrowRight className="transition group-hover:translate-x-1" />
+                    </>
+                  )}
                 </button>
               </div>
             </form>
-          </motion.div>
+          </Reveal>
         </div>
       </section>
-    </div>
+    </>
   );
 };
 

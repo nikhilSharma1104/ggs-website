@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Calendar from 'react-calendar';
 import type { Value } from 'react-calendar/dist/cjs/shared/types';
 import { fetchEventsFromSheet } from '../services/googleSheets';
+import { upcomingEvents } from '../data/site';
 import 'react-calendar/dist/Calendar.css';
 import './CalendarModal.css';
 
@@ -18,6 +19,10 @@ interface Event {
 }
 
 const REFRESH_INTERVAL = 60000; // Refresh every minute
+
+// Used when the Google Sheet isn't configured or can't be reached.
+const fallbackEvents = (): Event[] =>
+  upcomingEvents().map((e) => ({ date: e.date.toISOString(), title: e.title, description: e.description }));
 
 const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose }) => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -36,7 +41,13 @@ const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose }) => {
       }
       setError(null);
       
-      const fetchedEvents = await fetchEventsFromSheet();
+      let fetchedEvents: Event[];
+      try {
+        fetchedEvents = await fetchEventsFromSheet();
+      } catch (sheetErr) {
+        console.warn('Calendar sheet unavailable, using school calendar:', sheetErr);
+        fetchedEvents = fallbackEvents();
+      }
       setEvents(fetchedEvents);
       setLastUpdated(new Date());
 
@@ -135,7 +146,7 @@ const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose }) => {
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+          className="fixed inset-0 bg-ink-950/70 backdrop-blur-sm flex items-center justify-center p-4 z-[150]"
           onClick={onClose}
         >
           <motion.div
@@ -150,7 +161,7 @@ const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose }) => {
                 <motion.h2
                   initial={{ x: -20, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
-                  className="text-2xl font-bold text-gray-900"
+                  className="font-display text-3xl text-ink-900"
                 >
                   School Calendar
                 </motion.h2>

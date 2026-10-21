@@ -10,9 +10,9 @@ interface SEOProps {
   type?: string;
 }
 
-const defaultDescription = "Gurukulam Global School - A premier educational institution in India offering holistic education with modern facilities and traditional values.";
-const defaultKeywords = "Gurukulam Global School, education, CBSE, school in India, holistic education, academic excellence";
-const defaultImage = "/logo.png"; // Update with your actual logo path
+const defaultDescription = "Gurukulam Global School, Mathura - a premier school offering holistic, NEP 2020-aligned education from Playgroup to Grade 8, with modern facilities and traditional values.";
+const defaultKeywords = "Gurukulam Global School, best school in Mathura, school in Krishna Nagar Mathura, Vrindavan school, admissions, holistic education, academic excellence";
+const defaultImage = "https://www.gurukulamglobalschool.in/logo.png";
 const defaultUrl = "https://www.gurukulamglobalschool.in";
 
 export const SEO: React.FC<SEOProps> = ({
@@ -34,7 +34,6 @@ export const SEO: React.FC<SEOProps> = ({
       <meta name="description" content={description} />
       <meta name="keywords" content={keywords} />
       <meta name="robots" content="index, follow" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="canonical" href={url} />
 
       {/* Open Graph Meta Tags */}
@@ -62,21 +61,21 @@ export const SEO: React.FC<SEOProps> = ({
           "logo": defaultImage,
           "sameAs": [
             "https://www.facebook.com/gurukulamglobalschool",
-            "https://www.instagram.com/gurukulamglobalschool",
-            // Add other social media links
+            "https://www.instagram.com/gurukulamglobalschool"
           ],
           "address": {
             "@type": "PostalAddress",
-            "streetAddress": "Your School Address",
-            "addressLocality": "Your City",
-            "addressRegion": "Your State",
-            "postalCode": "Your Postal Code",
+            "streetAddress": "136, Madhuvan Enclave, Near Natraj Murti, Krishna Nagar",
+            "addressLocality": "Mathura",
+            "addressRegion": "Uttar Pradesh",
+            "postalCode": "281003",
             "addressCountry": "IN"
           },
           "contactPoint": {
             "@type": "ContactPoint",
-            "telephone": "Your-Phone-Number",
-            "contactType": "customer service"
+            "telephone": "+917617645050",
+            "email": "gurukulamglobalschool@gmail.com",
+            "contactType": "admissions"
           }
         })}
       </script>

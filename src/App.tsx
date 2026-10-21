@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
+import { HelmetProvider } from 'react-helmet-async';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -16,75 +17,113 @@ import PreparatoryStage from './pages/PreparatoryStage';
 import MiddleStage from './pages/MiddleStage';
 import Prospectus from './pages/Prospectus';
 import Careers from './pages/Careers';
+import NotFound from './pages/NotFound';
 import AdmissionPopup from './components/AdmissionPopup';
-import WhatsAppWidget from './components/WhatsAppWidget';
-import { HelmetProvider } from 'react-helmet-async';
+import IntroCurtain from './components/IntroCurtain';
+import { AdmissionContext } from './components/AdmissionContext';
+import { FloatingActions, ScrollProgress } from './components/widgets';
 
-const PageTransition: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const POPUP_KEY = 'ggs-admission-popup-dismissed';
+
+const PageTransition: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <motion.div
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+    transition={{ duration: 0.35, ease: 'easeOut' }}
+  >
+    {children}
+  </motion.div>
+);
+
+const AnimatedRoutes: React.FC = () => {
   const location = useLocation();
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
+  const page = (el: React.ReactNode) => <PageTransition>{el}</PageTransition>;
+
   return (
-    <motion.div
-      key={location.pathname}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.3 }}
-    >
-      {children}
-    </motion.div>
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={page(<Home />)} />
+        <Route path="/about" element={page(<About />)} />
+        <Route path="/academics" element={page(<Academics />)} />
+        <Route path="/academics/foundational-stage" element={page(<FoundationalStage />)} />
+        <Route path="/academics/preparatory-stage" element={page(<PreparatoryStage />)} />
+        <Route path="/academics/middle-stage" element={page(<MiddleStage />)} />
+        <Route path="/admissions" element={page(<Admissions />)} />
+        <Route path="/campus-life" element={page(<CampusLife />)} />
+        <Route path="/events" element={page(<Events />)} />
+        <Route path="/gallery" element={page(<Gallery />)} />
+        <Route path="/contact" element={page(<Contact />)} />
+        <Route path="/prospectus" element={page(<Prospectus />)} />
+        <Route path="/careers" element={page(<Careers />)} />
+        <Route path="*" element={page(<NotFound />)} />
+      </Routes>
+    </AnimatePresence>
+  );
+};
+
+const Shell: React.FC = () => {
+  const location = useLocation();
+  const [popupOpen, setPopupOpen] = useState(false);
+  const [introDone, setIntroDone] = useState(false);
+  const pathRef = useRef(location.pathname);
+  pathRef.current = location.pathname;
+
+  const openAdmission = useCallback(() => setPopupOpen(true), []);
+  const closeAdmission = useCallback(() => {
+    setPopupOpen(false);
+    try {
+      sessionStorage.setItem(POPUP_KEY, '1');
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  // Auto-invite once per session, a few seconds after the intro finishes.
+  useEffect(() => {
+    if (!introDone) return;
+    let dismissed = false;
+    try {
+      dismissed = sessionStorage.getItem(POPUP_KEY) === '1';
+    } catch {
+      /* ignore */
+    }
+    if (dismissed) return;
+    const t = setTimeout(() => {
+      if (pathRef.current !== '/admissions') setPopupOpen(true);
+    }, 4000);
+    return () => clearTimeout(t);
+  }, [introDone]);
+
+  const ctx = useMemo(() => ({ openAdmission }), [openAdmission]);
+
+  return (
+    <AdmissionContext.Provider value={ctx}>
+      <IntroCurtain onDone={() => setIntroDone(true)} />
+      <ScrollProgress />
+      <div className="flex min-h-screen flex-col">
+        <Navbar onApply={openAdmission} />
+        <main className="flex-grow">
+          <AnimatedRoutes />
+        </main>
+        <Footer />
+      </div>
+      <FloatingActions onAdmissions={openAdmission} />
+      <AdmissionPopup isOpen={popupOpen} onClose={closeAdmission} />
+    </AdmissionContext.Provider>
   );
 };
 
 function App() {
-  const [showAdmissionPopup, setShowAdmissionPopup] = useState(false);
-
-  useEffect(() => {
-    // Show popup after 3 seconds
-    const timer = setTimeout(() => {
-      setShowAdmissionPopup(true);
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
   return (
     <HelmetProvider>
       <Router>
-        <div className="flex flex-col min-h-screen">
-          <Navbar />
-          <main className="flex-grow">
-            <AnimatePresence mode="wait">
-              <Routes>
-                <Route path="/" element={<PageTransition><Home /></PageTransition>} />
-                <Route path="/about" element={<PageTransition><About /></PageTransition>} />
-                <Route path="/academics" element={<PageTransition><Academics /></PageTransition>} />
-                <Route path="/academics/foundational-stage" element={<PageTransition><FoundationalStage /></PageTransition>} />
-                <Route path="/academics/preparatory-stage" element={<PageTransition><PreparatoryStage /></PageTransition>} />
-                <Route path="/academics/middle-stage" element={<PageTransition><MiddleStage /></PageTransition>} />
-                <Route path="/admissions" element={<PageTransition><Admissions /></PageTransition>} />
-                <Route path="/campus-life" element={<PageTransition><CampusLife /></PageTransition>} />
-                <Route path="/events" element={<PageTransition><Events /></PageTransition>} />
-                <Route path="/gallery" element={<PageTransition><Gallery /></PageTransition>} />
-                <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
-                <Route path="/prospectus" element={<PageTransition><Prospectus /></PageTransition>} />
-                <Route path="/careers" element={<PageTransition><Careers /></PageTransition>} />
-              </Routes>
-            </AnimatePresence>
-          </main>
-          <Footer />
-          <WhatsAppWidget phoneNumber="+917617645050" />
-          {showAdmissionPopup && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="relative bg-white rounded-xl shadow-2xl max-w-md w-full mx-4">
-                <AdmissionPopup 
-                  isOpen={showAdmissionPopup}
-                  onClose={() => setShowAdmissionPopup(false)} 
-                />
-              </div>
-            </div>
-          )}
-        </div>
+        <Shell />
       </Router>
     </HelmetProvider>
   );

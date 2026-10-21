@@ -27,7 +27,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  background: linear-gradient(135deg, #122445 0%, #0B1A33 100%);
   padding: 1rem;
   border-radius: 12px;
 }
@@ -49,7 +49,7 @@
   left: 50%;
   width: 0;
   height: 2px;
-  background: #60a5fa;
+  background: #D2AA48;
   transition: all 0.3s ease;
   transform: translateX(-50%);
 }
@@ -115,7 +115,7 @@
 }
 
 .calendar-custom .react-calendar__tile--active {
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
+  background: linear-gradient(135deg, #122445 0%, #0B1A33 100%) !important;
   color: #ffffff !important;
   font-weight: 600;
   transform: scale(1.05);
