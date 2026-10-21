@@ -120,17 +120,20 @@ const Shell: React.FC = () => {
   const openJourney = useCallback(() => setJourneyOpen(true), []);
   const closeJourney = useCallback(() => {
     setJourneyOpen(false);
-    setFlag('local', JOURNEY_KEY);
+    setFlag('session', JOURNEY_KEY);
     // the journey ends on its own admissions call-to-action
     setFlag('session', POPUP_KEY);
   }, []);
   const openAssistant = useCallback(() => setAssistantOpen(true), []);
 
-  // First visit to the home page opens with the Gurukul Journey game;
+  // Opening the website starts the Gurukul Journey game;
   // otherwise invite to admissions once per session.
   useEffect(() => {
     if (!introDone || isAutomated()) return;
-    if (!readFlag('local', JOURNEY_KEY) && pathRef.current === '/') {
+    // Every new visit to the home page opens with the journey (once per browser
+    // session); ?journey forces it, e.g. for sharing or testing.
+    const forced = new URLSearchParams(window.location.search).has('journey');
+    if (forced || (!readFlag('session', JOURNEY_KEY) && pathRef.current === '/')) {
       journeyShownRef.current = true;
       setJourneyOpen(true);
       return;
